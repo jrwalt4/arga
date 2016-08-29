@@ -1,0 +1,40 @@
+{
+  "name": "arga",
+  "version": "0.0.0",
+  "description": "ADO.NET DataSet implementation for javascript",
+  "main": "build/arga.js",
+  "config": {
+    "main":"buid/arga.js",
+    "min": "build/arga.min.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://www.github.com/jrwalt4/arga.git"
+  },
+  "directories": {
+    "lib": "src"
+  },
+  "scripts": {
+    "my-build":"gulp",
+    "test": "jasmine"
+  },
+  "keywords": [
+    "dataset"
+  ],
+  "author": "jrwalt4",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-beautify": "^2.0.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-iife": "^0.3.0",
+    "gulp-merge": "^0.1.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-tsc": "^1.2.0",
+    "gulp-typescript": "^2.13.6",
+    "gulp-uglify": "^2.0.0",
+    "gulp-wrap": "^0.13.0",
+    "jasmine": "^2.4.1",
+    "merge-stream": "^1.0.0"
+  }
+}

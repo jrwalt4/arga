@@ -1,0 +1,20 @@
+{
+    "exclude": [
+        "archive",
+        "node_modules",
+        "build",
+        "dist",
+        "test",
+        "spec",
+        ".vscode",
+        ".git",
+        "gulpfile.js"
+    ],
+    "compilerOptions": {
+        "allowJs": true,
+        "outDir": "build",
+        "outFile": "build/arga.ts.js",
+        "noEmitOnError": true,
+        "noLib": false
+    }
+}
