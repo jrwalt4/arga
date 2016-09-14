@@ -1,0 +1,2 @@
+// IDataSchema.ts
+"use strict";

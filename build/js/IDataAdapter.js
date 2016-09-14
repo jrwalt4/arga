@@ -1,0 +1,2 @@
+// IDataAdapter.js
+"use strict";

@@ -1,7 +1,10 @@
 // DataRow.js
 
-namespace arga {
-	export class DataRow {
+import DataTable = require('./DataTable')
+import DataRowState = require('./DataRowState')
+import DataRowVersion = require('./DataRowVersion')
+
+class DataRow {
 		private _table: DataTable
 		private _original: Object
 		private _current: Object
@@ -123,4 +126,4 @@ namespace arga {
 			this._current = Object.create(this._original);
 		}
 	}
-}
+export = DataRow

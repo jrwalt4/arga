@@ -5,3 +5,5 @@ enum DataColumnConstraint {
     UNIQUE,
     INDEX
 }
+
+export = DataColumnConstraint

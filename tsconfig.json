@@ -3,18 +3,21 @@
         "archive",
         "node_modules",
         "build",
-        "dist",
-        "test",
+        "lib",
         "spec",
         ".vscode",
         ".git",
         "gulpfile.js"
     ],
     "compilerOptions": {
-        "allowJs": true,
-        "outDir": "build",
-        "outFile": "build/arga.ts.js",
-        "noEmitOnError": true,
+        "module": "commonjs",
+        "target":"es5",
+        //"allowJs": true,
+        "declaration": true,
+        //"declarationDir": "build/dts",
+        "outDir": "build/js",
+        //"outFile": "build/arga.ts.js",
+        //"noEmitOnError": true,
         "noLib": false
     }
 }

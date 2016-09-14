@@ -4,7 +4,7 @@
   "description": "ADO.NET DataSet implementation for javascript",
   "main": "build/arga.js",
   "config": {
-    "main":"buid/arga.js",
+    "main": "buid/arga.js",
     "min": "build/arga.min.js"
   },
   "repository": {
@@ -15,11 +15,18 @@
     "lib": "src"
   },
   "scripts": {
-    "my-build":"gulp",
-    "test": "jasmine"
+    "bld": "gulp build",
+    "test": "gulp test"
   },
   "keywords": [
-    "dataset"
+    "dataset",
+    "synchronous",
+    "datatable",
+    "database",
+    "index",
+    "dataadapter",
+    "indexedDB",
+    "ADO.NET"
   ],
   "author": "jrwalt4",
   "license": "MIT",
@@ -28,6 +35,7 @@
     "gulp-beautify": "^2.0.0",
     "gulp-concat": "^2.6.0",
     "gulp-iife": "^0.3.0",
+    "gulp-jasmine": "^2.4.1",
     "gulp-merge": "^0.1.1",
     "gulp-rename": "^1.2.2",
     "gulp-tsc": "^1.2.0",

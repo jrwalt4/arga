@@ -1,0 +1,28 @@
+import DataTable = require('./DataTable');
+import DataRowState = require('./DataRowState');
+import DataRowVersion = require('./DataRowVersion');
+declare class DataRow {
+    private _table;
+    private _original;
+    private _current;
+    private _proposed;
+    constructor();
+    /**
+     * pass 'null' to set the table to 'undefined'
+     */
+    table(): DataTable;
+    table(oDataTable: DataTable): this;
+    rowState(): DataRowState;
+    isEditing(): boolean;
+    get(): any;
+    set(): any;
+    del(): any;
+    has(): boolean;
+    item(column: string, newValue?: any, version?: DataRowVersion): any;
+    private _getItem(column, version);
+    private _setItem(column, newValue, version);
+    private _getVersion(version);
+    acceptChanges(): void;
+    rejectChanges(): void;
+}
+export = DataRow;

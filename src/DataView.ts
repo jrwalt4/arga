@@ -1,7 +1,7 @@
 // DataView.js
 
-namespace arga {
-    export class DataView {
-        
-    }
+class DataView {
+
 }
+
+export = DataView

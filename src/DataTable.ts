@@ -1,20 +1,25 @@
 // DataTable.ts
-namespace arga {
-	
-	let dt_counter: number = 0;
 
-	export class DataTable implements IDataSchema {
+import DataColumn = require('./DataColumn')
+import DataRow = require('./DataRow')
+import DataRowCollection = require('./DataRowCollection')
+import IDataSchema = require('./IDataSchema')
+import {createKeyComparer} from './Util'
+
+let dt_counter: number = 0;
+
+class DataTable implements IDataSchema {
 		private _name: string;
-		private _rows: DataRow[];
+		private _rows: DataRowCollection;
 		private _columns: DataColumn[];
 		private _keyPath: string;
 		private _keyComparer: (keyA: string, keyB: string) => number;
 		constructor(sName?: string, sKeyPath?: string) {
 			this._name = sName || "Table" + dt_counter++;
-			this._rows = [];
+			this._rows = new DataRowCollection();
 			this._columns = [];
 			this._keyPath = sKeyPath;
-			this._keyComparer = util.createKeyComparer(sKeyPath);
+			this._keyComparer = createKeyComparer(sKeyPath);
 		}
 		name(): string;
 		name(sName: string): this;
@@ -25,12 +30,13 @@ namespace arga {
 			}
 			return this._name;
 		}
-		rows(): DataRow[] {
-			return this._rows.slice();
+
+		rows(): DataRowCollection {
+			return this._rows;
 		}
 
 		addRow(oRow: DataRow): this {
-			this._rows.push(oRow);
+			this._rows.add(oRow);
 			oRow.table(this);
 			return this;
 		}
@@ -48,9 +54,9 @@ namespace arga {
 		}
 
 		acceptChanges() {
-			this._rows.forEach((dr: DataRow) => {
+			this._rows.toArray().forEach((dr: DataRow) => {
 				dr.acceptChanges();
 			})
 		}
 	}
-}
+export = DataTable

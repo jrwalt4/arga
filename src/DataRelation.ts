@@ -1,7 +1,9 @@
 // DataRelation.ts
 
-module arga {
-    export class DataRelation {
+import DataColumn = require('./DataColumn')
+import DataRow = require('./DataRow')
+
+class DataRelation {
 
         constructor(
             private _parent: DataColumn,
@@ -16,4 +18,4 @@ module arga {
             return new DataRow;
         }
     }
-}
+export = DataRelation
