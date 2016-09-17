@@ -1,0 +1,10 @@
+"use strict";
+exports.DataSet = require('./core/DataSet');
+exports.DataTable = require('./core/DataTable');
+exports.DataView = require('./core/DataView');
+exports.DataRow = require('./core/DataRow');
+exports.DataRowVersion = require('./core/DataRowVersion');
+exports.DataRowState = require('./core/DataRowState');
+exports.DataColumn = require('./core/DataColumn');
+exports.DataColumnConstraint = require('./core/DataColumnConstraint');
+exports.DataColumnCollection = require('./core/DataColumnCollection');

@@ -7,7 +7,8 @@
         "spec",
         ".vscode",
         ".git",
-        "gulpfile.js"
+        "gulpfile.js",
+        "src/not_used"
     ],
     "compilerOptions": {
         "module": "commonjs",
@@ -15,7 +16,7 @@
         //"allowJs": true,
         "declaration": true,
         //"declarationDir": "build/dts",
-        "outDir": "build/js",
+        "outDir": "build",
         //"outFile": "build/arga.ts.js",
         //"noEmitOnError": true,
         "noLib": false
