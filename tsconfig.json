@@ -12,13 +12,15 @@
     ],
     "compilerOptions": {
         "module": "commonjs",
-        "target":"es5",
+        "target":"es3",
         //"allowJs": true,
         "declaration": true,
         //"declarationDir": "build/dts",
         "outDir": "build",
         //"outFile": "build/arga.ts.js",
-        //"noEmitOnError": true,
+        "noEmitOnError": true,
+        "sourceMap": true,
+        //"listFiles": true,
         "noLib": false
     }
 }

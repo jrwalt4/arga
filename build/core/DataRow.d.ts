@@ -6,14 +6,18 @@ declare class DataRow {
     private _original;
     private _current;
     private _proposed;
-    constructor();
+    constructor(dataTable: DataTable);
+    private _createCurrent();
     /**
      * pass 'null' to set the table to 'undefined'
      */
     table(): DataTable;
     table(oDataTable: DataTable): this;
     rowState(): DataRowState;
+    beginEdit(): void;
     isEditing(): boolean;
+    private _createProposed();
+    endEdit(): void;
     get(): any;
     set(): any;
     del(): any;
@@ -24,5 +28,7 @@ declare class DataRow {
     private _getVersion(version);
     acceptChanges(): void;
     rejectChanges(): void;
+    dispatchRowChange(): void;
+    dispatchBeforeRowChange(): void;
 }
 export = DataRow;

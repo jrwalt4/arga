@@ -12,20 +12,26 @@ class DataColumn<TKey> {
     private _keyPath: string
     private _constraints: DataColumnConstraint[]
 
-    private _Item:Item<TKey>
+    private _Item: Item<TKey>
 
-    constructor(name: string, keyPath:string) {
+    constructor(table: DataTable, name: string, keyPath?: string) {
+        if (!(table instanceof DataTable)) {
+            throw new Error("cannot construct DataColumn without DataTable")
+        }
         this._name = name;
         this._keyPath = keyPath;
-        this._index = new SortedArray<Item<TKey>>(undefined,util.createContentEquator(keyPath), util.createContentComparer(keyPath));
+        this._index = new SortedArray<Item<TKey>>(undefined, util.createContentEquator(keyPath), util.createContentComparer(keyPath));
     }
 
     private _get(object: Object): any {
-        return object[this._keyPath];
+        return util.resolveKeyPath(this._keyPath, object);
 
     }
 
-    table(): DataTable;
+    table(): DataTable {
+        return this._table;
+    }
+    /*
     table(newTable: DataTable): this;
     table(newTable?: DataTable): any {
         if (newTable !== undefined && newTable instanceof DataTable) {
@@ -34,6 +40,7 @@ class DataColumn<TKey> {
         }
         return this._table;
     }
+    //*/
 
     name(): string
     name(sName: string): this
@@ -47,7 +54,7 @@ class DataColumn<TKey> {
 }
 
 class Item<T> {
-    constructor(public key:T, public index:number){}
+    constructor(public key: T, public index: number) { }
 }
 
 export = DataColumn;

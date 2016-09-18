@@ -1,17 +1,22 @@
 // DataRowCollection.ts
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 //import {Collection} from './Util.Collection'
 var SortedArray = require('collections/sorted-array');
-var DataRowCollection = (function (_super) {
-    __extends(DataRowCollection, _super);
+var DataRowCollection = (function () {
     function DataRowCollection() {
-        _super.call(this, new Array());
+        this._rows = new SortedArray();
     }
+    DataRowCollection.prototype.add = function () {
+        var rows = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            rows[_i - 0] = arguments[_i];
+        }
+        this._rows.addEach(rows);
+    };
+    DataRowCollection.prototype.toArray = function () {
+        return this._rows.toArray();
+    };
     return DataRowCollection;
-}(SortedArray));
+}());
 module.exports = DataRowCollection;
+//# sourceMappingURL=DataRowCollection.js.map

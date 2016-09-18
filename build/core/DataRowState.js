@@ -9,3 +9,4 @@ var DataRowState;
     DataRowState[DataRowState["DELETED"] = 16] = "DELETED";
 })(DataRowState || (DataRowState = {}));
 module.exports = DataRowState;
+//# sourceMappingURL=DataRowState.js.map

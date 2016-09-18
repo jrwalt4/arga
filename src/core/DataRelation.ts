@@ -3,19 +3,15 @@
 import DataColumn = require('./DataColumn')
 import DataRow = require('./DataRow')
 
-class DataRelation {
+abstract class DataRelation {
 
-        constructor(
-            private _parent: DataColumn<any>,
-            private _child: DataColumn<any>,
-            private _operator: Function) { }
+    constructor(
+        private _parent: DataColumn<any>,
+        private _child: DataColumn<any>,
+        private _operator: Function) { }
 
-        getChildRows(oRow: DataRow): DataRow[] {
-            return [new DataRow];
-        }
+    abstract getChildRows(oRow: DataRow): DataRow[]
 
-        getParentRow(oRow: DataRow): DataRow {
-            return new DataRow;
-        }
-    }
+    abstract getParentRow(oRow: DataRow): DataRow
+}
 export = DataRelation

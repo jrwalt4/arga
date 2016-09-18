@@ -2,8 +2,8 @@
 
 import DataColumn = require('./DataColumn')
 
-interface IDataSchema {
+interface DataSchemaBase {
         columns(): DataColumn<any>[];
         keyPath(): string;
     }
-export = IDataSchema
+export = DataSchemaBase

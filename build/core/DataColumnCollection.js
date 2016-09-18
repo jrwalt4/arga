@@ -7,3 +7,4 @@ var DataColumnCollection = (function () {
     return DataColumnCollection;
 }());
 module.exports = DataColumnCollection;
+//# sourceMappingURL=DataColumnCollection.js.map

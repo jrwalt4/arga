@@ -10,9 +10,17 @@ class DataRow {
 		private _current: Object
 		private _proposed: Object
 
-		constructor() {
+		constructor(dataTable:DataTable) {
+			if (!(dataTable instanceof DataTable)) {
+				throw new Error("Cannot construct DataRow without DataTable")
+			}
+			this._table = dataTable;
 			this._original = {};
-			this._current = Object.create(this._original);
+			this._current = this._createCurrent();
+		}
+
+		private _createCurrent():Object {
+			return Object.create(this._original);
 		}
 
 		/**
@@ -37,23 +45,41 @@ class DataRow {
 			 * should probably implement this with biflags,
 			 * but here it is for now
 			 */
-			if (this._current === undefined) {
+			if (this._current === null) {
 				return DataRowState.DELETED;
+			}
+			if (this._current === void 0 || Object.keys(this._current).length == 0) {
+				return DataRowState.UNCHANGED;
 			}
 			if (this.table() === undefined) {
 				return DataRowState.DETACHED;
 			}
-			if (Object.keys(this._current).length == 0) {
-				return DataRowState.UNCHANGED;
-			}
-
-			// currently not implementing 'DataRowState.PROPOSED'
 
 			return DataRowState.MODIFIED;
 		}
 
+		beginEdit():void {
+			if(this.isEditing()) {
+				throw "already editing";
+			}
+			this._proposed = this._createProposed();
+		}
+
 		isEditing(): boolean {
-			return !!this._proposed;
+			return !!this._proposed && Object.keys(this._proposed).length === 0;
+		}
+
+		private _createProposed() {
+			return Object.create(this._current);
+		}
+
+		endEdit():void {
+			this.dispatchBeforeRowChange();
+			var self = this;
+			Object.keys(this._proposed).forEach(function(key){
+				self._current[key] = self._proposed[key];
+			})
+			this.dispatchRowChange();
 		}
 
 		get(): any {
@@ -116,14 +142,23 @@ class DataRow {
 		}
 
 		acceptChanges() {
+			var self = this;
 			Object.keys(this._current).forEach(function (key, i) {
-				this._original[key] = this._current[key];
+				self._original[key] = self._current[key];
 			})
 			this._current = Object.create(this._original);
 		}
 
 		rejectChanges() {
 			this._current = Object.create(this._original);
+		}
+
+		dispatchRowChange() {
+
+		}
+
+		dispatchBeforeRowChange() {
+
 		}
 	}
 export = DataRow

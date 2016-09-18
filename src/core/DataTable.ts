@@ -3,12 +3,12 @@
 import DataColumn = require('./DataColumn')
 import DataRow = require('./DataRow')
 import DataRowCollection = require('./DataRowCollection')
-import IDataSchema = require('./IDataSchema')
+//import IDataSchema = require('./IDataSchema')
 import {createContentComparer} from './Util'
 
 let dt_counter: number = 0;
 
-class DataTable implements IDataSchema {
+class DataTable {
 		private _name: string;
 		private _rows: DataRowCollection;
 		private _columns: DataColumn<any>[];
@@ -41,10 +41,6 @@ class DataTable implements IDataSchema {
 			return this;
 		}
 
-		schema(): IDataSchema {
-			return this;
-		}
-
 		columns(): DataColumn<any>[] {
 			return this._columns;
 		}
@@ -60,3 +56,5 @@ class DataTable implements IDataSchema {
 		}
 	}
 export = DataTable
+
+console.log('loaded DataTable')

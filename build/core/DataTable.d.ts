@@ -1,8 +1,7 @@
 import DataColumn = require('./DataColumn');
 import DataRow = require('./DataRow');
 import DataRowCollection = require('./DataRowCollection');
-import IDataSchema = require('./IDataSchema');
-declare class DataTable implements IDataSchema {
+declare class DataTable {
     private _name;
     private _rows;
     private _columns;
@@ -13,7 +12,6 @@ declare class DataTable implements IDataSchema {
     name(sName: string): this;
     rows(): DataRowCollection;
     addRow(oRow: DataRow): this;
-    schema(): IDataSchema;
     columns(): DataColumn<any>[];
     keyPath(): string;
     acceptChanges(): void;

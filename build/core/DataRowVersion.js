@@ -8,3 +8,4 @@ var DataRowVersion;
     DataRowVersion[DataRowVersion["DEFAULT"] = 3] = "DEFAULT";
 })(DataRowVersion || (DataRowVersion = {}));
 module.exports = DataRowVersion;
+//# sourceMappingURL=DataRowVersion.js.map

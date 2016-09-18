@@ -21,7 +21,7 @@ A table of rows with a common schema. schemas can be enforced through the use of
 
 #### arga.DataRelation
 
-#### arga.IDataAdapter
+#### arga.DataAdapterBase
 
 ## Usage
 
@@ -98,4 +98,4 @@ dataAdapter.updateAsync(table).then(function(){
 
 ```
 
-## Extending arga.js
+## Extending

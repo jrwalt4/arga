@@ -1,10 +1,10 @@
 // IDataAdapter.js
 
-import DataTable = require('./DataTable')
+import DataTable = require('../core/DataTable')
 
-interface IDataAdapter {
+interface DataAdapterBase {
         updateAsync(dataTable:DataTable):PromiseLike<any>
         fillAsync(dataTable:DataTable):PromiseLike<any>
     }
 
-export = IDataAdapter
+export = DataAdapterBase

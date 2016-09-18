@@ -1,6 +1,7 @@
 // DataTable.ts
 "use strict";
 var DataRowCollection = require('./DataRowCollection');
+//import IDataSchema = require('./IDataSchema')
 var Util_1 = require('./Util');
 var dt_counter = 0;
 var DataTable = (function () {
@@ -26,9 +27,6 @@ var DataTable = (function () {
         oRow.table(this);
         return this;
     };
-    DataTable.prototype.schema = function () {
-        return this;
-    };
     DataTable.prototype.columns = function () {
         return this._columns;
     };
@@ -42,4 +40,6 @@ var DataTable = (function () {
     };
     return DataTable;
 }());
+console.log('loaded DataTable');
 module.exports = DataTable;
+//# sourceMappingURL=DataTable.js.map

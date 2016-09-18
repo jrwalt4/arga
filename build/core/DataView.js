@@ -6,3 +6,4 @@ var DataView = (function () {
     return DataView;
 }());
 module.exports = DataView;
+//# sourceMappingURL=DataView.js.map

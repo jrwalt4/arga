@@ -6,10 +6,9 @@ declare class DataColumn<TKey> {
     private _keyPath;
     private _constraints;
     private _Item;
-    constructor(name: string, keyPath: string);
+    constructor(table: DataTable, name: string, keyPath?: string);
     private _get(object);
     table(): DataTable;
-    table(newTable: DataTable): this;
     name(): string;
     name(sName: string): this;
 }

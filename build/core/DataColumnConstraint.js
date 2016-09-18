@@ -7,3 +7,4 @@ var DataColumnConstraint;
     DataColumnConstraint[DataColumnConstraint["INDEX"] = 2] = "INDEX";
 })(DataColumnConstraint || (DataColumnConstraint = {}));
 module.exports = DataColumnConstraint;
+//# sourceMappingURL=DataColumnConstraint.js.map

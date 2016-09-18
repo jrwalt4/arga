@@ -11,7 +11,7 @@
     "lib": "src"
   },
   "scripts": {
-    "build": "echo working",
+    "dist": "tsc",
     "test": "jasmine"
   },
   "keywords": [
