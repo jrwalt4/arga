@@ -17,11 +17,6 @@ function createContentEquator(sKeyPath) {
     };
 }
 exports.createContentEquator = createContentEquator;
-function getKeyWithKeyPath(sKeyPath, obj) {
-    //sKeyPath
-    var keyPathArray = sKeyPath.split('.');
-}
-exports.getKeyWithKeyPath = getKeyWithKeyPath;
 function compareKeys(keyA, keyB) {
     if (indexedDB !== void 0) {
         return indexedDB.cmp(keyA, keyB);
@@ -51,6 +46,4 @@ function createValueWithKeyPath(value, sKeyPath) {
     }, value);
 }
 exports.createValueWithKeyPath = createValueWithKeyPath;
-function resolveKeyPathArray(aKeypath) {
-}
 //# sourceMappingURL=Util.js.map

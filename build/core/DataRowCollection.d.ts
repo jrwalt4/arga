@@ -1,7 +1,9 @@
+import DataTable = require('./DataTable');
 import DataRow = require('./DataRow');
 declare class DataRowCollection {
     private _rows;
-    constructor();
+    private _table;
+    constructor(dataTable: DataTable);
     add(...rows: DataRow[]): void;
     toArray(): DataRow[];
 }

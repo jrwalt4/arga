@@ -1,6 +1,7 @@
 // DataTable.ts
 
 import DataColumn = require('./DataColumn')
+import DataColumnCollection = require('./DataColumnCollection')
 import DataRow = require('./DataRow')
 import DataRowCollection = require('./DataRowCollection')
 //import IDataSchema = require('./IDataSchema')
@@ -11,13 +12,13 @@ let dt_counter: number = 0;
 class DataTable {
 		private _name: string;
 		private _rows: DataRowCollection;
-		private _columns: DataColumn<any>[];
+		private _columns: DataColumnCollection;
 		private _keyPath: string;
 		private _keyComparer: (keyA: string, keyB: string) => number;
 		constructor(sName?: string, sKeyPath?: string) {
 			this._name = sName || "Table" + dt_counter++;
-			this._rows = new DataRowCollection();
-			this._columns = [];
+			this._rows = new DataRowCollection(this);
+			this._columns = new DataColumnCollection(this);
 			this._keyPath = sKeyPath;
 			this._keyComparer = createContentComparer(sKeyPath);
 		}
@@ -35,13 +36,7 @@ class DataTable {
 			return this._rows;
 		}
 
-		addRow(oRow: DataRow): this {
-			this._rows.add(oRow);
-			oRow.table(this);
-			return this;
-		}
-
-		columns(): DataColumn<any>[] {
+		columns(): DataColumnCollection {
 			return this._columns;
 		}
 

@@ -18,12 +18,6 @@ export function createContentEquator<K,V>(sKeyPath:string):ContentEquals<K,V> {
 	}
 }
 
-export function getKeyWithKeyPath<T>(sKeyPath: string, obj: any) {
-	//sKeyPath
-	var keyPathArray = sKeyPath.split('.');
-
-}
-
 export function compareKeys<T>(keyA: T, keyB: T) {
 	if (indexedDB !== void 0) {
 		return indexedDB.cmp(keyA, keyB);
@@ -52,6 +46,24 @@ export function createValueWithKeyPath(value:any, sKeyPath:string) {
 	}, value) 
 }
 
-function resolveKeyPathArray(aKeypath: string[]): any {
+export interface SimpleCollection {
+	/**
+	 * Whether the collection contains the key
+	 */
+	has(key:any):any
 
+	/**
+	 * Returns the value of the requested key
+	 */
+	get(key:any):any
+
+	/**
+	 * Sets the value at the requested key
+	 */
+	set(key:any, value:any):any
+
+	/**
+	 * deletes the value at the provided key
+	 */
+	del(key:any):any
 }

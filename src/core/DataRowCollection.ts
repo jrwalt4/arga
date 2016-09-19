@@ -1,13 +1,17 @@
 // DataRowCollection.ts
 
-
-//import {Collection} from './Util.Collection'
-import SortedArray = require('collections/sorted-array');
+import SortedArray = require('collections/sorted-array')
+import DataTable = require('./DataTable')
 import DataRow = require('./DataRow')
 
 class DataRowCollection {
     private _rows:SortedArray<DataRow>
-    constructor() {
+    private _table:DataTable
+    constructor(dataTable:DataTable) {
+        if(!(dataTable instanceof DataTable)) {
+            throw new Error("Cannot create DataRowCollection without DataTable")
+        }
+        this._table = dataTable;
         this._rows = new SortedArray<DataRow>();
     }
 

@@ -12,7 +12,7 @@ var DataColumn = (function () {
         this._keyPath = keyPath;
         this._index = new SortedArray(undefined, util.createContentEquator(keyPath), util.createContentComparer(keyPath));
     }
-    DataColumn.prototype._get = function (object) {
+    DataColumn.prototype.getValue = function (object) {
         return util.resolveKeyPath(this._keyPath, object);
     };
     DataColumn.prototype.table = function () {
@@ -24,6 +24,12 @@ var DataColumn = (function () {
             return this;
         }
         return this._name;
+    };
+    DataColumn.prototype.keyPath = function () {
+        if (this._keyPath === void 0) {
+            return this.name();
+        }
+        return this._keyPath;
     };
     return DataColumn;
 }());

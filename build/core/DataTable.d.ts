@@ -1,5 +1,4 @@
-import DataColumn = require('./DataColumn');
-import DataRow = require('./DataRow');
+import DataColumnCollection = require('./DataColumnCollection');
 import DataRowCollection = require('./DataRowCollection');
 declare class DataTable {
     private _name;
@@ -11,8 +10,7 @@ declare class DataTable {
     name(): string;
     name(sName: string): this;
     rows(): DataRowCollection;
-    addRow(oRow: DataRow): this;
-    columns(): DataColumn<any>[];
+    columns(): DataColumnCollection;
     keyPath(): string;
     acceptChanges(): void;
 }

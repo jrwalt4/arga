@@ -1,5 +1,6 @@
 // DataTable.ts
 "use strict";
+var DataColumnCollection = require('./DataColumnCollection');
 var DataRowCollection = require('./DataRowCollection');
 //import IDataSchema = require('./IDataSchema')
 var Util_1 = require('./Util');
@@ -7,8 +8,8 @@ var dt_counter = 0;
 var DataTable = (function () {
     function DataTable(sName, sKeyPath) {
         this._name = sName || "Table" + dt_counter++;
-        this._rows = new DataRowCollection();
-        this._columns = [];
+        this._rows = new DataRowCollection(this);
+        this._columns = new DataColumnCollection(this);
         this._keyPath = sKeyPath;
         this._keyComparer = Util_1.createContentComparer(sKeyPath);
     }
@@ -21,11 +22,6 @@ var DataTable = (function () {
     };
     DataTable.prototype.rows = function () {
         return this._rows;
-    };
-    DataTable.prototype.addRow = function (oRow) {
-        this._rows.add(oRow);
-        oRow.table(this);
-        return this;
     };
     DataTable.prototype.columns = function () {
         return this._columns;

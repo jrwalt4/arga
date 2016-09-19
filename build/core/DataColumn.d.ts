@@ -7,9 +7,10 @@ declare class DataColumn<TKey> {
     private _constraints;
     private _Item;
     constructor(table: DataTable, name: string, keyPath?: string);
-    private _get(object);
+    getValue(object: Object): any;
     table(): DataTable;
     name(): string;
     name(sName: string): this;
+    keyPath(): string;
 }
 export = DataColumn;

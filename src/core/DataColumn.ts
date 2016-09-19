@@ -23,9 +23,8 @@ class DataColumn<TKey> {
         this._index = new SortedArray<Item<TKey>>(undefined, util.createContentEquator(keyPath), util.createContentComparer(keyPath));
     }
 
-    private _get(object: Object): any {
+    getValue(object: Object): any {
         return util.resolveKeyPath(this._keyPath, object);
-
     }
 
     table(): DataTable {
@@ -50,6 +49,13 @@ class DataColumn<TKey> {
             return this;
         }
         return this._name;
+    }
+
+    keyPath():string {
+        if(this._keyPath === void 0) {
+            return this.name()
+        }
+        return this._keyPath
     }
 }
 

@@ -1,9 +1,13 @@
 // DataRowCollection.ts
 "use strict";
-//import {Collection} from './Util.Collection'
 var SortedArray = require('collections/sorted-array');
+var DataTable = require('./DataTable');
 var DataRowCollection = (function () {
-    function DataRowCollection() {
+    function DataRowCollection(dataTable) {
+        if (!(dataTable instanceof DataTable)) {
+            throw new Error("Cannot create DataRowCollection without DataTable");
+        }
+        this._table = dataTable;
         this._rows = new SortedArray();
     }
     DataRowCollection.prototype.add = function () {
