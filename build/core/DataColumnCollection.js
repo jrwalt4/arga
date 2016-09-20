@@ -1,10 +1,9 @@
 // DataColumnCollection.ts
 "use strict";
-var DataTable = require('./DataTable');
 var DataColumnCollection = (function () {
     function DataColumnCollection(dataTable) {
-        if (!(dataTable instanceof DataTable)) {
-            throw new Error("Cannot create DataColumnCollection without DataTable");
+        if (dataTable === void 0) {
+            throw new Error("Illegal DataColumnCollection constructor: expected DataTable as first argument");
         }
         this._table = dataTable;
         this._columns = new Array();

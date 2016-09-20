@@ -8,8 +8,8 @@ class DataRowCollection {
     private _rows:SortedArray<DataRow>
     private _table:DataTable
     constructor(dataTable:DataTable) {
-        if(!(dataTable instanceof DataTable)) {
-            throw new Error("Cannot create DataRowCollection without DataTable")
+        if (dataTable === void 0) {
+            throw new Error("Illegal DataRowCollection constructor: expected DataTable as first argument")
         }
         this._table = dataTable;
         this._rows = new SortedArray<DataRow>();

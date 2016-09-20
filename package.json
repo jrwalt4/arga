@@ -11,7 +11,7 @@
     "lib": "src"
   },
   "scripts": {
-    "dist": "tsc",
+    "build-browser": "node build-browser.js",
     "test": "jasmine"
   },
   "keywords": [
@@ -30,6 +30,10 @@
   },
   "devDependencies": {
     "browserify": "^13.1.0",
-    "jasmine": "^2.4.1"
+    "jasmine": "^2.4.1",
+    "minifyify": "^7.3.3",
+    "tsify": "^1.0.7",
+    "typescript": "^1.8.10",
+    "uglify": "^0.1.5"
   }
 }

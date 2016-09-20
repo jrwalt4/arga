@@ -1,11 +1,10 @@
 // DataRowCollection.ts
 "use strict";
 var SortedArray = require('collections/sorted-array');
-var DataTable = require('./DataTable');
 var DataRowCollection = (function () {
     function DataRowCollection(dataTable) {
-        if (!(dataTable instanceof DataTable)) {
-            throw new Error("Cannot create DataRowCollection without DataTable");
+        if (dataTable === void 0) {
+            throw new Error("Illegal DataRowCollection constructor: expected DataTable as first argument");
         }
         this._table = dataTable;
         this._rows = new SortedArray();

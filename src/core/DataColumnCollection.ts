@@ -7,8 +7,8 @@ class DataColumnCollection {
     private _table: DataTable
     private _columns: DataColumn<any>[];
     constructor(dataTable: DataTable) {
-        if (!(dataTable instanceof DataTable)) {
-            throw new Error("Cannot create DataColumnCollection without DataTable")
+        if (dataTable === void 0) {
+            throw new Error("Illegal DataColumnCollection constructor: expected DataTable as first argument")
         }
         this._table = dataTable;
         this._columns = new Array<DataColumn<any>>();

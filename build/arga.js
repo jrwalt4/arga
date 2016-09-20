@@ -3,6 +3,7 @@ exports.DataSet = require('./core/DataSet');
 exports.DataTable = require('./core/DataTable');
 exports.DataView = require('./core/DataView');
 exports.DataRow = require('./core/DataRow');
+exports.DataRowCollection = require('./core/DataRowCollection');
 exports.DataRowVersion = require('./core/DataRowVersion');
 exports.DataRowState = require('./core/DataRowState');
 exports.DataColumn = require('./core/DataColumn');

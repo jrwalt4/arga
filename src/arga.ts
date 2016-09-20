@@ -5,6 +5,7 @@ export import DataTable = require('./core/DataTable');
 export import DataView = require('./core/DataView');
 
 export import DataRow = require('./core/DataRow');
+export import DataRowCollection = require('./core/DataRowCollection');
 export import DataRowVersion = require('./core/DataRowVersion')
 export import DataRowState = require('./core/DataRowState')
 
