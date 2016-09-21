@@ -15,7 +15,7 @@ var start = Date.now();
     })
 })).then(function () {
     return new Promise(function (resolve, reject) {
-        fs.mkdir('build/browser', undefined, function (err) {
+        fs.mkdir('build/web', undefined, function (err) {
             if (!err) {
                 resolve();
             } else {
@@ -29,19 +29,21 @@ var start = Date.now();
     })
 }).then(function () {
 
+    console.log(`begin loading require's after ${Date.now() - start} ms`)
     var browserify = require('browserify');
     var tsify = require('tsify');
     var minifyify = require('minifyify');
 
-    //var outJs = fs.createWriteStream('./build/browser/arga.js');
-    var outMin = fs.createWriteStream('./build/browser/arga.min.js');
+    console.log(`finished loading require's after ${Date.now() - start} ms`)
+    //var outJs = fs.createWriteStream('./build/web/arga.js');
+    var outMin = fs.createWriteStream('./build/web/arga.min.js');
 
     var b = browserify(['./src/arga.ts'], {
         debug: true,
         standalone: 'arga'
     }).plugin(tsify)
     .plugin(minifyify, {
-        output:'./build/browser/arga.min.js.map',
+        output:'./build/web/arga.min.js.map',
         map:'arga.min.js.map'
     }).bundle().pipe(outMin);
 

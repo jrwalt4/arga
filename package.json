@@ -11,8 +11,8 @@
     "lib": "src"
   },
   "scripts": {
-    "build-node": "node build-web.js",
-    "build-web":"tsc",
+    "build-web": "node build-web.js",
+    "build-node":"tsc",
     "test": "jasmine"
   },
   "keywords": [
