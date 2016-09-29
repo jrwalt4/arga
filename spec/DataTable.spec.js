@@ -1,8 +1,16 @@
 var DataTable = require('../build/core/DataTable');
+var DataSet = require('../build/core/DataSet');
 
-describe("Test suite for arga.DataTable", function() {
-    it("should create a DataTable named DataTable0", function() {
-        var dt = new DataTable();
-        expect(dt.name()).toBe("Table0");
+describe("arga.DataTable", function() {
+    var dr = new DataTable();
+
+    beforeEach(function() {
+        dr = new DataTable();
+    });
+
+    it("should create a DataTable with provided name", function() {
+        var tblName = "DataTable 1";
+        var dt = new DataTable(tblName);
+        expect(dt.name()).toBe(tblName);
     })
 })

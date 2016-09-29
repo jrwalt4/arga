@@ -1,23 +1,11 @@
+import DataRow = require('./DataRow');
+export import KeyedCollection = require('./util/KeyedCollection');
 export declare function createContentComparer<K, V>(sKeyPath: string): ContentCompare<K, V>;
 export declare function createContentEquator<K, V>(sKeyPath: string): ContentEquals<K, V>;
 export declare function compareKeys<T>(keyA: T, keyB: T): number;
 export declare function resolveKeyPath<T>(sKeyPath: string, obj: any): T;
+export declare function resolveKeyPathArray<T>(aKeyPathArray: string[], obj: any): T;
+export declare function resolveKeyPathFromDataRow<T>(sKeyPath: string, row: DataRow): T;
 export declare function createValueWithKeyPath(value: any, sKeyPath: string): any;
-export interface SimpleCollection {
-    /**
-     * Whether the collection contains the key
-     */
-    has(key: any): any;
-    /**
-     * Returns the value of the requested key
-     */
-    get(key: any): any;
-    /**
-     * Sets the value at the requested key
-     */
-    set(key: any, value: any): any;
-    /**
-     * deletes the value at the provided key
-     */
-    del(key: any): any;
-}
+export declare function deepCopy(value: any): typeof value;
+export declare function flattenPrototype(obj: Object, depth?: number, doNotCopy?: Object[]): Object;

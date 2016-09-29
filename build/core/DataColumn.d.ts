@@ -1,13 +1,14 @@
 import DataTable = require('./DataTable');
-declare class DataColumn<TKey> {
+import DataRow = require('./DataRow');
+declare class DataColumn<T> {
     private _name;
     private _index;
     private _table;
     private _keyPath;
     private _constraints;
-    private _Item;
     constructor(table: DataTable, name: string, keyPath?: string);
-    getValue(object: Object): any;
+    getValue(data: Object): T;
+    setValue(row: DataRow, value: T): void;
     table(): DataTable;
     name(): string;
     name(sName: string): this;

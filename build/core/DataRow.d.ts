@@ -1,24 +1,27 @@
 import DataTable = require('./DataTable');
 import DataRowState = require('./DataRowState');
 import DataRowVersion = require('./DataRowVersion');
-import { SimpleCollection } from './Util';
-declare class DataRow implements SimpleCollection {
+import DataColumn = require('./DataColumn');
+declare class DataRow {
     private _table;
     private _original;
     private _current;
     private _proposed;
-    constructor(dataTable: DataTable);
+    constructor(dataTable: DataTable, values?: Object);
     private _createCurrent();
     private _createProposed();
+    get<T>(column: DataColumn<T>, version?: DataRowVersion): T;
     get<T>(key: string, version?: DataRowVersion): T;
+    set(values: Object, version: DataRowVersion): this;
     set<T>(key: string, newValue: T, version?: DataRowVersion): this;
     del(key: string): any;
-    has(key: string): boolean;
+    has(key: string, version?: DataRowVersion): boolean;
     delete(version?: DataRowVersion): void;
-    item(key: string, newValue?: any, version?: DataRowVersion): any;
-    private _getItem(key, version?);
+    private _getItemWithColumn<T>(column, version?);
+    private _getItemWithKey<T>(key, version?);
     private _setItem(column, newValue, version?);
-    private _getVersion(version);
+    private _setItems(values, version?);
+    private _getVersion(version?);
     private _getColumn(name);
     /**
      * pass 'null' to set the table to 'undefined'

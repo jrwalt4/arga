@@ -1,39 +1,67 @@
 // DataRow.js
 "use strict";
-var DataTable = require('./DataTable');
 var DataRowState = require('./DataRowState');
 var DataRowVersion = require('./DataRowVersion');
+var Util_1 = require('./Util');
 var DataRow = (function () {
-    function DataRow(dataTable) {
-        if (!(dataTable instanceof DataTable)) {
+    function DataRow(dataTable, values) {
+        if (dataTable === void 0) {
             throw new Error("Cannot construct DataRow without DataTable");
         }
         this._table = dataTable;
-        this._original = {};
-        this._current = this._createCurrent();
-        this._proposed = this._createProposed();
+        if (values !== void 0 && typeof values === "object") {
+            this._original = Util_1.deepCopy(values);
+        }
+        else {
+            this._original = null;
+        }
     }
     DataRow.prototype._createCurrent = function () {
+        this._original = this._original || null;
         return Object.create(this._original);
     };
     DataRow.prototype._createProposed = function () {
-        if (this._current == void 0) {
-            throw new Error("DataRow._current has been deleted");
+        if (this.rowState() === DataRowState.DELETED) {
+            throw new Error("Cannot create proposed after deleting row");
+        }
+        if (this._current === void 0) {
+            this._current = this._createCurrent();
         }
         return Object.create(this._current);
     };
-    DataRow.prototype.get = function (key, version) {
-        return this._getItem(key, version);
+    DataRow.prototype.get = function (keyOrColumn, version) {
+        switch (typeof keyOrColumn) {
+            case "string":
+                var key = keyOrColumn;
+                return this._getItemWithKey(key, version);
+            case "object":
+                var column = keyOrColumn;
+                return this._getItemWithColumn(column, version);
+        }
     };
-    DataRow.prototype.set = function (key, newValue, version) {
-        return this._setItem(key, newValue, version);
+    DataRow.prototype.set = function (valsOrKey, valOrVersion, version) {
+        switch (typeof valsOrKey) {
+            case "string":
+                var key = valsOrKey;
+                var value = valOrVersion;
+                return this._setItem(key, value, version);
+            case "object":
+                var values = valsOrKey;
+                var version = valOrVersion;
+                return this._setItems(values, version);
+        }
     };
     DataRow.prototype.del = function (key) {
         this._setItem(key, null);
     };
-    DataRow.prototype.has = function (key) {
-        return Object.keys(this._current).indexOf(key) >= 0 ||
-            Object.keys(this._original).indexOf(key) >= 0;
+    DataRow.prototype.has = function (key, version) {
+        var searchObject = this._getVersion(version);
+        for (var member in searchObject) {
+            if (member == key) {
+                return true;
+            }
+        }
+        return false;
     };
     DataRow.prototype.delete = function (version) {
         if (this.isEditing()) {
@@ -43,39 +71,51 @@ var DataRow = (function () {
             this._current = null;
         }
     };
-    DataRow.prototype.item = function (key, newValue, version) {
-        if (newValue !== undefined) {
-            return this._setItem(key, newValue, version);
+    DataRow.prototype._getItemWithColumn = function (column, version) {
+        var data = this._getVersion(version);
+        if (data === void 0 || data === null) {
+            return void 0;
         }
         else {
-            return this._getItem(key, version);
+            return column.getValue(data);
         }
     };
-    DataRow.prototype._getItem = function (key, version) {
-        var column = this._getColumn(key);
-        if (column === void 0) {
-            return this._getVersion(version)[key];
+    DataRow.prototype._getItemWithKey = function (key, version) {
+        var data = this._getVersion(version);
+        if (data === void 0 || data === null) {
+            return void 0;
         }
         else {
-            return column.getValue(this._getVersion(version));
+            return data[key];
         }
     };
     DataRow.prototype._setItem = function (column, newValue, version) {
-        if (this.rowState() == DataRowState.DELETED) {
+        if (version === DataRowVersion.ORIGINAL) {
+            throw new Error("Cannot write to original version");
+        }
+        if (this.rowState() === DataRowState.DELETED) {
             throw new Error("Row already deleted");
         }
         this._getVersion(version)[column] = newValue;
         return this;
     };
+    DataRow.prototype._setItems = function (values, version) {
+        for (var key in values) {
+            this._setItem(key, values[key]);
+        }
+        return this;
+    };
     DataRow.prototype._getVersion = function (version) {
-        version = version || DataRowVersion.DEFAULT;
+        if (version === void 0) { version = DataRowVersion.DEFAULT; }
         switch (version) {
             case DataRowVersion.DEFAULT:
                 if (this.isEditing()) {
-                    return this._proposed;
+                    return this._proposed ||
+                        (this._proposed = this._createProposed());
                 }
                 else {
-                    return this._current;
+                    return this._current ||
+                        (this._current = this._createCurrent());
                 }
             case DataRowVersion.CURRENT:
                 return this._current;
@@ -107,19 +147,17 @@ var DataRow = (function () {
          * should probably implement this with bitmask,
          * but here it is for now
          */
+        if (this._table === void 0) {
+            return DataRowState.DETACHED;
+        }
+        if (this._original === null) {
+            return DataRowState.ADDED;
+        }
         if (this._current === null) {
             return DataRowState.DELETED;
         }
-        if (Object.keys(this._current).length === 0) {
+        if (this._current === void 0) {
             return DataRowState.UNCHANGED;
-        }
-        /* not sure if a DataRowState.PROPOSED is needed
-        if (Object.keys(this._proposed).length !== 0){
-            return DataRowState.PROPOSED
-        }
-        //*/
-        if (this._table === undefined) {
-            return DataRowState.DETACHED;
         }
         return DataRowState.MODIFIED;
     };
@@ -142,16 +180,10 @@ var DataRow = (function () {
         this.dispatchRowChange();
     };
     DataRow.prototype.acceptChanges = function () {
+        // need to fix
         var self = this;
-        Object.keys(this._current).forEach(function (key, i) {
-            var value = self._current[key];
-            if (value === null) {
-                delete self._original[key];
-            }
-            else {
-                self._original[key] = self._current[key];
-            }
-        });
+        var newOriginal = Util_1.deepCopy(this._current);
+        this._original = newOriginal;
         this._current = this._createCurrent();
     };
     DataRow.prototype.rejectChanges = function () {

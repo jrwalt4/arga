@@ -2,18 +2,19 @@
 "use strict";
 var SortedArray = require('collections/sorted-array');
 var util = require('./Util');
-var DataTable = require('./DataTable');
 var DataColumn = (function () {
     function DataColumn(table, name, keyPath) {
-        if (!(table instanceof DataTable)) {
+        if (table === void 0) {
             throw new Error("cannot construct DataColumn without DataTable");
         }
         this._name = name;
         this._keyPath = keyPath;
         this._index = new SortedArray(undefined, util.createContentEquator(keyPath), util.createContentComparer(keyPath));
     }
-    DataColumn.prototype.getValue = function (object) {
-        return util.resolveKeyPath(this._keyPath, object);
+    DataColumn.prototype.getValue = function (data) {
+        return util.resolveKeyPath(this._keyPath, data);
+    };
+    DataColumn.prototype.setValue = function (row, value) {
     };
     DataColumn.prototype.table = function () {
         return this._table;

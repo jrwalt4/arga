@@ -3,8 +3,9 @@ declare class DataSet {
     private _name;
     private _tables;
     private _relations;
-    constructor(name?: string);
+    constructor(sName?: string);
     tables(): DataTable[];
+    newTable(sName?: string): DataTable;
     addTable(oTable: string): void;
     addTable(oTable: DataTable): void;
     acceptChanges(): void;

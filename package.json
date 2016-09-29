@@ -7,13 +7,16 @@
     "type": "git",
     "url": "https://www.github.com/jrwalt4/arga.git"
   },
+  "bin": {
+    "jasmine-node":"./node_modules/jasmine-node"
+  },
   "directories": {
     "lib": "src"
   },
   "scripts": {
     "build-web": "node build-web.js",
-    "build-node":"tsc",
-    "test": "jasmine"
+    "build-node": "tsc",
+    "test": "tsc && jasmine"
   },
   "keywords": [
     "dataset",
@@ -32,6 +35,7 @@
   "devDependencies": {
     "browserify": "^13.1.0",
     "jasmine": "^2.4.1",
+    "jasmine-node": "^1.14.5",
     "minifyify": "^7.3.3",
     "tsify": "^1.0.7",
     "typescript": "^1.8.10",

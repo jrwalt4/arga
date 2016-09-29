@@ -6,50 +6,83 @@ import DataRowVersion = require('./DataRowVersion')
 
 import DataColumn = require('./DataColumn')
 
-import {SimpleCollection} from './Util'
+import {KeyedCollection, deepCopy} from './Util'
 
-class DataRow implements SimpleCollection {
+class DataRow {
 	private _table: DataTable
 	private _original: Object
 	private _current: Object
 	private _proposed: Object
 
-	constructor(dataTable: DataTable) {
-		if (!(dataTable instanceof DataTable)) {
+	constructor(dataTable: DataTable, values?: Object) {
+		if (dataTable === void 0) {
 			throw new Error("Cannot construct DataRow without DataTable")
 		}
 		this._table = dataTable;
-		this._original = {};
-		this._current = this._createCurrent();
-		this._proposed = this._createProposed();
+
+		if (values !== void 0 && typeof values === "object") {
+			this._original = deepCopy(values);
+		} else {
+			this._original = null;
+		}
 	}
 
 	private _createCurrent(): Object {
+		this._original = this._original || null;
 		return Object.create(this._original);
 	}
 
 	private _createProposed() {
-		if (this._current == void 0) {
-			throw new Error("DataRow._current has been deleted");
+		if (this.rowState() === DataRowState.DELETED) {
+			throw new Error("Cannot create proposed after deleting row")
+		}
+		if (this._current === void 0) {
+			this._current = this._createCurrent();
 		}
 		return Object.create(this._current);
 	}
 
-	get<T>(key: string, version?: DataRowVersion): T {
-		return this._getItem(key, version);
+	get<T>(column: DataColumn<T>, version?: DataRowVersion): T
+	get<T>(key: string, version?: DataRowVersion): T
+	get<T>(keyOrColumn: any, version?: DataRowVersion): T {
+		switch (typeof keyOrColumn) {
+			case "string":
+				var key = keyOrColumn;
+				return this._getItemWithKey<T>(key, version);
+			case "object":
+				var column = keyOrColumn;
+				return this._getItemWithColumn<T>(column, version);
+		}
 	}
 
-	set<T>(key: string, newValue: T, version?: DataRowVersion): this {
-		return this._setItem(key, newValue, version)
+	set(values: Object, version: DataRowVersion): this
+	set<T>(key: string, newValue: T, version?: DataRowVersion): this
+	set<T>(valsOrKey: any, valOrVersion?: any, version?: DataRowVersion): this {
+		switch (typeof valsOrKey) {
+			case "string":
+				var key: string = valsOrKey;
+				var value: T = valOrVersion;
+				return this._setItem(key, value, version);
+			case "object":
+				var values: Object = valsOrKey;
+				var version: DataRowVersion = valOrVersion;
+				return this._setItems(values, version)
+		}
+
 	}
 
 	del(key: string): any {
 		this._setItem(key, null);
 	}
 
-	has(key: string): boolean {
-		return Object.keys(this._current).indexOf(key) >= 0 ||
-			Object.keys(this._original).indexOf(key) >= 0
+	has(key: string, version?: DataRowVersion): boolean {
+		var searchObject = this._getVersion(version);
+		for (var member in searchObject) {
+			if (member == key) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	delete(version?: DataRowVersion) {
@@ -60,39 +93,50 @@ class DataRow implements SimpleCollection {
 		}
 	}
 
-	item(key: string, newValue?: any, version?: DataRowVersion): any {
-		if (newValue !== undefined) {
-			return this._setItem(key, newValue, version);
+	private _getItemWithColumn<T>(column: DataColumn<T>, version?: DataRowVersion): T {
+		var data = this._getVersion(version);
+		if(data === void 0 || data === null) {
+			return void 0;
 		} else {
-			return this._getItem(key, version);
+			return column.getValue(data);
 		}
 	}
-
-	private _getItem(key: string, version?: DataRowVersion): any {
-		var column = this._getColumn(key);
-		if (column === void 0) {
-			return this._getVersion(version)[key];
+	private _getItemWithKey<T>(key: string, version?: DataRowVersion): T {
+		var data = this._getVersion(version);
+		if(data === void 0 || data === null) {
+			return void 0;
 		} else {
-			return column.getValue(this._getVersion(version));
+			return data[key]
 		}
 	}
 
 	private _setItem(column: string, newValue: any, version?: DataRowVersion): this {
-		if (this.rowState() == DataRowState.DELETED) {
+		if (version === DataRowVersion.ORIGINAL) {
+			throw new Error("Cannot write to original version");
+		}
+		if (this.rowState() === DataRowState.DELETED) {
 			throw new Error("Row already deleted");
 		}
 		this._getVersion(version)[column] = newValue;
 		return this;
 	}
 
-	private _getVersion(version: DataRowVersion): Object {
-		version = version || DataRowVersion.DEFAULT;
+	private _setItems(values: Object, version?: DataRowVersion): this {
+		for (var key in values) {
+			this._setItem(key, values[key]);
+		}
+		return this;
+	}
+
+	private _getVersion(version: DataRowVersion = DataRowVersion.DEFAULT): Object {
 		switch (version) {
 			case DataRowVersion.DEFAULT:
 				if (this.isEditing()) {
-					return this._proposed;
+					return this._proposed ||
+						(this._proposed = this._createProposed());
 				} else {
-					return this._current;
+					return this._current ||
+						(this._current = this._createCurrent());
 				}
 			case DataRowVersion.CURRENT:
 				return this._current;
@@ -131,20 +175,22 @@ class DataRow implements SimpleCollection {
 		 * should probably implement this with bitmask,
 		 * but here it is for now
 		 */
+		if (this._table === void 0) {
+			return DataRowState.DETACHED;
+		}
+
+		if (this._original === null) {
+			return DataRowState.ADDED;
+		}
+
 		if (this._current === null) {
 			return DataRowState.DELETED;
 		}
-		if (Object.keys(this._current).length === 0) {
+
+		if (this._current === void 0) {
 			return DataRowState.UNCHANGED;
 		}
-		/* not sure if a DataRowState.PROPOSED is needed
-		if (Object.keys(this._proposed).length !== 0){
-			return DataRowState.PROPOSED
-		}
-		//*/
-		if (this._table === undefined) {
-			return DataRowState.DETACHED;
-		}
+
 		return DataRowState.MODIFIED;
 	}
 
@@ -170,15 +216,10 @@ class DataRow implements SimpleCollection {
 	}
 
 	acceptChanges() {
+		// need to fix
 		var self = this;
-		Object.keys(this._current).forEach(function (key, i) {
-			var value = self._current[key];
-			if (value === null) {
-				delete self._original[key]
-			} else {
-				self._original[key] = self._current[key];
-			}
-		})
+		var newOriginal = deepCopy(this._current);
+		this._original = newOriginal;
 		this._current = this._createCurrent();
 	}
 

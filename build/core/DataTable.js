@@ -4,10 +4,9 @@ var DataColumnCollection = require('./DataColumnCollection');
 var DataRowCollection = require('./DataRowCollection');
 //import IDataSchema = require('./IDataSchema')
 var Util_1 = require('./Util');
-var dt_counter = 0;
 var DataTable = (function () {
     function DataTable(sName, sKeyPath) {
-        this._name = sName || "Table" + dt_counter++;
+        this._name = sName;
         this._rows = new DataRowCollection(this);
         this._columns = new DataColumnCollection(this);
         this._keyPath = sKeyPath;
@@ -36,6 +35,5 @@ var DataTable = (function () {
     };
     return DataTable;
 }());
-console.log('loaded DataTable');
 module.exports = DataTable;
 //# sourceMappingURL=DataTable.js.map

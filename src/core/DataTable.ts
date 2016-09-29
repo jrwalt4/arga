@@ -7,8 +7,6 @@ import DataRowCollection = require('./DataRowCollection')
 //import IDataSchema = require('./IDataSchema')
 import {createContentComparer} from './Util'
 
-let dt_counter: number = 0;
-
 class DataTable {
 		private _name: string;
 		private _rows: DataRowCollection;
@@ -16,7 +14,7 @@ class DataTable {
 		private _keyPath: string;
 		private _keyComparer: (keyA: string, keyB: string) => number;
 		constructor(sName?: string, sKeyPath?: string) {
-			this._name = sName || "Table" + dt_counter++;
+			this._name = sName;
 			this._rows = new DataRowCollection(this);
 			this._columns = new DataColumnCollection(this);
 			this._keyPath = sKeyPath;
@@ -51,5 +49,3 @@ class DataTable {
 		}
 	}
 export = DataTable
-
-console.log('loaded DataTable')
