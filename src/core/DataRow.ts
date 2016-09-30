@@ -3,6 +3,7 @@
 import DataTable = require('./DataTable')
 import DataRowState = require('./DataRowState')
 import DataRowVersion = require('./DataRowVersion')
+import {EventEmitter2 as EventEmitter} from 'eventemitter2'
 
 import DataColumn = require('./DataColumn')
 
@@ -13,12 +14,14 @@ class DataRow {
 	private _original: Object
 	private _current: Object
 	private _proposed: Object
+	public observable:EventEmitter.emitter
 
 	constructor(dataTable: DataTable, values?: Object) {
 		if (dataTable === void 0) {
 			throw new Error("Cannot construct DataRow without DataTable")
 		}
 		this._table = dataTable;
+		this.observable = new EventEmitter();
 
 		if (values !== void 0 && typeof values === "object") {
 			this._original = deepCopy(values);
@@ -32,7 +35,7 @@ class DataRow {
 		return Object.create(this._original);
 	}
 
-	private _createProposed() {
+	private _createProposed():Object {
 		if (this.rowState() === DataRowState.DELETED) {
 			throw new Error("Cannot create proposed after deleting row")
 		}
@@ -206,13 +209,13 @@ class DataRow {
 	}
 
 	endEdit(): void {
-		this.dispatchBeforeRowChange();
+		this.dispatchBeforeRowChange({type:"modify"});
 		var self = this;
 		Object.keys(this._proposed).forEach(function (key) {
 			self._current[key] = self._proposed[key];
 		})
 		delete this._proposed;
-		this.dispatchRowChange();
+		this.dispatchRowChange({type:"modify"});
 	}
 
 	acceptChanges() {
@@ -227,12 +230,20 @@ class DataRow {
 		this._current = this._createCurrent();
 	}
 
-	dispatchRowChange() {
-
+	private dispatchRowChange(args:DataRow.DataRowChangeEventArgs) {
+		this.observable.emit("rowchange", args);
 	}
 
-	dispatchBeforeRowChange() {
-
+	private dispatchBeforeRowChange(args:DataRow.DataRowChangeEventArgs) {
+		this.observable.emit("beforerowchange", args);
 	}
 }
+
+namespace DataRow {
+	export type DataRowChangeEventArgs = {
+		type:DataRowChangeType
+	}
+	export type DataRowChangeType = "modify"|"delete"|"add" 
+}
+
 export = DataRow

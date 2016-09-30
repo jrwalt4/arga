@@ -5,7 +5,7 @@ import DataColumnCollection = require('./DataColumnCollection')
 import DataRow = require('./DataRow')
 import DataRowCollection = require('./DataRowCollection')
 //import IDataSchema = require('./IDataSchema')
-import {createContentComparer} from './Util'
+import {createContentCompare} from './Util'
 
 class DataTable {
 		private _name: string;
@@ -18,7 +18,7 @@ class DataTable {
 			this._rows = new DataRowCollection(this);
 			this._columns = new DataColumnCollection(this);
 			this._keyPath = sKeyPath;
-			this._keyComparer = createContentComparer(sKeyPath);
+			this._keyComparer = createContentCompare(sKeyPath);
 		}
 		name(): string;
 		name(sName: string): this;

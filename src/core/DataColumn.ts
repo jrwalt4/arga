@@ -19,7 +19,7 @@ class DataColumn<T> {
         }
         this._name = name;
         this._keyPath = keyPath;
-        this._index = new SortedArray<Item<T>>(undefined, util.createContentEquator(keyPath), util.createContentComparer(keyPath));
+        this._index = new SortedArray<Item<T>>(undefined, util.createContentEquals(keyPath), util.createContentCompare(keyPath));
     }
 
     getValue(data: Object): T {

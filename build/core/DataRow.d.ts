@@ -1,12 +1,14 @@
 import DataTable = require('./DataTable');
 import DataRowState = require('./DataRowState');
 import DataRowVersion = require('./DataRowVersion');
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import DataColumn = require('./DataColumn');
 declare class DataRow {
     private _table;
     private _original;
     private _current;
     private _proposed;
+    observable: EventEmitter.emitter;
     constructor(dataTable: DataTable, values?: Object);
     private _createCurrent();
     private _createProposed();
@@ -34,7 +36,13 @@ declare class DataRow {
     endEdit(): void;
     acceptChanges(): void;
     rejectChanges(): void;
-    dispatchRowChange(): void;
-    dispatchBeforeRowChange(): void;
+    private dispatchRowChange(args);
+    private dispatchBeforeRowChange(args);
+}
+declare namespace DataRow {
+    type DataRowChangeEventArgs = {
+        type: DataRowChangeType;
+    };
+    type DataRowChangeType = "modify" | "delete" | "add";
 }
 export = DataRow;

@@ -2,6 +2,7 @@
 "use strict";
 var DataRowState = require('./DataRowState');
 var DataRowVersion = require('./DataRowVersion');
+var eventemitter2_1 = require('eventemitter2');
 var Util_1 = require('./Util');
 var DataRow = (function () {
     function DataRow(dataTable, values) {
@@ -9,6 +10,7 @@ var DataRow = (function () {
             throw new Error("Cannot construct DataRow without DataTable");
         }
         this._table = dataTable;
+        this.observable = new eventemitter2_1.EventEmitter2();
         if (values !== void 0 && typeof values === "object") {
             this._original = Util_1.deepCopy(values);
         }
@@ -171,13 +173,13 @@ var DataRow = (function () {
         return !!this._proposed;
     };
     DataRow.prototype.endEdit = function () {
-        this.dispatchBeforeRowChange();
+        this.dispatchBeforeRowChange({ type: "modify" });
         var self = this;
         Object.keys(this._proposed).forEach(function (key) {
             self._current[key] = self._proposed[key];
         });
         delete this._proposed;
-        this.dispatchRowChange();
+        this.dispatchRowChange({ type: "modify" });
     };
     DataRow.prototype.acceptChanges = function () {
         // need to fix
@@ -189,9 +191,11 @@ var DataRow = (function () {
     DataRow.prototype.rejectChanges = function () {
         this._current = this._createCurrent();
     };
-    DataRow.prototype.dispatchRowChange = function () {
+    DataRow.prototype.dispatchRowChange = function (args) {
+        this.observable.emit("rowchange", args);
     };
-    DataRow.prototype.dispatchBeforeRowChange = function () {
+    DataRow.prototype.dispatchBeforeRowChange = function (args) {
+        this.observable.emit("beforerowchange", args);
     };
     return DataRow;
 }());

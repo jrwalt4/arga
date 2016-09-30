@@ -10,7 +10,7 @@ var DataTable = (function () {
         this._rows = new DataRowCollection(this);
         this._columns = new DataColumnCollection(this);
         this._keyPath = sKeyPath;
-        this._keyComparer = Util_1.createContentComparer(sKeyPath);
+        this._keyComparer = Util_1.createContentCompare(sKeyPath);
     }
     DataTable.prototype.name = function (sName) {
         if (sName !== undefined) {

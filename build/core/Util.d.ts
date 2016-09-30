@@ -1,11 +1,2 @@
-import DataRow = require('./DataRow');
 export import KeyedCollection = require('./util/KeyedCollection');
-export declare function createContentComparer<K, V>(sKeyPath: string): ContentCompare<K, V>;
-export declare function createContentEquator<K, V>(sKeyPath: string): ContentEquals<K, V>;
-export declare function compareKeys<T>(keyA: T, keyB: T): number;
-export declare function resolveKeyPath<T>(sKeyPath: string, obj: any): T;
-export declare function resolveKeyPathArray<T>(aKeyPathArray: string[], obj: any): T;
-export declare function resolveKeyPathFromDataRow<T>(sKeyPath: string, row: DataRow): T;
-export declare function createValueWithKeyPath(value: any, sKeyPath: string): any;
-export declare function deepCopy(value: any): typeof value;
-export declare function flattenPrototype(obj: Object, depth?: number, doNotCopy?: Object[]): Object;
+export { createContentCompare, createContentEquals, compareKeys, resolveKeyPath, resolveKeyPathArray, resolveKeyPathFromDataRow, createValueWithKeyPath, deepCopy, flattenPrototypeChain } from './util/Functions';

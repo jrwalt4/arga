@@ -9,7 +9,7 @@ var DataColumn = (function () {
         }
         this._name = name;
         this._keyPath = keyPath;
-        this._index = new SortedArray(undefined, util.createContentEquator(keyPath), util.createContentComparer(keyPath));
+        this._index = new SortedArray(undefined, util.createContentEquals(keyPath), util.createContentCompare(keyPath));
     }
     DataColumn.prototype.getValue = function (data) {
         return util.resolveKeyPath(this._keyPath, data);
