@@ -89,4 +89,12 @@ function flattenPrototypeChain(obj, depth, doNotCopy) {
     return copyObj;
 }
 exports.flattenPrototypeChain = flattenPrototypeChain;
+function createUUID() {
+    var uuid = '0';
+    for (var i = 0; i < 12; i++) {
+        uuid += '0';
+    }
+    return uuid;
+}
+exports.createUUID = createUUID;
 //# sourceMappingURL=Functions.js.map

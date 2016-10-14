@@ -1,7 +1,8 @@
 // Util.ts
 // Utilities used by arga.js
 "use strict";
-exports.KeyedCollection = require('./util/KeyedCollection');
+var KeyedCollection_1 = require('./util/KeyedCollection');
+exports.KeyedCollection = KeyedCollection_1.KeyedCollection;
 var Functions_1 = require('./util/Functions');
 exports.createContentCompare = Functions_1.createContentCompare;
 exports.createContentEquals = Functions_1.createContentEquals;

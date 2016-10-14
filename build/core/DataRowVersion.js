@@ -1,5 +1,5 @@
-"use strict";
 // DataRowVersion.ts
+"use strict";
 var DataRowVersion;
 (function (DataRowVersion) {
     DataRowVersion[DataRowVersion["ORIGINAL"] = 0] = "ORIGINAL";

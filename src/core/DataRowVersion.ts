@@ -1,4 +1,5 @@
 // DataRowVersion.ts
+
 enum DataRowVersion {
     ORIGINAL,
     CURRENT,

@@ -101,6 +101,7 @@ var KeyedCollection = (function () {
     };
     return KeyedCollection;
 }());
+exports.KeyedCollection = KeyedCollection;
 function findIndex(array, predicate) {
     'use strict';
     if (array === null) {
@@ -122,5 +123,4 @@ function findIndex(array, predicate) {
     return -1;
 }
 ;
-module.exports = KeyedCollection;
 //# sourceMappingURL=KeyedCollection.js.map

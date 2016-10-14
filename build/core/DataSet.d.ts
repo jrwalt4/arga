@@ -1,4 +1,5 @@
 import DataTable = require('./DataTable');
+export = DataSet;
 declare class DataSet {
     private _name;
     private _tables;
@@ -12,4 +13,3 @@ declare class DataSet {
     getChanges(): void;
     name(newValue?: string): string;
 }
-export = DataSet;

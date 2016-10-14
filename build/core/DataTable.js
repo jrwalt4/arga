@@ -2,15 +2,15 @@
 "use strict";
 var DataColumnCollection = require('./DataColumnCollection');
 var DataRowCollection = require('./DataRowCollection');
-//import IDataSchema = require('./IDataSchema')
-var Util_1 = require('./Util');
 var DataTable = (function () {
+    //private _keyComparer: (keyA: string, keyB: string) => number;
     function DataTable(sName, sKeyPath) {
         this._name = sName;
-        this._rows = new DataRowCollection(this);
+        sKeyPath = sKeyPath || '_id';
+        this._rows = new DataRowCollection(this, sKeyPath);
         this._columns = new DataColumnCollection(this);
         this._keyPath = sKeyPath;
-        this._keyComparer = Util_1.createContentCompare(sKeyPath);
+        //this._keyComparer = createContentCompare(sKeyPath);
     }
     DataTable.prototype.name = function (sName) {
         if (sName !== undefined) {
@@ -25,11 +25,14 @@ var DataTable = (function () {
     DataTable.prototype.columns = function () {
         return this._columns;
     };
+    DataTable.prototype.primaryKey = function () {
+        return this.keyPath();
+    };
     DataTable.prototype.keyPath = function () {
         return this._keyPath;
     };
     DataTable.prototype.acceptChanges = function () {
-        this._rows.toArray().forEach(function (dr) {
+        this.rows().toArray().forEach(function (dr) {
             dr.acceptChanges();
         });
     };

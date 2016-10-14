@@ -1,5 +1,6 @@
 import DataTable = require('./DataTable');
 import DataRow = require('./DataRow');
+export = DataColumn;
 declare class DataColumn<T> {
     private _name;
     private _index;
@@ -14,4 +15,3 @@ declare class DataColumn<T> {
     name(sName: string): this;
     keyPath(): string;
 }
-export = DataColumn;

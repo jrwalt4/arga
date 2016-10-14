@@ -1,11 +1,11 @@
 // DataSet.ts
 "use strict";
 var DataTable = require('./DataTable');
-//import SimpleSet = require('collections/set');
 var ds_counter = 0;
 var dt_counter = 0;
 var DataSet = (function () {
     function DataSet(sName) {
+        this._tables = new Array();
         ++ds_counter;
         this._name = sName || "Set " + ds_counter;
         this._tables = [];

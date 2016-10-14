@@ -5,81 +5,70 @@ var DataRowVersion = require('./DataRowVersion');
 var eventemitter2_1 = require('eventemitter2');
 var Util_1 = require('./Util');
 var DataRow = (function () {
-    function DataRow(dataTable, values) {
-        if (dataTable === void 0) {
-            throw new Error("Cannot construct DataRow without DataTable");
-        }
-        this._table = dataTable;
+    function DataRow(values) {
         this.observable = new eventemitter2_1.EventEmitter2();
-        if (values !== void 0 && typeof values === "object") {
-            this._original = Util_1.deepCopy(values);
-        }
-        else {
-            this._original = null;
-        }
+        /**
+         * _original is set to undefined, and
+         * _current is an empty object so we
+         * start off as DataRowState.ADDED
+         */
+        this._original = void 0;
+        this._current = this._createCurrent();
     }
+    DataRow.prototype._createOriginal = function () {
+        return Object.create(null);
+    };
     DataRow.prototype._createCurrent = function () {
-        this._original = this._original || null;
-        return Object.create(this._original);
+        return Object.create(this._original || null);
     };
     DataRow.prototype._createProposed = function () {
-        if (this.rowState() === DataRowState.DELETED) {
-            throw new Error("Cannot create proposed after deleting row");
-        }
-        if (this._current === void 0) {
-            this._current = this._createCurrent();
-        }
-        return Object.create(this._current);
+        return Object.create(this._current || null);
     };
-    DataRow.prototype.get = function (keyOrColumn, version) {
-        switch (typeof keyOrColumn) {
-            case "string":
-                var key = keyOrColumn;
-                return this._getItemWithKey(key, version);
-            case "object":
-                var column = keyOrColumn;
-                return this._getItemWithColumn(column, version);
+    /**
+     *
+     */
+    DataRow.prototype.rowState = function () {
+        /**
+         *  __________________________________
+         * | _original | _current |   state   |
+         * |-----------|----------|-----------|
+         * | undefined | undefined|   ERROR   |
+         * | undefined |    {}    |   ADDED   |
+         * | undefined |   null   |  DELETED  | deleted immediately (won't wait to sync)
+         * |     {}    | undefined| UNCHANGED |
+         * |     {}    |    {}    | MODIFIED  |
+         * |     {}    |   null   |  DELETED  |
+         * |___________|__________|___________|
+         *
+         */
+        if (this._table === void 0) {
+            return DataRowState.DETACHED;
         }
-    };
-    DataRow.prototype.set = function (valsOrKey, valOrVersion, version) {
-        switch (typeof valsOrKey) {
-            case "string":
-                var key = valsOrKey;
-                var value = valOrVersion;
-                return this._setItem(key, value, version);
-            case "object":
-                var values = valsOrKey;
-                var version = valOrVersion;
-                return this._setItems(values, version);
+        if (this._current === null) {
+            return DataRowState.DELETED;
         }
-    };
-    DataRow.prototype.del = function (key) {
-        this._setItem(key, null);
+        if (this._original === void 0) {
+            return DataRowState.ADDED;
+        }
+        return this._current === void 0 ? DataRowState.UNCHANGED : DataRowState.MODIFIED;
     };
     DataRow.prototype.has = function (key, version) {
         var searchObject = this._getVersion(version);
         for (var member in searchObject) {
-            if (member == key) {
+            if (member === key) {
                 return true;
             }
         }
         return false;
     };
-    DataRow.prototype.delete = function (version) {
-        if (this.isEditing()) {
-            this._proposed = null;
+    DataRow.prototype.get = function (keyOrColumn, version) {
+        if (typeof keyOrColumn === "string") {
+            var key = keyOrColumn;
+            return this._getItemWithKey(key, version);
         }
-        else {
-            this._current = null;
-        }
-    };
-    DataRow.prototype._getItemWithColumn = function (column, version) {
-        var data = this._getVersion(version);
-        if (data === void 0 || data === null) {
-            return void 0;
-        }
-        else {
-            return column.getValue(data);
+        if (isDataColumn(keyOrColumn)) {
+            var column = keyOrColumn;
+            return this._getItemWithColumn(column, version);
         }
     };
     DataRow.prototype._getItemWithKey = function (key, version) {
@@ -91,21 +80,14 @@ var DataRow = (function () {
             return data[key];
         }
     };
-    DataRow.prototype._setItem = function (column, newValue, version) {
-        if (version === DataRowVersion.ORIGINAL) {
-            throw new Error("Cannot write to original version");
+    DataRow.prototype._getItemWithColumn = function (column, version) {
+        var data = this._getVersion(version);
+        if (data === void 0 || data === null) {
+            return void 0;
         }
-        if (this.rowState() === DataRowState.DELETED) {
-            throw new Error("Row already deleted");
+        else {
+            return column.getValue(data);
         }
-        this._getVersion(version)[column] = newValue;
-        return this;
-    };
-    DataRow.prototype._setItems = function (values, version) {
-        for (var key in values) {
-            this._setItem(key, values[key]);
-        }
-        return this;
     };
     DataRow.prototype._getVersion = function (version) {
         if (version === void 0) { version = DataRowVersion.DEFAULT; }
@@ -129,8 +111,69 @@ var DataRow = (function () {
                 throw new Error("DataRowVersion {" + version + "} is not recognized");
         }
     };
-    DataRow.prototype._getColumn = function (name) {
-        return this.table().columns().get(name);
+    DataRow.prototype.set = function (valsOrKeyOrColumn, value) {
+        switch (typeof valsOrKeyOrColumn) {
+            case "string":
+                var key = valsOrKeyOrColumn;
+                //var value: T = valOrVersion;
+                return this._setItem(key, value);
+            case "object":
+                if (isDataColumn(valsOrKeyOrColumn)) {
+                    var column = valsOrKeyOrColumn;
+                    column.setValue(this, value);
+                    return this;
+                }
+                else {
+                    var values = valsOrKeyOrColumn;
+                    return this._setItems(values);
+                }
+        }
+        return this;
+    };
+    DataRow.prototype._setItems = function (values) {
+        for (var key in values) {
+            this._setItem(key, values[key]);
+        }
+        return this;
+    };
+    DataRow.prototype._setItem = function (key, newValue) {
+        // bitwise check (&) in case rowState() is 
+        // changed to return a set of flags in
+        // future versions
+        if (this.rowState() & DataRowState.DELETED) {
+            throw new Error("Row already deleted");
+        }
+        if (this.isEditing()) {
+            this._proposed = this._proposed || this._createProposed();
+            this._proposed[key] = newValue;
+        }
+        else {
+            this._current = this._current || this._createCurrent();
+            this._current[key] = newValue;
+        }
+        return this;
+    };
+    DataRow.prototype.del = function (key) {
+        if (this.has(key)) {
+            this._setItem(key, null);
+            return true;
+        }
+        return false;
+    };
+    DataRow.prototype.delete = function () {
+        if (this.isEditing()) {
+            this._proposed = null;
+        }
+        else {
+            this._current = null;
+        }
+        if (this.rowState() & DataRowState.ADDED) {
+            this.dispatchBeforeDelete();
+            this.dispatchDelete();
+        }
+    };
+    DataRow.prototype.key = function () {
+        return this.table().keyPath();
     };
     DataRow.prototype.table = function (oDataTable) {
         if (oDataTable !== undefined) {
@@ -143,25 +186,6 @@ var DataRow = (function () {
             return this;
         }
         return this._table;
-    };
-    DataRow.prototype.rowState = function () {
-        /*
-         * should probably implement this with bitmask,
-         * but here it is for now
-         */
-        if (this._table === void 0) {
-            return DataRowState.DETACHED;
-        }
-        if (this._original === null) {
-            return DataRowState.ADDED;
-        }
-        if (this._current === null) {
-            return DataRowState.DELETED;
-        }
-        if (this._current === void 0) {
-            return DataRowState.UNCHANGED;
-        }
-        return DataRowState.MODIFIED;
     };
     DataRow.prototype.beginEdit = function () {
         if (this.isEditing()) {
@@ -182,22 +206,37 @@ var DataRow = (function () {
         this.dispatchRowChange({ type: "modify" });
     };
     DataRow.prototype.acceptChanges = function () {
-        // need to fix
-        var self = this;
-        var newOriginal = Util_1.deepCopy(this._current);
-        this._original = newOriginal;
-        this._current = this._createCurrent();
+        if (this.isEditing()) {
+            this.endEdit();
+        }
+        /**
+         * copy all the changes from _current onto _original,
+         */
+        this._original = Util_1.deepCopy(this._current) || this._createOriginal();
+        delete this._current;
     };
     DataRow.prototype.rejectChanges = function () {
-        this._current = this._createCurrent();
-    };
-    DataRow.prototype.dispatchRowChange = function (args) {
-        this.observable.emit("rowchange", args);
+        if (this.isEditing()) {
+            this.endEdit();
+        }
+        delete this._current;
     };
     DataRow.prototype.dispatchBeforeRowChange = function (args) {
-        this.observable.emit("beforerowchange", args);
+        this.observable.emit("beforechange", args);
+    };
+    DataRow.prototype.dispatchRowChange = function (args) {
+        this.observable.emit("change", args);
+    };
+    DataRow.prototype.dispatchBeforeDelete = function () {
+        this.observable.emit("beforedeleted");
+    };
+    DataRow.prototype.dispatchDelete = function () {
+        this.observable.emit("deleted");
     };
     return DataRow;
 }());
+function isDataColumn(dc) {
+    return (typeof dc.getValue === "function" && typeof dc.setValue === "function");
+}
 module.exports = DataRow;
 //# sourceMappingURL=DataRow.js.map

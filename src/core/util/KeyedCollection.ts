@@ -2,9 +2,7 @@
 
 import {resolveKeyPath} from './Functions'
 
-export = KeyedCollection;
-
-class KeyedCollection<TKey, TValue> {
+export class KeyedCollection<TKey, TValue> {
 	private _data: TValue[]
 	private _keyPath: string
 

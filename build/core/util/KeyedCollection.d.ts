@@ -1,5 +1,4 @@
-export = KeyedCollection;
-declare class KeyedCollection<TKey, TValue> {
+export declare class KeyedCollection<TKey, TValue> {
     private _data;
     private _keyPath;
     constructor(keyPath: string);

@@ -6,6 +6,8 @@ import DataTable = require('./DataTable');
 import DataRow = require('./DataRow');
 import DataColumnConstraint = require('./DataColumnConstraint');
 
+export = DataColumn;
+
 class DataColumn<T> {
     private _name: string
     private _index: SortedArray<Item<T>>
@@ -13,10 +15,7 @@ class DataColumn<T> {
     private _keyPath: string
     private _constraints: DataColumnConstraint[]
 
-    constructor(table: DataTable, name: string, keyPath?: string) {
-        if (table === void 0) {
-            throw new Error("cannot construct DataColumn without DataTable")
-        }
+    constructor(name: string, keyPath?: string) {
         this._name = name;
         this._keyPath = keyPath;
         this._index = new SortedArray<Item<T>>(undefined, util.createContentEquals(keyPath), util.createContentCompare(keyPath));
@@ -65,5 +64,3 @@ class DataColumn<T> {
 class Item<T> {
     constructor(public key: T, public index: number) { }
 }
-
-export = DataColumn;

@@ -39,7 +39,13 @@ export function resolveKeyPathArray<T>(aKeyPathArray: string[], obj: any): T {
 		if (prevResult === void 0) {
 			return void 0;
 		}
-		return prevResult[nextVal];
+		var value:any;
+		if (typeof prevResult[nextVal] === "function") {
+			value = prevResult[nextVal]();
+		} else {
+			value = prevResult[nextVal];
+		}
+		return value;
 	}, obj)
 }
 
@@ -51,7 +57,11 @@ export function resolveKeyPathFromDataRow<T>(sKeyPath: string, row: DataRow) {
 	return resolveKeyPathArray<T>(path, firstMember);
 }
 
-export function createValueWithKeyPath(value: any, sKeyPath: string) {
+export function setValueAtKeyPath(obj:Object, sKeyPath:string, value:any) {
+
+}
+
+export function createValueWithKeyPath(value: any, sKeyPath: string):Object {
 	var keyPathArray = sKeyPath.split('.');
 	return keyPathArray.reduceRight(function (prevValue: any, key: string, curIndex: number, array: string[]) {
 		var wrappedValue = {};
@@ -88,4 +98,12 @@ export function flattenPrototypeChain(obj: Object, depth?: number, doNotCopy?: O
 		}
 	}
 	return copyObj;
+}
+
+export function createUUID():string {
+	var uuid = '0';
+	for (var i = 0 ; i < 12 ; i++) {
+		uuid+='0';
+	}
+	return uuid;
 }

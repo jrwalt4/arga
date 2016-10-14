@@ -1,19 +1,28 @@
 // DataColumnCollection.ts
 
 import DataColumn = require('./DataColumn');
-import DataTable = require('./DataTable')
+import DataTable = require('./DataTable');
+import {KeyedCollection} from './Util'
 
-class DataColumnCollection {
+export = DataColumnCollection
+
+class DataColumnCollection extends KeyedCollection<string, DataColumn<any>> {
     private _table: DataTable
-    private _columns: DataColumn<any>[];
+    //private _columns: DataColumn<any>[];
     constructor(dataTable: DataTable) {
+        super('name');
         if (dataTable === void 0) {
             throw new Error("Illegal DataColumnCollection constructor: expected DataTable as first argument")
         }
         this._table = dataTable;
-        this._columns = new Array<DataColumn<any>>();
+        //this._columns = new Array<DataColumn<any>>();
     }
 
+    table():DataTable {
+        return this._table;
+    }
+
+    /*
     add(dataColumn:DataColumn<any>):this {
         if(this._columns.indexOf(dataColumn)<0) {
             this._columns.push(dataColumn);
@@ -36,6 +45,5 @@ class DataColumnCollection {
     remove(col:string|DataColumn<any>) {
         
     }
+    //*/
 }
-
-export = DataColumnCollection

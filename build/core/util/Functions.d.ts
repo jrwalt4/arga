@@ -8,3 +8,4 @@ export declare function resolveKeyPathFromDataRow<T>(sKeyPath: string, row: Data
 export declare function createValueWithKeyPath(value: any, sKeyPath: string): any;
 export declare function deepCopy(value: any): typeof value;
 export declare function flattenPrototypeChain(obj: Object, depth?: number, doNotCopy?: Object[]): Object;
+export declare function createUUID(): string;

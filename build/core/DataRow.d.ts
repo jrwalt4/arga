@@ -3,46 +3,54 @@ import DataRowState = require('./DataRowState');
 import DataRowVersion = require('./DataRowVersion');
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import DataColumn = require('./DataColumn');
+export = DataRow;
 declare class DataRow {
     private _table;
     private _original;
     private _current;
     private _proposed;
     observable: EventEmitter.emitter;
-    constructor(dataTable: DataTable, values?: Object);
+    constructor(values?: Object);
+    private _createOriginal();
     private _createCurrent();
     private _createProposed();
+    /**
+     *
+     */
+    rowState(): DataRowState;
+    has(key: string, version?: DataRowVersion): boolean;
     get<T>(column: DataColumn<T>, version?: DataRowVersion): T;
     get<T>(key: string, version?: DataRowVersion): T;
-    set(values: Object, version: DataRowVersion): this;
-    set<T>(key: string, newValue: T, version?: DataRowVersion): this;
-    del(key: string): any;
-    has(key: string, version?: DataRowVersion): boolean;
-    delete(version?: DataRowVersion): void;
-    private _getItemWithColumn<T>(column, version?);
     private _getItemWithKey<T>(key, version?);
-    private _setItem(column, newValue, version?);
-    private _setItems(values, version?);
+    private _getItemWithColumn<T>(column, version?);
     private _getVersion(version?);
-    private _getColumn(name);
+    set<T>(key: string, newValue: T): this;
+    set(values: Object): this;
+    set<T>(column: DataColumn<T>, value: T): this;
+    private _setItems(values);
+    private _setItem(key, newValue);
+    del(key: string): boolean;
+    delete(): void;
+    key(): string;
     /**
      * pass 'null' to set the table to 'undefined'
      */
     table(): DataTable;
     table(oDataTable: DataTable): this;
-    rowState(): DataRowState;
     beginEdit(): void;
     isEditing(): boolean;
     endEdit(): void;
     acceptChanges(): void;
     rejectChanges(): void;
-    private dispatchRowChange(args);
     private dispatchBeforeRowChange(args);
+    private dispatchRowChange(args);
+    private dispatchBeforeDelete();
+    private dispatchDelete();
 }
 declare namespace DataRow {
-    type DataRowChangeEventArgs = {
-        type: DataRowChangeType;
+    type RowChangeEventArgs = {
+        type: RowChangeType;
+        key?: any;
     };
-    type DataRowChangeType = "modify" | "delete" | "add";
+    type RowChangeType = "modify" | "delete" | "add";
 }
-export = DataRow;

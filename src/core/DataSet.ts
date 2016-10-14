@@ -2,22 +2,22 @@
 
 import DataTable = require('./DataTable')
 import DataRelation = require('./DataRelation')
-//import SimpleSet = require('collections/set');
+import {KeyedCollection} from './util'
+
+export = DataSet
 
 var ds_counter = 0;
 var dt_counter = 0;
 
 class DataSet {
 
-	private _name: string;
-	private _tables: DataTable[];
-	private _relations: DataRelation[];
+	private _name: string
+	private _tables = new Array<DataTable>()
+	private _relations = new KeyedCollection<string, DataRelation>('name')
 
 	constructor(sName?: string) {
 		++ds_counter;
 		this._name = sName || "Set " + ds_counter;
-		this._tables = [];
-		this._relations = [];
 	}
 
 	tables(): DataTable[] {
@@ -63,4 +63,3 @@ class DataSet {
 		return this._name;
 	};
 }
-export = DataSet

@@ -1,6 +1,6 @@
 interface GenericCollection<T> extends Array<T> {
 
-    has(value: T): boolean
+    has(value: any): boolean
 
     get(value: any): T
 

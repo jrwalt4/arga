@@ -8,7 +8,7 @@ describe("arga.DataRow", function () {
     var dr = new DataRow(dt);
 
     afterEach(function () {
-        dr = new DataRow(dt);
+        dr = new DataRow();
     })
 
     it("should set property from key and value", function () {
@@ -34,11 +34,12 @@ describe("arga.DataRow", function () {
         expect(dr.get("job")).toEqual("Engineer");
     })
 
-    it("should start with rowState equals ADDED", function() {
-        expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.ADDED]);
+    it("should start with rowState equals DETACHED", function() {
+        expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.DETACHED]);
     })
 
-    it("should reset rowState back to UNCHANGED", function(){
+    it("should set rowState to UNCHANGED", function(){
+        dt.rows().add(dr);
         dr.acceptChanges();
         expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.UNCHANGED]);
     })
@@ -47,13 +48,6 @@ describe("arga.DataRow", function () {
         dr.acceptChanges();
         dr.set("name", "Reese");
         expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.MODIFIED]);
-    })
-
-    it("should throw error when trying to set to ORIGINAL", function() {
-        function setOriginal() {
-            dr.set("name","Reese", DataRowVersion.ORIGINAL)
-        }
-        expect(setOriginal).toThrow();
     })
     
 })
