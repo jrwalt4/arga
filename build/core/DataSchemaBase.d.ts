@@ -1,6 +1,5 @@
-import DataColumn = require('./DataColumn');
-interface DataSchemaBase {
-    columns(): DataColumn<any>[];
+import { DataColumn } from './DataColumn';
+export interface DataSchemaBase {
+    columns(): DataColumn[];
     keyPath(): string;
 }
-export = DataSchemaBase;

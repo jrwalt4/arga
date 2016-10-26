@@ -1,9 +1,8 @@
 // DataRowVersion.ts
 
-enum DataRowVersion {
+export enum DataRowVersion {
     ORIGINAL,
     CURRENT,
     PROPOSED,
     DEFAULT,
 }
-export = DataRowVersion

@@ -1,8 +1,7 @@
-import DataColumn = require('./DataColumn');
-import DataTable = require('./DataTable');
+import { DataColumn } from './DataColumn';
+import { DataTable } from './DataTable';
 import { KeyedCollection } from './Util';
-export = DataColumnCollection;
-declare class DataColumnCollection extends KeyedCollection<string, DataColumn<any>> {
+export declare class DataColumnCollection extends KeyedCollection<string, DataColumn> {
     private _table;
     constructor(dataTable: DataTable);
     table(): DataTable;

@@ -1,15 +1,13 @@
 // DataSet.ts
 
-import DataTable = require('./DataTable')
-import DataRelation = require('./DataRelation')
+import {DataTable} from './DataTable'
+import {DataRelation} from './DataRelation'
 import {KeyedCollection} from './util'
-
-export = DataSet
 
 var ds_counter = 0;
 var dt_counter = 0;
 
-class DataSet {
+export class DataSet {
 
 	private _name: string
 	private _tables = new Array<DataTable>()

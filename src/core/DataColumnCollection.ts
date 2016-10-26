@@ -1,12 +1,10 @@
 // DataColumnCollection.ts
 
-import DataColumn = require('./DataColumn');
-import DataTable = require('./DataTable');
+import {DataColumn} from './DataColumn'
+import {DataTable} from './DataTable'
 import {KeyedCollection} from './Util'
 
-export = DataColumnCollection
-
-class DataColumnCollection extends KeyedCollection<string, DataColumn<any>> {
+export class DataColumnCollection extends KeyedCollection<string, DataColumn> {
     private _table: DataTable
     //private _columns: DataColumn<any>[];
     constructor(dataTable: DataTable) {

@@ -1,17 +1,15 @@
 // DataRow.js
 
-import DataTable = require('./DataTable')
-import DataRowState = require('./DataRowState')
-import DataRowVersion = require('./DataRowVersion')
-import {EventEmitter2 as EventEmitter} from 'eventemitter2'
+import { DataTable } from './DataTable'
+import { DataRowState } from './DataRowState'
+import { DataRowVersion } from './DataRowVersion'
+import { EventEmitter2 as EventEmitter } from 'eventemitter2'
 
-import DataColumn = require('./DataColumn')
+import { DataColumn } from './DataColumn'
 
-import {KeyedCollection, deepCopy} from './Util'
+import { KeyedCollection, deepCopy } from './Util'
 
-export = DataRow;
-
-class DataRow {
+export class DataRow {
 	private _table: DataTable
 	private _original: Object
 	private _current: Object
@@ -99,7 +97,7 @@ class DataRow {
 		return false;
 	}
 
-	get<T>(column: DataColumn<T>, version?: DataRowVersion): T
+	get<T>(column: DataColumn, version?: DataRowVersion): T
 	get<T>(key: string, version?: DataRowVersion): T
 	get<T>(keyOrColumn: any, version?: DataRowVersion): T {
 		if (typeof keyOrColumn === "string") {
@@ -107,7 +105,7 @@ class DataRow {
 			return this._getItemWithKey<T>(key, version);
 		}
 		if (isDataColumn<T>(keyOrColumn)) {
-			var column: DataColumn<T> = keyOrColumn;
+			var column: DataColumn = keyOrColumn;
 			return this._getItemWithColumn<T>(column, version);
 		}
 	}
@@ -121,12 +119,12 @@ class DataRow {
 		}
 	}
 
-	private _getItemWithColumn<T>(column: DataColumn<T>, version?: DataRowVersion): T {
+	private _getItemWithColumn<T>(column: DataColumn, version?: DataRowVersion): T {
 		var data = this._getVersion(version);
 		if (data === void 0 || data === null) {
 			return void 0;
 		} else {
-			return column.getValue(data);
+			return <T>column.getValue(data);
 		}
 	}
 
@@ -153,7 +151,7 @@ class DataRow {
 
 	set<T>(key: string, newValue: T): this
 	set(values: Object): this
-	set<T>(column: DataColumn<T>, value: T): this
+	set<T>(column: DataColumn, value: T): this
 	set<T>(valsOrKeyOrColumn: any, value?: T): this {
 		switch (typeof valsOrKeyOrColumn) {
 			case "string":
@@ -162,7 +160,7 @@ class DataRow {
 				return this._setItem(key, value);
 			case "object":
 				if (isDataColumn<T>(valsOrKeyOrColumn)) {
-					let column: DataColumn<T> = valsOrKeyOrColumn;
+					let column: DataColumn = valsOrKeyOrColumn;
 					column.setValue(this, value);
 					return this;
 				} else {
@@ -219,10 +217,6 @@ class DataRow {
 		}
 	}
 
-	key() {
-		return this.table().keyPath()
-	}
-
 	beginEdit(): void {
 		if (this.isEditing()) {
 			throw new Error("already editing");
@@ -263,11 +257,11 @@ class DataRow {
 		delete this._current;
 	}
 
-	private dispatchBeforeRowChange(args: DataRow.RowChangeEventArgs) {
+	private dispatchBeforeRowChange(args: RowChangeEventArgs) {
 		this.observable.emit("beforechange", args);
 	}
 
-	private dispatchRowChange(args: DataRow.RowChangeEventArgs) {
+	private dispatchRowChange(args: RowChangeEventArgs) {
 		this.observable.emit("change", args);
 	}
 
@@ -280,14 +274,12 @@ class DataRow {
 	}
 }
 
-function isDataColumn<T>(dc: any): dc is DataColumn<T> {
+function isDataColumn<T>(dc: any): dc is DataColumn {
 	return (typeof dc.getValue === "function" && typeof dc.setValue === "function");
 }
 
-namespace DataRow {
-	export type RowChangeEventArgs = {
-		type: RowChangeType,
-		key?:any
-	}
-	export type RowChangeType = "modify" | "delete" | "add"
+export type RowChangeEventArgs = {
+	type: RowChangeType,
+	key?: any
 }
+export type RowChangeType = "modify" | "delete" | "add"

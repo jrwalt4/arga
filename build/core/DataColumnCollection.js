@@ -22,5 +22,5 @@ var DataColumnCollection = (function (_super) {
     };
     return DataColumnCollection;
 }(Util_1.KeyedCollection));
-module.exports = DataColumnCollection;
+exports.DataColumnCollection = DataColumnCollection;
 //# sourceMappingURL=DataColumnCollection.js.map

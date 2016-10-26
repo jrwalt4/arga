@@ -7,11 +7,13 @@ export declare class KeyedCollection<TKey, TValue> {
     set(value: TValue): boolean;
     add(newValue: TValue): boolean;
     del(key: TKey): boolean;
-    indexOf(key: TKey): number;
+    private indexOf(key);
+    find(predicate: ContentCompare<TValue>): TValue;
     keysArray(): TKey[];
     valuesArray(): TValue[];
-    entriesArray(): (TKey | TValue)[][];
+    entriesArray(): [TKey, TValue][];
     toString(): string;
     size: number;
     static isCollection(obj: any): boolean;
 }
+export declare type ContentCompare<T> = (value: T, index: number, array: T[]) => boolean;

@@ -2,22 +2,28 @@
 
 import SortedArray = require('collections/sorted-array')
 
-import DataTable = require('./DataTable')
-import DataRow = require('./DataRow')
-import {createContentCompare, createContentEquals} from './Util'
+import {DataTable} from './DataTable'
+import {DataRow} from './DataRow'
+import {createContentCompare, createContentEquals, createValueWithKeyPath} from './Util'
 
-export = DataRowCollection;
-
-class DataRowCollection {
+export class DataRowCollection {
     private _rows:SortedArray<DataRow>
     private _table:DataTable
-    constructor(dataTable:DataTable, sKeyPath:string) {
+    constructor(dataTable:DataTable) {
         if (dataTable === void 0) {
             throw new Error("Illegal DataRowCollection constructor: expected DataTable as first argument")
         }
         this._table = dataTable;
         
-        this._rows = new SortedArray<DataRow>([], createContentEquals(sKeyPath), createContentCompare(sKeyPath));
+        var drc = this;
+
+        this._rows = new SortedArray<DataRow>([], function(objA, objB):boolean {
+            var keyColumn = drc.table().primaryKey();
+            return keyColumn.getValue(objA) === keyColumn.getValue(objB); 
+        }, function (objA, objB):number {
+            var keyColumn = drc.table().primaryKey();
+            return 1
+        });
     }
 
     //*
@@ -26,7 +32,7 @@ class DataRowCollection {
     }
 
     has(value:any):boolean {
-        return this._rows.has(value);
+        return this._rows.has({}); // TODO
     }
 
     get(value:any):DataRow {
@@ -35,9 +41,16 @@ class DataRowCollection {
 
     add(...rows:DataRow[]) {
         for (let row of rows) {
-            row.table(this.table());
+            this._addRow(row);
         }
-        this._rows.addEach(rows);
+    }
+
+    private _addRow(row:DataRow) {
+        if (this._rows.add(row)) {
+            row.table(this.table());
+        } else {
+            throw new Error("Could not add DataRow:" + row);
+        }
     }
 
     clear() {

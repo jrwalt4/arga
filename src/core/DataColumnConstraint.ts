@@ -1,9 +1,7 @@
 // DataColumnConstraint.ts
 
-enum DataColumnConstraint {
+export enum DataColumnConstraint {
     PRIMARY_KEY,
     UNIQUE,
     INDEX
 }
-
-export = DataColumnConstraint

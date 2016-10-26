@@ -25,6 +25,30 @@ function compareKeys(keyA, keyB) {
     }
 }
 exports.compareKeys = compareKeys;
+function getValueAtKeyPath(sKeyPath, item) {
+    sKeyPath = sKeyPath || "";
+    var path = sKeyPath.split('.');
+    return resolveKeyPathArray(path, item);
+}
+exports.getValueAtKeyPath = getValueAtKeyPath;
+function setValueAtKeyPath(sKeyPath, item, value) {
+    var keyPathArray = sKeyPath.split('.');
+    var lastKey = keyPathArray.pop();
+    var penultimantValue = resolveKeyPathArray(keyPathArray, item);
+    return !!(penultimantValue[lastKey] = value);
+}
+exports.setValueAtKeyPath = setValueAtKeyPath;
+function createKeyPathGetter(sKeyPath) {
+    return new Function("__item__", "return __item__." + sanitizeKeyPath(sKeyPath));
+}
+exports.createKeyPathGetter = createKeyPathGetter;
+function createKeyPathSetter(sKeyPath) {
+    return new Function("__item__", "__value__", "__item__." + sanitizeKeyPath(sKeyPath) + " = __value__ ");
+}
+exports.createKeyPathSetter = createKeyPathSetter;
+function sanitizeKeyPath(sKeyPath) {
+    return sKeyPath.split('.').map(function (value) { return value.trim(); }).join('.');
+}
 function resolveKeyPath(sKeyPath, obj) {
     sKeyPath = sKeyPath || "";
     var path = sKeyPath.split('.');
@@ -36,18 +60,17 @@ function resolveKeyPathArray(aKeyPathArray, obj) {
         if (prevResult === void 0) {
             return void 0;
         }
-        return prevResult[nextVal];
+        var value;
+        if (typeof prevResult[nextVal] === "function") {
+            value = prevResult[nextVal]();
+        }
+        else {
+            value = prevResult[nextVal];
+        }
+        return value;
     }, obj);
 }
 exports.resolveKeyPathArray = resolveKeyPathArray;
-function resolveKeyPathFromDataRow(sKeyPath, row) {
-    sKeyPath = sKeyPath || "";
-    var path = sKeyPath.split('.');
-    var firstMemberKey = path.shift();
-    var firstMember = row.get(firstMemberKey);
-    return resolveKeyPathArray(path, firstMember);
-}
-exports.resolveKeyPathFromDataRow = resolveKeyPathFromDataRow;
 function createValueWithKeyPath(value, sKeyPath) {
     var keyPathArray = sKeyPath.split('.');
     return keyPathArray.reduceRight(function (prevValue, key, curIndex, array) {

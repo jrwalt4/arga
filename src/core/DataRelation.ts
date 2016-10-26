@@ -1,17 +1,16 @@
 // DataRelation.ts
 
-import DataColumn = require('./DataColumn')
-import DataRow = require('./DataRow')
+import {DataColumn} from './DataColumn'
+import {DataRow} from './DataRow'
 
-abstract class DataRelation {
+export abstract class DataRelation {
 
     constructor(
-        private _parent: DataColumn<any>,
-        private _child: DataColumn<any>,
+        private _parent: DataColumn,
+        private _child: DataColumn,
         private _operator: Function) { }
 
     abstract getChildRows(oRow: DataRow): DataRow[]
 
     abstract getParentRow(oRow: DataRow): DataRow
 }
-export = DataRelation

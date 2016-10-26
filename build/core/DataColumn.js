@@ -3,18 +3,24 @@
 var SortedArray = require('collections/sorted-array');
 var util = require('./Util');
 var DataColumn = (function () {
-    function DataColumn(table, name, keyPath) {
-        if (table === void 0) {
-            throw new Error("cannot construct DataColumn without DataTable");
-        }
+    function DataColumn(name, constructorOptions) {
+        if (constructorOptions === void 0) { constructorOptions = { keyPath: name }; }
         this._name = name;
-        this._keyPath = keyPath;
-        this._index = new SortedArray(undefined, util.createContentEquals(keyPath), util.createContentCompare(keyPath));
+        if (constructorOptions.keyPath) {
+            var keyPath = constructorOptions.keyPath;
+            this.getValue = function (data) { return util.resolveKeyPath(keyPath, data); };
+            this.setValue = function (data, value) { return util.setValueAtKeyPath(keyPath, data, value); };
+        }
+        else {
+        }
+        if (constructorOptions.index) {
+            this._index = new SortedArray(undefined, util.createContentEquals(keyPath), util.createContentCompare(keyPath));
+        }
     }
     DataColumn.prototype.getValue = function (data) {
         return util.resolveKeyPath(this._keyPath, data);
     };
-    DataColumn.prototype.setValue = function (row, value) {
+    DataColumn.prototype.setValue = function (data, value) {
     };
     DataColumn.prototype.table = function () {
         return this._table;
@@ -34,6 +40,7 @@ var DataColumn = (function () {
     };
     return DataColumn;
 }());
+exports.DataColumn = DataColumn;
 var Item = (function () {
     function Item(key, index) {
         this.key = key;
@@ -41,5 +48,4 @@ var Item = (function () {
     }
     return Item;
 }());
-module.exports = DataColumn;
 //# sourceMappingURL=DataColumn.js.map

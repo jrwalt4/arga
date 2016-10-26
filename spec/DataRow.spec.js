@@ -1,11 +1,11 @@
-var DataRow = require("../build/core/DataRow");
-var DataTable = require("../build/core/DataTable");
-var DataRowState = require("../build/core/DataRowState");
-var DataRowVersion = require("../build/core/DataRowVersion");
+var DataRow = require("../build/core/DataRow").DataRow;
+var DataTable = require("../build/core/DataTable").DataTable;
+var DataRowState = require("../build/core/DataRowState").DataRowState;
+var DataRowVersion = require("../build/core/DataRowVersion").DataRowVersion;
 
 describe("arga.DataRow", function () {
     var dt = new DataTable();
-    var dr = new DataRow(dt);
+    var dr = new DataRow();
 
     afterEach(function () {
         dr = new DataRow();
@@ -45,6 +45,7 @@ describe("arga.DataRow", function () {
     })
 
     it("should update the rowState to MODIFIED", function () {
+        dt.rows().add(dr);
         dr.acceptChanges();
         dr.set("name", "Reese");
         expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.MODIFIED]);

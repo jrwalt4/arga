@@ -5,5 +5,5 @@ var DataView = (function () {
     }
     return DataView;
 }());
-module.exports = DataView;
+exports.DataView = DataView;
 //# sourceMappingURL=DataView.js.map

@@ -1,7 +1,5 @@
 // DataView.js
 
-class DataView {
+export class DataView {
 
 }
-
-export = DataView

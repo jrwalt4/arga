@@ -1,17 +1,19 @@
-import DataColumnCollection = require('./DataColumnCollection');
-import DataRowCollection = require('./DataRowCollection');
-export = DataTable;
-declare class DataTable {
+import { DataColumn } from './DataColumn';
+import { DataColumnCollection } from './DataColumnCollection';
+import { DataRow } from './DataRow';
+import { DataRowCollection } from './DataRowCollection';
+export declare class DataTable {
     private _name;
-    private _rows;
-    private _columns;
+    private _rowCollection;
+    private _columnCollection;
     private _keyPath;
-    constructor(sName?: string, sKeyPath?: string);
+    constructor(sName?: string);
     name(): string;
     name(sName: string): this;
     rows(): DataRowCollection;
+    rows(key: any): DataRow;
     columns(): DataColumnCollection;
-    primaryKey(): string;
-    keyPath(): string;
+    columns(columnName: string): DataColumn;
+    primaryKey(): DataColumn;
     acceptChanges(): void;
 }

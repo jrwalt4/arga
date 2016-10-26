@@ -1,3 +1,2 @@
-declare class DataView {
+export declare class DataView {
 }
-export = DataView;

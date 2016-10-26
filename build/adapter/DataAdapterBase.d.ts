@@ -1,6 +1,5 @@
-import DataTable = require('../core/DataTable');
-interface DataAdapterBase {
+import { DataTable } from '../core/DataTable';
+export interface DataAdapterBase {
     updateAsync(dataTable: DataTable): PromiseLike<any>;
     fillAsync(dataTable: DataTable): PromiseLike<any>;
 }
-export = DataAdapterBase;

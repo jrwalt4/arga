@@ -7,7 +7,7 @@ var KeyedCollection = (function () {
         this._keyPath = keyPath;
     }
     KeyedCollection.prototype.has = function (key) {
-        return this.indexOf(key) !== void 0;
+        return this.indexOf(key) > -1;
     };
     KeyedCollection.prototype.get = function (key) {
         var index = this.indexOf(key);
@@ -64,6 +64,13 @@ var KeyedCollection = (function () {
             return Functions_1.resolveKeyPath(self._keyPath, value) === key;
         });
     };
+    KeyedCollection.prototype.find = function (predicate) {
+        var index = findIndex(this._data, predicate);
+        if (index > -1) {
+            return this._data[index];
+        }
+        return void 0;
+    };
     KeyedCollection.prototype.keysArray = function () {
         var self = this;
         return this._data.map(function (value) {
@@ -71,7 +78,7 @@ var KeyedCollection = (function () {
         });
     };
     KeyedCollection.prototype.valuesArray = function () {
-        return this._data;
+        return this._data.slice();
     };
     KeyedCollection.prototype.entriesArray = function () {
         var self = this;

@@ -1,15 +1,22 @@
-import DataTable = require('./DataTable');
-import DataRow = require('./DataRow');
-export = DataColumn;
-declare class DataColumn<T> {
+import { DataTable } from './DataTable';
+import { DataColumnConstraint } from './DataColumnConstraint';
+export declare type DataColumnConstructorOptions = {
+    keyPath?: string;
+    primaryKey?: boolean;
+    index?: boolean;
+    constraints?: DataColumnConstraint[];
+    get?(object: {}): any;
+    set?(object: {});
+};
+export declare class DataColumn {
     private _name;
     private _index;
     private _table;
     private _keyPath;
     private _constraints;
-    constructor(table: DataTable, name: string, keyPath?: string);
-    getValue(data: Object): T;
-    setValue(row: DataRow, value: T): void;
+    constructor(name: string, constructorOptions?: DataColumnConstructorOptions);
+    getValue<T>(data: Object): T;
+    setValue<T>(data: Object, value: T): void;
     table(): DataTable;
     name(): string;
     name(sName: string): this;

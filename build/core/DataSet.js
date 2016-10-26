@@ -1,15 +1,15 @@
 // DataSet.ts
 "use strict";
-var DataTable = require('./DataTable');
+var DataTable_1 = require('./DataTable');
+var util_1 = require('./util');
 var ds_counter = 0;
 var dt_counter = 0;
 var DataSet = (function () {
     function DataSet(sName) {
         this._tables = new Array();
+        this._relations = new util_1.KeyedCollection('name');
         ++ds_counter;
         this._name = sName || "Set " + ds_counter;
-        this._tables = [];
-        this._relations = [];
     }
     DataSet.prototype.tables = function () {
         return this._tables.slice();
@@ -17,7 +17,7 @@ var DataSet = (function () {
     DataSet.prototype.newTable = function (sName) {
         ++dt_counter;
         sName = sName || "Table " + dt_counter;
-        return new DataTable(sName);
+        return new DataTable_1.DataTable(sName);
     };
     DataSet.prototype.addTable = function (oTable) {
         var tbl;
@@ -25,7 +25,7 @@ var DataSet = (function () {
             tbl = this.newTable(oTable);
         }
         else {
-            if (oTable instanceof DataTable) {
+            if (oTable instanceof DataTable_1.DataTable) {
                 tbl = oTable;
             }
             else {
@@ -53,5 +53,5 @@ var DataSet = (function () {
     ;
     return DataSet;
 }());
-module.exports = DataSet;
+exports.DataSet = DataSet;
 //# sourceMappingURL=DataSet.js.map

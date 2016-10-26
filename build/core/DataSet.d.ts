@@ -1,6 +1,5 @@
-import DataTable = require('./DataTable');
-export = DataSet;
-declare class DataSet {
+import { DataTable } from './DataTable';
+export declare class DataSet {
     private _name;
     private _tables;
     private _relations;

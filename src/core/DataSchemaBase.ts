@@ -1,9 +1,8 @@
 // IDataSchema.ts
 
-import DataColumn = require('./DataColumn')
+import {DataColumn} from './DataColumn'
 
-interface DataSchemaBase {
-    columns(): DataColumn<any>[];
+export interface DataSchemaBase {
+    columns(): DataColumn[];
     keyPath(): string;
 }
-export = DataSchemaBase

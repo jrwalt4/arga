@@ -8,5 +8,5 @@ var DataRelation = (function () {
     }
     return DataRelation;
 }());
-module.exports = DataRelation;
+exports.DataRelation = DataRelation;
 //# sourceMappingURL=DataRelation.js.map

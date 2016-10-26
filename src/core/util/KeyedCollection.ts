@@ -1,6 +1,6 @@
 // util/KeyedCollection.ts
 
-import {resolveKeyPath} from './Functions'
+import { resolveKeyPath } from './Functions'
 
 export class KeyedCollection<TKey, TValue> {
 	private _data: TValue[]
@@ -12,7 +12,7 @@ export class KeyedCollection<TKey, TValue> {
 	}
 
 	has(key: TKey): boolean {
-		return this.indexOf(key) !== void 0
+		return this.indexOf(key) > -1
 	}
 
 	get(key: TKey): TValue {
@@ -64,11 +64,19 @@ export class KeyedCollection<TKey, TValue> {
 		return deleted;
 	}
 
-	indexOf(key: TKey): number {
+	private indexOf(key: TKey): number {
 		var self = this;
-		return findIndex(this._data, function (value: TValue) {
+		return findIndex(this._data, function (value: TValue): boolean {
 			return resolveKeyPath(self._keyPath, value) === key;
 		})
+	}
+
+	find(predicate:ContentCompare<TValue>): TValue {
+		var index = findIndex(this._data, predicate);
+		if (index > -1) {
+			return this._data[index]
+		}
+		return void 0;
 	}
 
 	keysArray(): TKey[] {
@@ -79,12 +87,12 @@ export class KeyedCollection<TKey, TValue> {
 	}
 
 	valuesArray(): TValue[] {
-		return this._data;
+		return this._data.slice();
 	}
 
-	entriesArray(): (TKey | TValue)[][] {
+	entriesArray(): [TKey, TValue][] {
 		var self = this;
-		return this._data.map(function (value: TValue) {
+		return this._data.map(function (value: TValue): [TKey, TValue] {
 			return [resolveKeyPath<TKey>(this._keyPath, value), value];
 		});
 	}
@@ -110,7 +118,7 @@ export class KeyedCollection<TKey, TValue> {
 
 }
 
-type ContentCompare<T> = (value: T, index: number, array: T[]) => boolean
+export type ContentCompare<T> = (value: T, index: number, array: T[]) => boolean
 
 function findIndex(array: any[], predicate: ContentCompare<any>): number {
 	'use strict';

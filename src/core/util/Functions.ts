@@ -28,6 +28,32 @@ export function compareKeys<T>(keyA: T, keyB: T) {
 	}
 }
 
+export function getValueAtKeyPath<T>(sKeyPath: string, item: {}): T {
+	sKeyPath = sKeyPath || "";
+	var path = sKeyPath.split('.');
+	return resolveKeyPathArray<T>(path, item);
+}
+
+export function setValueAtKeyPath(sKeyPath:string, item:{}, value:any):boolean {
+	let keyPathArray = sKeyPath.split('.');
+	let lastKey = keyPathArray.pop();
+	let penultimantValue = resolveKeyPathArray<{}>(keyPathArray, item);
+	return !!(penultimantValue[lastKey] = value);
+}
+
+export function createKeyPathGetter<T>(sKeyPath: string): (item: {}) => T {
+	return <(item: {}) => T>new Function("__item__", "return __item__." + sanitizeKeyPath(sKeyPath))
+}
+
+export function createKeyPathSetter<T>(sKeyPath: string): (item: {}, value: T) => void {
+	return <(item: {}, value: T) => void>new Function("__item__", "__value__",
+		"__item__." + sanitizeKeyPath(sKeyPath) + " = __value__ ")
+}
+
+function sanitizeKeyPath(sKeyPath: string): string {
+	return sKeyPath.split('.').map(value => value.trim()).join('.');
+}
+
 export function resolveKeyPath<T>(sKeyPath: string, obj: any): T {
 	sKeyPath = sKeyPath || "";
 	var path = sKeyPath.split('.');
@@ -39,7 +65,7 @@ export function resolveKeyPathArray<T>(aKeyPathArray: string[], obj: any): T {
 		if (prevResult === void 0) {
 			return void 0;
 		}
-		var value:any;
+		var value: any;
 		if (typeof prevResult[nextVal] === "function") {
 			value = prevResult[nextVal]();
 		} else {
@@ -49,19 +75,7 @@ export function resolveKeyPathArray<T>(aKeyPathArray: string[], obj: any): T {
 	}, obj)
 }
 
-export function resolveKeyPathFromDataRow<T>(sKeyPath: string, row: DataRow) {
-	sKeyPath = sKeyPath || "";
-	var path = sKeyPath.split('.');
-	var firstMemberKey = path.shift();
-	var firstMember = row.get<T>(firstMemberKey);
-	return resolveKeyPathArray<T>(path, firstMember);
-}
-
-export function setValueAtKeyPath(obj:Object, sKeyPath:string, value:any) {
-
-}
-
-export function createValueWithKeyPath(value: any, sKeyPath: string):Object {
+export function createValueWithKeyPath(value: any, sKeyPath: string): Object {
 	var keyPathArray = sKeyPath.split('.');
 	return keyPathArray.reduceRight(function (prevValue: any, key: string, curIndex: number, array: string[]) {
 		var wrappedValue = {};
@@ -91,7 +105,7 @@ export function flattenPrototypeChain(obj: Object, depth?: number, doNotCopy?: O
 			if (doNotCopy.indexOf(value) < 0) {
 				copyObj[key] = flattenPrototypeChain(value, depth - 1, doNotCopy);
 			} else {
-				console.warn("circular reference in obj:"+obj)
+				console.warn("circular reference in obj:" + obj)
 			}
 		} else {
 			copyObj[key] = value;
@@ -100,10 +114,10 @@ export function flattenPrototypeChain(obj: Object, depth?: number, doNotCopy?: O
 	return copyObj;
 }
 
-export function createUUID():string {
+export function createUUID(): string {
 	var uuid = '0';
-	for (var i = 0 ; i < 12 ; i++) {
-		uuid+='0';
+	for (var i = 0; i < 12; i++) {
+		uuid += '0';
 	}
 	return uuid;
 }

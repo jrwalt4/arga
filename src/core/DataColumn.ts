@@ -2,46 +2,52 @@
 
 import SortedArray = require('collections/sorted-array');
 import * as util from './Util'
-import DataTable = require('./DataTable');
-import DataRow = require('./DataRow');
-import DataColumnConstraint = require('./DataColumnConstraint');
+import {DataTable} from './DataTable'
+import {DataRow} from './DataRow'
+import {DataColumnConstraint}  from './DataColumnConstraint'
 
-export = DataColumn;
+export type DataColumnConstructorOptions = {
+    keyPath?:string
+    primaryKey?:boolean
+    index?:boolean
+    constraints?:DataColumnConstraint[]
+    get?(object:{}):any
+    set?(object:{});
+}
 
-class DataColumn<T> {
+export class DataColumn {
     private _name: string
-    private _index: SortedArray<Item<T>>
+    private _index: SortedArray<Item<any>>
     private _table: DataTable
     private _keyPath: string
     private _constraints: DataColumnConstraint[]
 
-    constructor(name: string, keyPath?: string) {
+    constructor(name: string, constructorOptions:DataColumnConstructorOptions = {keyPath:name}) {
         this._name = name;
-        this._keyPath = keyPath;
-        this._index = new SortedArray<Item<T>>(undefined, util.createContentEquals(keyPath), util.createContentCompare(keyPath));
+        if (constructorOptions.keyPath) {
+            var keyPath = constructorOptions.keyPath;
+            this.getValue = (data:Object) => util.resolveKeyPath(keyPath, data)
+            this.setValue = (data:Object, value:any)=> util.setValueAtKeyPath(keyPath, data, value) 
+        } else {
+
+        }
+        if (constructorOptions.index) {
+            this._index = new SortedArray<Item<any>>(undefined, util.createContentEquals(keyPath), util.createContentCompare(keyPath));
+            //this._index.addRangeChangeListener(()=>{});
+        }
     }
 
-    getValue(data: Object): T {
+    getValue<T>(data: Object): T {
         return util.resolveKeyPath<T>(this._keyPath, data);
     }
 
-    setValue(row:DataRow, value:T) {
+    setValue<T>(data:Object, value:T) {
 
     }
 
     table(): DataTable {
         return this._table;
     }
-    /*
-    table(newTable: DataTable): this;
-    table(newTable?: DataTable): any {
-        if (newTable !== undefined && newTable instanceof DataTable) {
-            this._table = newTable;
-            return this;
-        }
-        return this._table;
-    }
-    //*/
 
     name(): string
     name(sName: string): this

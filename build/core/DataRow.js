@@ -1,7 +1,7 @@
 // DataRow.js
 "use strict";
-var DataRowState = require('./DataRowState');
-var DataRowVersion = require('./DataRowVersion');
+var DataRowState_1 = require('./DataRowState');
+var DataRowVersion_1 = require('./DataRowVersion');
 var eventemitter2_1 = require('eventemitter2');
 var Util_1 = require('./Util');
 var DataRow = (function () {
@@ -15,6 +15,18 @@ var DataRow = (function () {
         this._original = void 0;
         this._current = this._createCurrent();
     }
+    DataRow.prototype.table = function (oDataTable) {
+        if (oDataTable !== undefined) {
+            if (oDataTable === null) {
+                this._table = undefined;
+            }
+            else {
+                this._table = oDataTable;
+            }
+            return this;
+        }
+        return this._table;
+    };
     DataRow.prototype._createOriginal = function () {
         return Object.create(null);
     };
@@ -42,15 +54,15 @@ var DataRow = (function () {
          *
          */
         if (this._table === void 0) {
-            return DataRowState.DETACHED;
+            return DataRowState_1.DataRowState.DETACHED;
         }
         if (this._current === null) {
-            return DataRowState.DELETED;
+            return DataRowState_1.DataRowState.DELETED;
         }
         if (this._original === void 0) {
-            return DataRowState.ADDED;
+            return DataRowState_1.DataRowState.ADDED;
         }
-        return this._current === void 0 ? DataRowState.UNCHANGED : DataRowState.MODIFIED;
+        return this._current === void 0 ? DataRowState_1.DataRowState.UNCHANGED : DataRowState_1.DataRowState.MODIFIED;
     };
     DataRow.prototype.has = function (key, version) {
         var searchObject = this._getVersion(version);
@@ -90,9 +102,9 @@ var DataRow = (function () {
         }
     };
     DataRow.prototype._getVersion = function (version) {
-        if (version === void 0) { version = DataRowVersion.DEFAULT; }
+        if (version === void 0) { version = DataRowVersion_1.DataRowVersion.DEFAULT; }
         switch (version) {
-            case DataRowVersion.DEFAULT:
+            case DataRowVersion_1.DataRowVersion.DEFAULT:
                 if (this.isEditing()) {
                     return this._proposed ||
                         (this._proposed = this._createProposed());
@@ -101,11 +113,11 @@ var DataRow = (function () {
                     return this._current ||
                         (this._current = this._createCurrent());
                 }
-            case DataRowVersion.CURRENT:
+            case DataRowVersion_1.DataRowVersion.CURRENT:
                 return this._current;
-            case DataRowVersion.ORIGINAL:
+            case DataRowVersion_1.DataRowVersion.ORIGINAL:
                 return this._original;
-            case DataRowVersion.PROPOSED:
+            case DataRowVersion_1.DataRowVersion.PROPOSED:
                 return this._proposed;
             default:
                 throw new Error("DataRowVersion {" + version + "} is not recognized");
@@ -140,7 +152,7 @@ var DataRow = (function () {
         // bitwise check (&) in case rowState() is 
         // changed to return a set of flags in
         // future versions
-        if (this.rowState() & DataRowState.DELETED) {
+        if (this.rowState() & DataRowState_1.DataRowState.DELETED) {
             throw new Error("Row already deleted");
         }
         if (this.isEditing()) {
@@ -167,25 +179,10 @@ var DataRow = (function () {
         else {
             this._current = null;
         }
-        if (this.rowState() & DataRowState.ADDED) {
+        if (this.rowState() & DataRowState_1.DataRowState.ADDED) {
             this.dispatchBeforeDelete();
             this.dispatchDelete();
         }
-    };
-    DataRow.prototype.key = function () {
-        return this.table().keyPath();
-    };
-    DataRow.prototype.table = function (oDataTable) {
-        if (oDataTable !== undefined) {
-            if (oDataTable === null) {
-                this._table = undefined;
-            }
-            else {
-                this._table = oDataTable;
-            }
-            return this;
-        }
-        return this._table;
     };
     DataRow.prototype.beginEdit = function () {
         if (this.isEditing()) {
@@ -235,8 +232,8 @@ var DataRow = (function () {
     };
     return DataRow;
 }());
+exports.DataRow = DataRow;
 function isDataColumn(dc) {
     return (typeof dc.getValue === "function" && typeof dc.setValue === "function");
 }
-module.exports = DataRow;
 //# sourceMappingURL=DataRow.js.map

@@ -1,4 +1,4 @@
-var DataSet = require('../build/core/DataSet');
+var DataSet = require('../build/core/DataSet').DataSet;
 describe("arga.DataSet", function() {
 
     var ds = new DataSet();;
