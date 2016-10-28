@@ -27,13 +27,17 @@ var DataTable = (function () {
         }
         return this._columnCollection.get(columnName);
     };
-    DataTable.prototype.primaryKey = function () {
-        throw new Error("not yet implemented");
-        /*
-        return this.columns().find(function (column, index, array){
-            return !column;
-        })
-        */
+    DataTable.prototype.primaryKey = function (dataColumn) {
+        if (dataColumn === void 0) {
+            return this._primaryKey;
+        }
+        if (Array.isArray(dataColumn)) {
+            this._primaryKey = dataColumn;
+        }
+        else {
+            this._primaryKey = [dataColumn];
+        }
+        return this;
     };
     DataTable.prototype.acceptChanges = function () {
         this.rows().toArray().forEach(function (dr) {

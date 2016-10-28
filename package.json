@@ -14,17 +14,17 @@
     "lib": "src"
   },
   "scripts": {
+    "build":"tsc",
     "build-web": "node build-web.js",
     "build-node": "tsc",
     "test": "tsc && jasmine"
   },
   "keywords": [
     "dataset",
-    "data table",
+    "datatable",
     "database",
     "index",
-    "data adapter",
-    "indexedDB",
+    "dataadapter",
     "ADO.NET"
   ],
   "author": "jrwalt4",

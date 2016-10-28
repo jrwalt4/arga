@@ -7,8 +7,8 @@ var DataColumn = (function () {
         if (constructorOptions === void 0) { constructorOptions = { keyPath: name }; }
         this._name = name;
         if (constructorOptions.keyPath) {
-            var keyPath = constructorOptions.keyPath;
-            this.getValue = function (data) { return util.resolveKeyPath(keyPath, data); };
+            var keyPath = this._keyPath = constructorOptions.keyPath;
+            this.getValue = function (data) { return util.getValueAtKeyPath(keyPath, data); };
             this.setValue = function (data, value) { return util.setValueAtKeyPath(keyPath, data, value); };
         }
         else {
@@ -22,8 +22,12 @@ var DataColumn = (function () {
     };
     DataColumn.prototype.setValue = function (data, value) {
     };
-    DataColumn.prototype.table = function () {
-        return this._table;
+    DataColumn.prototype.table = function (dataTable) {
+        if (dataTable === void 0) {
+            return this._table;
+        }
+        this._table = dataTable;
+        return this;
     };
     DataColumn.prototype.name = function (sName) {
         if (sName !== undefined) {
@@ -33,9 +37,6 @@ var DataColumn = (function () {
         return this._name;
     };
     DataColumn.prototype.keyPath = function () {
-        if (this._keyPath === void 0) {
-            return this.name();
-        }
         return this._keyPath;
     };
     return DataColumn;

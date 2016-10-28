@@ -24,6 +24,7 @@ export declare class DataRow {
     rowState(): DataRowState;
     has(key: string, version?: DataRowVersion): boolean;
     get<T>(column: DataColumn, version?: DataRowVersion): T;
+    get<T>(columns: DataColumn[], version?: DataRowVersion): [T];
     get<T>(key: string, version?: DataRowVersion): T;
     private _getItemWithKey<T>(key, version?);
     private _getItemWithColumn<T>(column, version?);

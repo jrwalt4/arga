@@ -98,16 +98,18 @@ export class DataRow {
 	}
 
 	get<T>(column: DataColumn, version?: DataRowVersion): T
+	get<T>(columns: DataColumn[], version?: DataRowVersion): [T]
 	get<T>(key: string, version?: DataRowVersion): T
-	get<T>(keyOrColumn: any, version?: DataRowVersion): T {
+	get<T>(keyOrColumn: any, version?: DataRowVersion): any {
 		if (typeof keyOrColumn === "string") {
 			var key = keyOrColumn;
 			return this._getItemWithKey<T>(key, version);
 		}
-		if (isDataColumn<T>(keyOrColumn)) {
-			var column: DataColumn = keyOrColumn;
-			return this._getItemWithColumn<T>(column, version);
+		if (Array.isArray(keyOrColumn)) {
+			return (<DataColumn[]>keyOrColumn).map((column) => this.get(column))
 		}
+		var column: DataColumn = keyOrColumn;
+		return this._getItemWithColumn<T>(column, version);
 	}
 
 	private _getItemWithKey<T>(key: string, version?: DataRowVersion): T {
@@ -159,7 +161,7 @@ export class DataRow {
 				//var value: T = valOrVersion;
 				return this._setItem(key, value);
 			case "object":
-				if (isDataColumn<T>(valsOrKeyOrColumn)) {
+				if (isDataColumn(valsOrKeyOrColumn)) {
 					let column: DataColumn = valsOrKeyOrColumn;
 					column.setValue(this, value);
 					return this;
@@ -274,10 +276,11 @@ export class DataRow {
 	}
 }
 
-function isDataColumn<T>(dc: any): dc is DataColumn {
+//*
+function isDataColumn(dc: any): dc is DataColumn {
 	return (typeof dc.getValue === "function" && typeof dc.setValue === "function");
 }
-
+//*/
 export type RowChangeEventArgs = {
 	type: RowChangeType,
 	key?: any

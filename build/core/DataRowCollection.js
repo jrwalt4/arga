@@ -8,44 +8,56 @@ var DataRowCollection = (function () {
         }
         this._table = dataTable;
         var drc = this;
-        this._rows = new SortedArray([], function (objA, objB) {
+        this._rows = new SortedArray([], function (key, row) {
+            var primaryKey = drc.table().primaryKey();
+            return primaryKey.every(function (column, index) {
+                return primaryKey[index] === row.get(column);
+            });
+        }, function (key, row) {
             var keyColumn = drc.table().primaryKey();
-            return keyColumn.getValue(objA) === keyColumn.getValue(objB);
-        }, function (objA, objB) {
-            //var keyColumn = drc.table().primaryKey();
             return 1;
         });
     }
-    //*
-    DataRowCollection.prototype.size = function () {
-        return this._rows.length;
+    Object.defineProperty(DataRowCollection.prototype, "size", {
+        //*
+        get: function () {
+            return this._rows.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    DataRowCollection.prototype.has = function (key) {
+        return this._rows.has(key); // TODO
     };
-    DataRowCollection.prototype.has = function (value) {
-        return this._rows.has({}); // TODO
+    DataRowCollection.prototype.get = function (key) {
+        return this._rows.get(key);
     };
-    DataRowCollection.prototype.get = function (value) {
-        return this._rows.get(value);
-    };
-    DataRowCollection.prototype.add = function () {
-        var rows = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            rows[_i - 0] = arguments[_i];
-        }
-        for (var _a = 0, rows_1 = rows; _a < rows_1.length; _a++) {
-            var row = rows_1[_a];
-            this._addRow(row);
-        }
-    };
-    DataRowCollection.prototype._addRow = function (row) {
+    /*
+    set(key:any):boolean {
+        throw new Error("DataRowCollection#set does not exist")
+    }
+    //*/
+    DataRowCollection.prototype.add = function (row) {
         if (this._rows.add(row)) {
             row.table(this.table());
+            return true;
         }
-        else {
-            throw new Error("Could not add DataRow:" + row);
-        }
+        return false;
+    };
+    DataRowCollection.prototype.delete = function (key) {
+        return this._rows.delete(key);
     };
     DataRowCollection.prototype.clear = function () {
         this._rows.clear();
+    };
+    DataRowCollection.prototype.find = function (value) {
+        return this.get(value);
+    };
+    DataRowCollection.prototype.entriesArray = function () {
+        var self = this;
+        return this._rows.map(function (row) {
+            return [row.get(self.table().primaryKey()), row];
+        });
     };
     DataRowCollection.prototype.toArray = function () {
         return this._rows.toArray();

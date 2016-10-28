@@ -17,8 +17,12 @@ var DataColumnCollection = (function (_super) {
         this._table = dataTable;
         //this._columns = new Array<DataColumn<any>>();
     }
-    DataColumnCollection.prototype.table = function () {
-        return this._table;
+    DataColumnCollection.prototype.add = function (dataColumn) {
+        var added = _super.prototype.add.call(this, dataColumn);
+        if (added) {
+            dataColumn.table(this._table);
+        }
+        return added;
     };
     return DataColumnCollection;
 }(Util_1.KeyedCollection));

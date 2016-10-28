@@ -11,7 +11,7 @@ export class DataTable {
 	private _name: string;
 	private _rowCollection: DataRowCollection;
 	private _columnCollection: DataColumnCollection;
-	private _keyPath: string;
+	private _primaryKey: DataColumn[];
 
 	constructor(sName?: string) {
 		this._name = sName || "Table";
@@ -20,8 +20,8 @@ export class DataTable {
 		this._columnCollection = new DataColumnCollection(this);
 	}
 	
-	name(): string;
-	name(sName: string): this;
+	name(): string
+	name(sName: string): this
 	name(sName?: string): any {
 		if (sName !== undefined) {
 			this._name = sName;
@@ -48,13 +48,19 @@ export class DataTable {
 		return this._columnCollection.get(columnName);
 	}
 
-	primaryKey():DataColumn {
-		throw new Error("not yet implemented");
-		/*
-		return this.columns().find(function (column, index, array){
-			return !column;
-		})
-		*/
+	primaryKey():DataColumn[] 
+	primaryKey(dataColumn:DataColumn):this
+	primaryKey(dataColumnArray:DataColumn[]):this
+	primaryKey(dataColumn?:DataColumn | DataColumn[]):any {
+		if (dataColumn === void 0) {
+			return this._primaryKey;
+		}
+		if (Array.isArray(dataColumn)) {
+			this._primaryKey = dataColumn;
+		} else {
+			this._primaryKey = [dataColumn];
+		}
+		return this;
 	}
 
 	acceptChanges() {

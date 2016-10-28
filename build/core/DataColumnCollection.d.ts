@@ -4,5 +4,5 @@ import { KeyedCollection } from './Util';
 export declare class DataColumnCollection extends KeyedCollection<string, DataColumn> {
     private _table;
     constructor(dataTable: DataTable);
-    table(): DataTable;
+    add(dataColumn: DataColumn): boolean;
 }

@@ -18,6 +18,7 @@ export declare class DataColumn {
     getValue<T>(data: Object): T;
     setValue<T>(data: Object, value: T): void;
     table(): DataTable;
+    table(dataTable: DataTable): this;
     name(): string;
     name(sName: string): this;
     keyPath(): string;

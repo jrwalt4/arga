@@ -25,8 +25,8 @@ export class DataColumn {
     constructor(name: string, constructorOptions:DataColumnConstructorOptions = {keyPath:name}) {
         this._name = name;
         if (constructorOptions.keyPath) {
-            var keyPath = constructorOptions.keyPath;
-            this.getValue = (data:Object) => util.resolveKeyPath(keyPath, data)
+            var keyPath = this._keyPath = constructorOptions.keyPath;
+            this.getValue = (data:Object) => util.getValueAtKeyPath(keyPath, data)
             this.setValue = (data:Object, value:any)=> util.setValueAtKeyPath(keyPath, data, value) 
         } else {
 
@@ -45,8 +45,14 @@ export class DataColumn {
 
     }
 
-    table(): DataTable {
-        return this._table;
+    table(): DataTable 
+    table(dataTable:DataTable):this
+    table(dataTable?:DataTable):any {
+        if (dataTable === void 0) {
+            return this._table;
+        }
+        this._table = dataTable;
+        return this;
     }
 
     name(): string
@@ -59,11 +65,8 @@ export class DataColumn {
         return this._name;
     }
 
-    keyPath(): string {
-        if (this._keyPath === void 0) {
-            return this.name()
-        }
-        return this._keyPath
+    keyPath():string {
+        return this._keyPath;
     }
 }
 

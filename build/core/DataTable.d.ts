@@ -6,7 +6,7 @@ export declare class DataTable {
     private _name;
     private _rowCollection;
     private _columnCollection;
-    private _keyPath;
+    private _primaryKey;
     constructor(sName?: string);
     name(): string;
     name(sName: string): this;
@@ -14,6 +14,8 @@ export declare class DataTable {
     rows(key: any): DataRow;
     columns(): DataColumnCollection;
     columns(columnName: string): DataColumn;
-    primaryKey(): DataColumn;
+    primaryKey(): DataColumn[];
+    primaryKey(dataColumn: DataColumn): this;
+    primaryKey(dataColumnArray: DataColumn[]): this;
     acceptChanges(): void;
 }

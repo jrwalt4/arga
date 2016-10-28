@@ -1,12 +1,14 @@
 // DataRowCollection.ts
 
 import SortedArray = require('collections/sorted-array')
+import {IKeyedCollection} from './Util'
 
 import {DataTable} from './DataTable'
 import {DataRow} from './DataRow'
+import {DataColumn} from './DataColumn'
 import {createContentCompare, createContentEquals, createValueWithKeyPath} from './Util'
 
-export class DataRowCollection {
+export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     private _rows:SortedArray<DataRow>
     private _table:DataTable
     constructor(dataTable:DataTable) {
@@ -17,44 +19,72 @@ export class DataRowCollection {
         
         var drc = this;
 
-        this._rows = new SortedArray<DataRow>([], function(objA, objB):boolean {
-            var keyColumn = drc.table().primaryKey();
-            return keyColumn.getValue(objA) === keyColumn.getValue(objB); 
-        }, function (objA, objB):number {
+        this._rows = new SortedArray<DataRow>([], function(key:any, row:DataRow):boolean {
+            var primaryKey = drc.table().primaryKey();
+            return primaryKey.every(function(column:DataColumn, index:number){
+                return primaryKey[index] === row.get(column);
+            })
+        }, function (key, row:DataRow):number {
             var keyColumn = drc.table().primaryKey();
             return 1
         });
     }
 
     //*
-    size():number {
+    get size():number {
         return this._rows.length;
     }
 
-    has(value:any):boolean {
-        return this._rows.has({}); // TODO
+    has(key:any):boolean {
+        return this._rows.has(key); // TODO
     }
 
-    get(value:any):DataRow {
-        return this._rows.get(value);
+    get(key:any):DataRow {
+        return this._rows.get(key);
     }
 
-    add(...rows:DataRow[]) {
-        for (let row of rows) {
-            this._addRow(row);
-        }
+    /*
+    set(key:any):boolean {
+        throw new Error("DataRowCollection#set does not exist")
     }
+    //*/
 
-    private _addRow(row:DataRow) {
+    add(row:DataRow):boolean {
         if (this._rows.add(row)) {
             row.table(this.table());
-        } else {
-            throw new Error("Could not add DataRow:" + row);
+            return true;
         }
+        return false;
+    }
+
+    delete(key:any):boolean {
+        return this._rows.delete(key);
     }
 
     clear() {
         this._rows.clear();
+    }
+
+    find(value:any):DataRow {
+        return this.get(value);
+    }
+
+    entriesArray():[any, DataRow][] {
+        var self = this;
+        return this._rows.map(function (row:DataRow):[any,DataRow] {
+            return [row.get(self.table().primaryKey()),row]
+        })
+    }
+
+    valuesArray():DataRow[] {
+        return this.toArray();
+    }
+
+    keysArray():any[] {
+        var self = this;
+        return this._rows.map(function(row:DataRow):any {
+            return row.get(self.table().primaryKey());
+        })
     }
 
     toArray():DataRow[] {

@@ -2,7 +2,21 @@
 
 import { resolveKeyPath } from './Functions'
 
-export class KeyedCollection<TKey, TValue> {
+export interface IKeyedCollection<TKey, TValue> {
+	size:number 
+	has(key: TKey): boolean
+	get(key: TKey): TValue
+	//set(value: TValue): boolean
+	add(value: TValue): boolean
+	delete(key: TKey): boolean
+	find(predicate:ContentCompare<TValue>): TValue
+	keysArray(): TKey[]
+	valuesArray(): TValue[]
+	entriesArray(): [TKey, TValue][]
+	toString(): string
+}
+
+export class KeyedCollection<TKey, TValue> implements IKeyedCollection<TKey, TValue> {
 	private _data: TValue[]
 	private _keyPath: string
 
@@ -24,6 +38,7 @@ export class KeyedCollection<TKey, TValue> {
 		}
 	}
 
+	/*
 	set(value: TValue): boolean {
 		var added = false;
 		var newKey = resolveKeyPath<TKey>(this._keyPath, value)
@@ -32,27 +47,28 @@ export class KeyedCollection<TKey, TValue> {
 			added = true;
 			this._data.push(value)
 		} else {
-			console.warn("value with key=" + newKey + " exists in collection. Replacing value")
+			
+		}
+		return added;
+	}
+	//*/
+
+	add(value: TValue): boolean {
+		var added = false;
+		var key = resolveKeyPath<TKey>(this._keyPath, value)
+		var index = this.indexOf(key);
+		if (index < 0) {
+			added = true;
+			this._data.push(value)
+		} else {
+			console.warn("value with key=" + key + " exists in collection. Replacing value")
 			this._data.splice(index, 1, value);
 			added = true;
 		}
 		return added;
 	}
 
-	add(newValue: TValue): boolean {
-		var added = false;
-		var newKey = resolveKeyPath<TKey>(this._keyPath, newValue)
-		var index = this.indexOf(newKey);
-		if (index < 0) {
-			added = true;
-			this._data.push(newValue)
-		} else {
-			throw new Error("value with key=" + newKey + " already exists in collection")
-		}
-		return added;
-	}
-
-	del(key: TKey): boolean {
+	delete(key: TKey): boolean {
 		var deleted = false;
 		var index = this.indexOf(key);
 		if (index < 0) {
@@ -111,11 +127,6 @@ export class KeyedCollection<TKey, TValue> {
 	set size(newValue) {
 		this._data.length = newValue;
 	}
-
-	static isCollection(obj: any) {
-		return obj instanceof KeyedCollection
-	}
-
 }
 
 export type ContentCompare<T> = (value: T, index: number, array: T[]) => boolean

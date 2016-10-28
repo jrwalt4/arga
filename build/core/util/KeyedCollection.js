@@ -18,35 +18,36 @@ var KeyedCollection = (function () {
             return this._data[index];
         }
     };
-    KeyedCollection.prototype.set = function (value) {
+    /*
+    set(value: TValue): boolean {
         var added = false;
-        var newKey = Functions_1.resolveKeyPath(this._keyPath, value);
+        var newKey = resolveKeyPath<TKey>(this._keyPath, value)
         var index = this.indexOf(newKey);
+        if (index < 0) {
+            added = true;
+            this._data.push(value)
+        } else {
+            
+        }
+        return added;
+    }
+    //*/
+    KeyedCollection.prototype.add = function (value) {
+        var added = false;
+        var key = Functions_1.resolveKeyPath(this._keyPath, value);
+        var index = this.indexOf(key);
         if (index < 0) {
             added = true;
             this._data.push(value);
         }
         else {
-            console.warn("value with key=" + newKey + " exists in collection. Replacing value");
+            console.warn("value with key=" + key + " exists in collection. Replacing value");
             this._data.splice(index, 1, value);
             added = true;
         }
         return added;
     };
-    KeyedCollection.prototype.add = function (newValue) {
-        var added = false;
-        var newKey = Functions_1.resolveKeyPath(this._keyPath, newValue);
-        var index = this.indexOf(newKey);
-        if (index < 0) {
-            added = true;
-            this._data.push(newValue);
-        }
-        else {
-            throw new Error("value with key=" + newKey + " already exists in collection");
-        }
-        return added;
-    };
-    KeyedCollection.prototype.del = function (key) {
+    KeyedCollection.prototype.delete = function (key) {
         var deleted = false;
         var index = this.indexOf(key);
         if (index < 0) {
@@ -103,9 +104,6 @@ var KeyedCollection = (function () {
         enumerable: true,
         configurable: true
     });
-    KeyedCollection.isCollection = function (obj) {
-        return obj instanceof KeyedCollection;
-    };
     return KeyedCollection;
 }());
 exports.KeyedCollection = KeyedCollection;

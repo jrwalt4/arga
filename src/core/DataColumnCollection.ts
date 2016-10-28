@@ -16,32 +16,11 @@ export class DataColumnCollection extends KeyedCollection<string, DataColumn> {
         //this._columns = new Array<DataColumn<any>>();
     }
 
-    table():DataTable {
-        return this._table;
-    }
-
-    /*
-    add(dataColumn:DataColumn<any>):this {
-        if(this._columns.indexOf(dataColumn)<0) {
-            this._columns.push(dataColumn);
-        } else {
-            throw new Error("Column '"+dataColumn.name()+"' already exists in collection")
+    add(dataColumn:DataColumn):boolean {
+        let added = super.add(dataColumn);
+        if(added) {
+            dataColumn.table(this._table);
         }
-        return this;
+        return added;
     }
-
-    get(col:string):DataColumn<any> {
-        if(typeof col === 'string') {
-            for (var dc of this._columns) {
-                if(dc.name() === col) {
-                    return dc
-                }
-            }
-        }
-    }
-
-    remove(col:string|DataColumn<any>) {
-        
-    }
-    //*/
 }

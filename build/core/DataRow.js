@@ -74,14 +74,16 @@ var DataRow = (function () {
         return false;
     };
     DataRow.prototype.get = function (keyOrColumn, version) {
+        var _this = this;
         if (typeof keyOrColumn === "string") {
             var key = keyOrColumn;
             return this._getItemWithKey(key, version);
         }
-        if (isDataColumn(keyOrColumn)) {
-            var column = keyOrColumn;
-            return this._getItemWithColumn(column, version);
+        if (Array.isArray(keyOrColumn)) {
+            return keyOrColumn.map(function (column) { return _this.get(column); });
         }
+        var column = keyOrColumn;
+        return this._getItemWithColumn(column, version);
     };
     DataRow.prototype._getItemWithKey = function (key, version) {
         var data = this._getVersion(version);
@@ -233,6 +235,7 @@ var DataRow = (function () {
     return DataRow;
 }());
 exports.DataRow = DataRow;
+//*
 function isDataColumn(dc) {
     return (typeof dc.getValue === "function" && typeof dc.setValue === "function");
 }

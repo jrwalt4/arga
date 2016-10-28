@@ -1,7 +1,7 @@
 // Util.ts
 // Utilities used by arga.js
 
-export { KeyedCollection } from './util/KeyedCollection';
+export { IKeyedCollection, KeyedCollection } from './util/KeyedCollection';
 
 export {
 	createContentCompare, createContentEquals, compareKeys,
