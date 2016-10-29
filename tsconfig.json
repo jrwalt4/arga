@@ -8,6 +8,7 @@
         ".vscode",
         ".git",
         "gulpfile.js",
+        //"typings",
         "src/not_used"
     ],
     "compilerOptions": {
@@ -17,6 +18,7 @@
         "outDir": "build",
         "noEmitOnError": true,
         "sourceMap": true,
+        //"listFiles": true,
         "noLib": false
     }
 }

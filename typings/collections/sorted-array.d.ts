@@ -1,4 +1,6 @@
 /// <reference path="./generic-collection.d.ts" />
+/// <reference path="./listen/property-changes.d.ts" />
+/// <reference path="./listen/range-changes.d.ts" />
 
 interface SortedArrayConstructor {
     /**
@@ -25,8 +27,8 @@ interface SortedArray<T> extends
     swap(start: number, length: number, values?: T[])
 }
 
-declare var SortedArray: SortedArrayConstructor;
+declare let SortedArray:SortedArrayConstructor
 
 declare module "collections/sorted-array" {
-    export = SortedArray
+    export = SortedArray;
 }

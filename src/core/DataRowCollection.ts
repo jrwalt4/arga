@@ -1,4 +1,5 @@
 // DataRowCollection.ts
+/// <reference path="../../typings/index.d.ts" />
 
 import SortedArray = require('collections/sorted-array')
 import {IKeyedCollection} from './Util'
