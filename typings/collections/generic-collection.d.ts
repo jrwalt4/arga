@@ -1,4 +1,4 @@
-interface GenericCollection<T> extends Array<T> {
+export interface GenericCollection<T> extends Array<T> {
 
     has(value: any): boolean
 

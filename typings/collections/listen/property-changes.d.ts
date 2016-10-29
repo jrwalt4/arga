@@ -1,5 +1,5 @@
 
-interface PropertyChanges<T> {
+export interface PropertyChanges<T> {
     addOwnPropertyChangeListener(key:string, listener:PropertyChangeListener<T>, beforeChange?:boolean):void
     removeOwnPropertyChangeListener(key:string, listener:PropertyChangeListener<T>):void
     
@@ -12,5 +12,5 @@ interface PropertyChanges<T> {
     makePropertyObservable(name:string):void
 }
 
-type PropertyChangeListener<T> = (value:any, key:string, collection:T)=>void | Object
+export type PropertyChangeListener<T> = (value:any, key:string, collection:T)=>void | Object
 
