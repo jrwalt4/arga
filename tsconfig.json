@@ -8,7 +8,6 @@
         ".vscode",
         ".git",
         "gulpfile.js",
-        "typings/collections",
         "src/not_used"
     ],
     "compilerOptions": {

@@ -2,6 +2,7 @@
 
 // used for type information only
 import DataRow = require('../DataRow')
+import {ContentCompare, ContentEquals} from 'collections/types'
 
 export function createContentCompare<K, V>(sKeyPath: string): ContentCompare<K, V> {
 

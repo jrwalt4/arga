@@ -9,15 +9,12 @@ import {createContentCompare} from './Util'
 
 export class DataTable {
 	private _name: string;
-	private _rowCollection: DataRowCollection;
-	private _columnCollection: DataColumnCollection;
+	private _rowCollection = new DataRowCollection(this);
+	private _columnCollection = new DataColumnCollection(this);
 	private _primaryKey: DataColumn[];
 
 	constructor(sName?: string) {
 		this._name = sName || "Table";
-
-		this._rowCollection = new DataRowCollection(this);
-		this._columnCollection = new DataColumnCollection(this);
 	}
 	
 	name(): string
