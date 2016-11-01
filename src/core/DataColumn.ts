@@ -32,17 +32,16 @@ export class DataColumn {
 
         }
         if (constructorOptions.index) {
-            this._index = new SortedArray<Item<any>>(undefined, util.createContentEquals(keyPath), util.createContentCompare(keyPath));
-            //this._index.addRangeChangeListener(()=>{});
+            console.warn("use IndexedDataColumn for index")
         }
     }
 
     getValue<T>(data: Object): T {
-        return util.resolveKeyPath<T>(this._keyPath, data);
+        return util.getValueAtKeyPath<T>(this._keyPath, data);
     }
 
-    setValue<T>(data:Object, value:T) {
-
+    setValue<T>(data:Object, value:T):boolean {
+        return util.setValueAtKeyPath(this._keyPath, data, value);
     }
 
     table(): DataTable 

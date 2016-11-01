@@ -2,60 +2,93 @@
 
 // used for type information only
 import DataRow = require('../DataRow')
-import {ContentCompare, ContentEquals} from 'collections/types'
+import { ContentCompare, ContentEquals } from 'collections/types'
 
-export function createContentCompare<K, V>(sKeyPath: string): ContentCompare<K, V> {
-
-	return function compare(objA: K, objB: V): number {
-		var keyA = resolveKeyPath(sKeyPath, objA)
-		var keyB = resolveKeyPath(sKeyPath, objB)
-		return keyA < keyB ? -1 : (keyA > keyB ? 1 : 0);
-	}
-}
-
-export function createContentEquals<K, V>(sKeyPath: string): ContentEquals<K, V> {
-	return function equals(objA: K, objB: V): boolean {
-		var keyA = resolveKeyPath(sKeyPath, objA)
-		var keyB = resolveKeyPath(sKeyPath, objB)
-		return keyA == keyB;
-	}
-}
-
-export function compareKeys<T>(keyA: T, keyB: T) {
+export function compareKeys(keyA: any, keyB: any): number {
 	if (typeof indexedDB !== "undefined") {
 		return indexedDB.cmp(keyA, keyB);
-	} else {
-		return (keyA < keyB ? -1 : keyA > keyB ? 1 : 0);
 	}
+	if (Array.isArray(keyA) && Array.isArray(keyB)) {
+		var cmp = 0;
+		for (var i = 0; i < keyA.length; i++) {
+			cmp = compareKeys(keyA[i], keyB[i]);
+			if (cmp !== 0) {
+				break;
+			}
+		}
+		return cmp;
+	}
+	return (keyA < keyB ? -1 : keyA > keyB ? 1 : 0);
 }
 
 export function getValueAtKeyPath<T>(sKeyPath: string, item: {}): T {
-	sKeyPath = sKeyPath || "";
-	var path = sKeyPath.split('.');
-	return resolveKeyPathArray<T>(path, item);
+	sKeyPath = sanitizeKeyPath(sKeyPath);
+	let keyPathArray = sKeyPath.split('.');
+	return keyPathArray.reduce(function (prevResult: any, nextVal: string) {
+		if (prevResult === void 0) {
+			return void 0;
+		}
+		var value: any;
+		if (typeof prevResult[nextVal] === "function") {
+			value = prevResult[nextVal]();
+		} else {
+			value = prevResult[nextVal];
+		}
+		return value;
+	}, item)
 }
 
-export function setValueAtKeyPath(sKeyPath:string, item:{}, value:any):boolean {
-	let keyPathArray = sKeyPath.split('.');
-	let lastKey = keyPathArray.pop();
-	let penultimantValue = resolveKeyPathArray<{}>(keyPathArray, item);
-	return !!(penultimantValue[lastKey] = value);
+export function setValueAtKeyPath(sKeyPath: string, item: {}, value: any, extendProto: boolean = false): boolean {
+	let keyPath = sanitizeKeyPath(sKeyPath);
+	let keyPathArray = keyPath.split('.');
+	let lastMemberName = keyPathArray.pop();
+	let penultimentMember = keyPathArray.reduce(function (member: {}, nextMemberName: string) {
+		if (member[nextMemberName] === void 0) {
+			member[nextMemberName] = {};
+		} else {
+			if (typeof member[nextMemberName] === "object") {
+				if (!member.hasOwnProperty(nextMemberName)) {
+					member[nextMemberName] = Object.create(member[nextMemberName]);
+				}
+			}
+		}
+		return member[nextMemberName];
+	}, item)
+	return !!(penultimentMember[lastMemberName] = value);
 }
 
 export function createKeyPathGetter<T>(sKeyPath: string): (item: {}) => T {
-	return <(item: {}) => T>new Function("__item__", "return __item__." + sanitizeKeyPath(sKeyPath))
+	let keyPath = sanitizeKeyPath(sKeyPath);
+	let keyPathArray = keyPath.split('.');
+	return function getter(item: {}): T {
+		return resolveKeyPathArray<T>(keyPathArray, item);
+	}
 }
 
-export function createKeyPathSetter<T>(sKeyPath: string): (item: {}, value: T) => void {
-	return <(item: {}, value: T) => void>new Function("__item__", "__value__",
-		"__item__." + sanitizeKeyPath(sKeyPath) + " = __value__ ")
+export function createKeyPathSetter<T>(sKeyPath: string, extendProto: boolean = false): (item: {}, value: T) => void {
+	return function setter(item: {}, value: T): boolean {
+		return setValueAtKeyPath(sKeyPath, item, value);
+	}
 }
 
-function sanitizeKeyPath(sKeyPath: string): string {
-	return sKeyPath.split('.').map(value => value.trim()).join('.');
+function sanitizeKeyPath(sKeyPath: string): string
+//function sanitizeKeyPath(sKeyPath: string, toArray:boolean): string[]
+//function sanitizeKeyPath(sKeyPath:string, toArray?:boolean):string|string[] 
+{
+	if (sKeyPath === void 0) {
+		sKeyPath = "";
+	}
+	var sanitizedArray = sKeyPath.split('.').map(value => value.trim());
+	/*
+	if(toArray){
+		return sanitizedArray.join('.');
+	}
+	//*/
+	return sanitizedArray.join('.');
 }
 
 export function resolveKeyPath<T>(sKeyPath: string, obj: any): T {
+	console.warn("util.resolveKeyPath() is deprecated: use util.getValueAtKeyPath()");
 	sKeyPath = sKeyPath || "";
 	var path = sKeyPath.split('.');
 	return resolveKeyPathArray<T>(path, obj);
@@ -122,3 +155,22 @@ export function createUUID(): string {
 	}
 	return uuid;
 }
+
+/*
+export function createContentCompare<K, V>(sKeyPath: string): ContentCompare<K, V> {
+
+	return function compare(objA: K, objB: V): number {
+		var keyA = resolveKeyPath(sKeyPath, objA)
+		var keyB = resolveKeyPath(sKeyPath, objB)
+		return keyA < keyB ? -1 : (keyA > keyB ? 1 : 0);
+	}
+}
+
+export function createContentEquals<K, V>(sKeyPath: string): ContentEquals<K, V> {
+	return function equals(objA: K, objB: V): boolean {
+		var keyA = resolveKeyPath(sKeyPath, objA)
+		var keyB = resolveKeyPath(sKeyPath, objB)
+		return keyA == keyB;
+	}
+}
+//*/

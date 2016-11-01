@@ -1,14 +1,14 @@
 // DataTable.ts
 
+import {DataSet} from './DataSet'
 import {DataColumn} from './DataColumn'
 import {DataColumnCollection} from './DataColumnCollection'
 import {DataRow} from './DataRow'
 import {DataRowCollection} from './DataRowCollection'
-//import IDataSchema = require('./IDataSchema')
-import {createContentCompare} from './Util'
 
 export class DataTable {
-	private _name: string;
+	private _name: string
+	private _dataSet:DataSet
 	private _rowCollection = new DataRowCollection(this);
 	private _columnCollection = new DataColumnCollection(this);
 	private _primaryKey: DataColumn[];
@@ -25,6 +25,15 @@ export class DataTable {
 			return this;
 		}
 		return this._name;
+	}
+
+	dataSet():DataSet
+	dataSet(dataSet:DataSet):this 
+	dataSet(dataSet?:DataSet):any {
+		if (dataSet === void 0) {
+			return this._dataSet;
+		}
+		this._dataSet = dataSet;
 	}
 
 	rows(): DataRowCollection

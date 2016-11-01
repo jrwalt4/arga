@@ -1,6 +1,7 @@
 // DataSet.ts
 
 import {DataTable} from './DataTable'
+import {DataTableCollection} from './DataTableCollection'
 import {DataRelation} from './DataRelation'
 import {KeyedCollection} from './util'
 
@@ -10,7 +11,7 @@ var dt_counter = 0;
 export class DataSet {
 
 	private _name: string
-	private _tables = new Array<DataTable>()
+	private _tables = new DataTableCollection(this)
 	private _relations = new KeyedCollection<string, DataRelation>('name')
 
 	constructor(sName?: string) {
@@ -18,8 +19,32 @@ export class DataSet {
 		this._name = sName || "Set " + ds_counter;
 	}
 
-	tables(): DataTable[] {
-		return this._tables.slice();
+	name():string
+	name(newName:string):this
+	name(newName?: string):any {
+		if (newName === void 0) {
+			return this._name;
+		}
+		this._name = newName;
+		return this;
+	};
+
+	tables(): DataTableCollection
+	tables(name:string):DataTable
+	tables(name?:string):DataTable | DataTableCollection {
+		if(name === void 0) {
+			return this._tables; 
+		}
+		return this._tables.get(name);
+	}
+
+	relations():KeyedCollection<string, DataRelation>
+	relations(name:string):DataRelation
+	relations(name?:string):any {
+		if(name === void 0) {
+			return this._relations;
+		}
+		return this._relations.get(name);
 	}
 
 	newTable(sName?: string): DataTable {
@@ -27,22 +52,6 @@ export class DataSet {
 		sName = sName || "Table " + dt_counter;
 		return new DataTable(sName);
 	}
-
-	addTable(oTable: string): void
-	addTable(oTable: DataTable): void
-	addTable(oTable: any) {
-		let tbl: DataTable;
-		if (typeof oTable === 'string') {
-			tbl = this.newTable(oTable);
-		} else {
-			if (oTable instanceof DataTable) {
-				tbl = oTable;
-			} else {
-				throw new TypeError("Cannot add table: " + oTable);
-			}
-		}
-		this._tables.push(tbl);
-	};
 
 	acceptChanges(): void {
 		this._tables.forEach(function (table) {
@@ -52,12 +61,5 @@ export class DataSet {
 
 	getChanges() {
 
-	};
-
-	name(newValue?: string) {
-		if (newValue != undefined) {
-			this._name = newValue;
-		}
-		return this._name;
 	};
 }

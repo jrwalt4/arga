@@ -6,11 +6,12 @@ import {IKeyedCollection} from './Util'
 import {DataTable} from './DataTable'
 import {DataRow} from './DataRow'
 import {DataColumn} from './DataColumn'
-import {createContentCompare, createContentEquals, createValueWithKeyPath} from './Util'
 
 export class DataRowCollection implements IKeyedCollection<any, DataRow> {
+
     private _rows:SortedArray<DataRow>
     private _table:DataTable
+
     constructor(dataTable:DataTable) {
         if (dataTable === void 0) {
             throw new Error("Illegal DataRowCollection constructor: expected DataTable as first argument")
@@ -26,7 +27,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
             })
         }, function (key, row:DataRow):number {
             var keyColumn = drc.table().primaryKey();
-            return 1
+            throw new Error("Not implemented yet")
         });
     }
 

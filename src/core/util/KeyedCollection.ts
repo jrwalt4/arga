@@ -95,6 +95,14 @@ export class KeyedCollection<TKey, TValue> implements IKeyedCollection<TKey, TVa
 		return void 0;
 	}
 
+	forEach(callback:(value:TValue, index:number, collection:TValue[])=>any) {
+		return this._data.forEach(callback);
+	}
+
+	toArray():TValue[] {
+		return this.valuesArray();
+	}
+
 	keysArray(): TKey[] {
 		var self = this;
 		return this._data.map(function (value: TValue) {
