@@ -74,4 +74,8 @@ export class DataTable {
 			dr.acceptChanges();
 		})
 	}
+
+	toString() {
+		return this.name();
+	}
 }

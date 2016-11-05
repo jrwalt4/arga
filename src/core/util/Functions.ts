@@ -4,21 +4,39 @@
 import DataRow = require('../DataRow')
 import { ContentCompare, ContentEquals } from 'collections/types'
 
-export function compareKeys(keyA: any, keyB: any): number {
-	if (typeof indexedDB !== "undefined") {
-		return indexedDB.cmp(keyA, keyB);
+export let compareKeys: (a, b) => number;
+if (typeof indexedDB !== "undefined") {
+	compareKeys = indexedDB.cmp.bind(indexedDB);
+} else {
+	compareKeys = function (keyA: any, keyB: any): number {
+
+		if (Array.isArray(keyA) && Array.isArray(keyB)) {
+			var cmp = 0;
+			for (var i = 0; i < keyA.length; i++) {
+				cmp = compareKeys(keyA[i], keyB[i]);
+				if (cmp !== 0) {
+					break;
+				}
+			}
+			return cmp;
+		}
+		return (keyA < keyB ? -1 : keyA > keyB ? 1 : 0);
 	}
-	if (Array.isArray(keyA) && Array.isArray(keyB)) {
-		var cmp = 0;
-		for (var i = 0; i < keyA.length; i++) {
-			cmp = compareKeys(keyA[i], keyB[i]);
-			if (cmp !== 0) {
+}
+
+export function equalKeys(keyA: any, keyB: any): boolean {
+	var equals = true;
+	if(Array.isArray(keyA) && Array.isArray(keyB)) {
+		for(var i = 0 ; i < keyA.length ; i++) {
+			equals = equalKeys(keyA[i], keyB[i]);
+			if(!equals) {
 				break;
 			}
 		}
-		return cmp;
+	} else {
+		equals = keyA === keyB;
 	}
-	return (keyA < keyB ? -1 : keyA > keyB ? 1 : 0);
+	return equals;
 }
 
 export function getValueAtKeyPath<T>(sKeyPath: string, item: {}): T {

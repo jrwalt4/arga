@@ -8,6 +8,7 @@ import {DataColumnConstraint}  from './DataColumnConstraint'
 
 export type DataColumnConstructorOptions = {
     keyPath?:string
+    type?:string
     primaryKey?:boolean
     index?:boolean
     constraints?:DataColumnConstraint[]
@@ -66,6 +67,17 @@ export class DataColumn {
 
     keyPath():string {
         return this._keyPath;
+    }
+
+    find(value:any):DataRow {
+        var self = this;
+        return this.table().rows().toArray().find(function(row){
+            return util.equalKeys(value, self.getValue(row))
+        })
+    }
+
+    findAll(value:any):DataRow[] {
+        throw new Error("not implemented")
     }
 }
 

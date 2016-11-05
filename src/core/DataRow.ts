@@ -3,11 +3,11 @@
 import { DataTable } from './DataTable'
 import { DataRowState } from './DataRowState'
 import { DataRowVersion } from './DataRowVersion'
-import { EventEmitter2 as EventEmitter } from 'eventemitter2'
-
 import { DataColumn } from './DataColumn'
+import {DataRelation} from './DataRelation'
+import { KeyedCollection, deepCopy, compareKeys, equalKeys, getValueAtKeyPath, setValueAtKeyPath } from './Util'
 
-import { KeyedCollection, deepCopy } from './Util'
+import { EventEmitter2 as EventEmitter } from 'eventemitter2'
 
 export class DataRow {
 	private _table: DataTable
@@ -25,6 +25,10 @@ export class DataRow {
 		 */
 		this._original = void 0;
 		this._current = this._createCurrent();
+
+		for (let key in values) {
+			this.set(key, values[key]);
+		}
 
 	}
 
@@ -46,7 +50,7 @@ export class DataRow {
 	}
 
 	private _createOriginal(): {} {
-		return Object.create(null);
+		return {};
 	}
 
 	private _createCurrent(): {} {
@@ -98,17 +102,16 @@ export class DataRow {
 	}
 
 	get<T>(column: DataColumn, version?: DataRowVersion): T
-	get<T>(columns: DataColumn[], version?: DataRowVersion): [T]
-	get<T>(key: string, version?: DataRowVersion): T
-	get<T>(keyOrColumn: any, version?: DataRowVersion): any {
-		if (typeof keyOrColumn === "string") {
-			var key = keyOrColumn;
-			return this._getItemWithKey<T>(key, version);
+	get<T>(columns: DataColumn[], version?: DataRowVersion): T[]
+	get<T>(columnName: string, version?: DataRowVersion): T
+	get<T>(columnOrName: any, version?: DataRowVersion): any {
+		if (typeof columnOrName === "string") {
+			return this._getItemWithKey<T>(columnOrName, version);
 		}
-		if (Array.isArray(keyOrColumn)) {
-			return (<DataColumn[]>keyOrColumn).map((column) => this.get(column))
+		if (Array.isArray(columnOrName)) {
+			return (<DataColumn[]>columnOrName).map(column => this.get(column))
 		}
-		var column: DataColumn = keyOrColumn;
+		var column: DataColumn = columnOrName;
 		return this._getItemWithColumn<T>(column, version);
 	}
 
@@ -117,7 +120,7 @@ export class DataRow {
 		if (data === void 0 || data === null) {
 			return void 0;
 		} else {
-			return data[key]
+			return getValueAtKeyPath<T>(key, data);
 		}
 	}
 
@@ -126,7 +129,7 @@ export class DataRow {
 		if (data === void 0 || data === null) {
 			return void 0;
 		} else {
-			return <T>column.getValue(data);
+			return column.getValue<T>(data);
 		}
 	}
 
@@ -191,10 +194,10 @@ export class DataRow {
 
 		if (this.isEditing()) {
 			this._proposed = this._proposed || this._createProposed();
-			this._proposed[key] = newValue;
+			setValueAtKeyPath(key, this._proposed, newValue);
 		} else {
 			this._current = this._current || this._createCurrent();
-			this._current[key] = newValue;
+			setValueAtKeyPath(key, this._current, newValue);
 		}
 		return this;
 	}
@@ -217,6 +220,30 @@ export class DataRow {
 			this.dispatchBeforeDelete();
 			this.dispatchDelete();
 		}
+	}
+
+	getChildRows(relation:DataRelation):DataRow[] {
+		
+		var parentColumn = relation.parentColumn();
+		var childColumn = relation.childColumn();
+		
+		if(parentColumn.table() !== this.table()) {
+			throw new Error("Parent Table of relation must be: "+this.table());
+		}
+
+		return childColumn.findAll(this.get(parentColumn));
+	}
+
+	getParentRow(relation:DataRelation):DataRow {
+		
+		let parentColumn = relation.parentColumn();
+		let childColumn = relation.childColumn();
+		
+		if(childColumn.table() !== this.table()) {
+			throw new Error("Parent Table of relation must be: "+this.table());
+		}
+
+		return parentColumn.find(this.get(childColumn));
 	}
 
 	beginEdit(): void {

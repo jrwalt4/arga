@@ -1,6 +1,7 @@
 // util/KeyedCollection.ts
 
 import { resolveKeyPath } from './Functions'
+import './Shim'
 
 export interface IKeyedCollection<TKey, TValue> {
 	size:number 
@@ -9,11 +10,6 @@ export interface IKeyedCollection<TKey, TValue> {
 	//set(value: TValue): boolean
 	add(value: TValue): boolean
 	delete(key: TKey): boolean
-	find(predicate:ContentCompare<TValue>): TValue
-	keysArray(): TKey[]
-	valuesArray(): TValue[]
-	entriesArray(): [TKey, TValue][]
-	toString(): string
 }
 
 export class KeyedCollection<TKey, TValue> implements IKeyedCollection<TKey, TValue> {

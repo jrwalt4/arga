@@ -2,6 +2,7 @@
 
 import SortedArray = require('collections/sorted-array')
 import {IKeyedCollection} from './Util'
+import * as util from './Util'
 
 import {DataTable} from './DataTable'
 import {DataRow} from './DataRow'
@@ -23,11 +24,11 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
         this._rows = new SortedArray<DataRow>([], function(key:any, row:DataRow):boolean {
             var primaryKey = drc.table().primaryKey();
             return primaryKey.every(function(column:DataColumn, index:number){
-                return primaryKey[index] === row.get(column);
+                return key === row.get(column);
             })
         }, function (key, row:DataRow):number {
-            var keyColumn = drc.table().primaryKey();
-            throw new Error("Not implemented yet")
+            var keyColumns = drc.table().primaryKey();
+            return util.compareKeys(key, row.get(keyColumns))
         });
     }
 
@@ -44,13 +45,13 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
         return this._rows.get(key);
     }
 
-    /*
-    set(key:any):boolean {
-        throw new Error("DataRowCollection#set does not exist")
-    }
-    //*/
-
-    add(row:DataRow):boolean {
+    add(row:DataRow):boolean
+    add(rowData:{}):boolean
+    add(rowOrData:DataRow|{}):boolean {
+        let row:DataRow;
+        if (!(rowOrData instanceof DataRow)) {
+            row = new DataRow(rowOrData);
+        }
         if (this._rows.add(row)) {
             row.table(this.table());
             return true;
@@ -58,16 +59,19 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
         return false;
     }
 
-    delete(key:any):boolean {
-        return this._rows.delete(key);
+    delete(row:DataRow):boolean
+    delete(keyOrRow:any):boolean {
+        let dataRow:DataRow;
+        if (keyOrRow instanceof DataRow) {
+            dataRow = keyOrRow;
+        } else {
+            dataRow = this.get(keyOrRow);
+        }
+        return this._rows.delete(dataRow);
     }
 
     clear() {
         this._rows.clear();
-    }
-
-    find(value:any):DataRow {
-        return this.get(value);
     }
 
     entriesArray():[any, DataRow][] {
