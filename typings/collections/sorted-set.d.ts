@@ -6,13 +6,14 @@ declare module "collections/sorted-set" {
 
     export = SortedSet
 
-    let SortedSet:SortedSetConstructor
+    let SortedSet: SortedSetConstructor
 
     interface SortedSetConstructor {
-        (values: any[]): SortedSet<any>
-        <T>(values: T[]): SortedSet<T>
-        new <T>(values: T[]): SortedSet<T>
-        from<T>(values: T[]): SortedSet<T>
+        (values?: any[]): SortedSet<any>
+        <T>(values?: T[]): SortedSet<T>
+        new (values?: any[]): SortedSet<any>
+        new <T>(values?: T[]): SortedSet<T>
+        from<T>(values?: T[]): SortedSet<T>
     }
 
     interface SortedSet<T> extends
