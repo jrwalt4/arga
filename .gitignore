@@ -1,6 +1,4 @@
 node_modules/
 archive/
 .vscode/
-build/**/*.d.ts
-build/**/*.map
 typings/globals
