@@ -14,7 +14,7 @@
     "lib": "src"
   },
   "scripts": {
-    "prepublish":"build-node && build-web",
+    "prepublish":"npm run build-node && npm run build-web",
     "build-web": "node build-web.js",
     "build-node": "tsc --d --noEmitOnError --sourceMap",
     "test": "tsc && jasmine"
