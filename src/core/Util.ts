@@ -6,6 +6,7 @@ export { IKeyedCollection, KeyedCollection } from './util/KeyedCollection';
 
 export {
 	compareKeys, equalKeys, resolveKeyPath, resolveKeyPathArray, createValueWithKeyPath,
-	deepCopy, flattenPrototypeChain, getValueAtKeyPath, setValueAtKeyPath
+	deepCopy, flattenPrototypeChain, getValueAtKeyPath, setValueAtKeyPath,
+	deserializeString
 } from './util/Functions'
 

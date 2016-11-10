@@ -14,9 +14,10 @@
     "lib": "src"
   },
   "scripts": {
-    "build":"tsc",
+    "prepublish":"build-node && build-web",
+    "install": "typings install",
     "build-web": "node build-web.js",
-    "build-node": "tsc",
+    "build-node": "tsc --d --noEmitOnError --sourceMap",
     "test": "tsc && jasmine"
   },
   "keywords": [

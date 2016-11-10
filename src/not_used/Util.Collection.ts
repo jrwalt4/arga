@@ -8,7 +8,7 @@ interface Array<T> {
 }
 //*/
 
-import {resolveKeyPath, compareKeys} from '../Util'
+import {resolveKeyPath, compareKeys} from '../core/Util'
 
 export class Collection<K,T> {
 

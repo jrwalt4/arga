@@ -13,10 +13,10 @@
     "compilerOptions": {
         "module": "commonjs",
         "target":"es5",
-        "declaration": true,
+        "declaration": false,
         "outDir": "build",
-        "noEmitOnError": true,
-        "sourceMap": true,
+        "noEmitOnError": false,
+        "sourceMap": false,
         //"listFiles": true,
         "noLib": false
     }

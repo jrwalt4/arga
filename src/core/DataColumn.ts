@@ -5,43 +5,62 @@ import * as util from './Util'
 import { DataTable } from './DataTable'
 import { DataRow } from './DataRow'
 import { DataColumnConstraint } from './DataColumnConstraint'
+import { DataType, GenericDataType } from './DataType'
 
 export type DataColumnConstructorOptions = {
     keyPath?: string
-    type?: string
-    primaryKey?: boolean
-    index?: boolean
+    type?: string | DataType
+    isPrimaryKey?: boolean
+    isIndex?: boolean
     constraints?: DataColumnConstraint[]
-    get?(object: {}): any
-    set?(object: {});
+    get?: (object: {}) => any
+    set?: (object: {}) => boolean
 }
 
-export class DataColumn {
+export class GenericDataColumn<T> {
     private _name: string
     private _table: DataTable
+    private _type: DataType
     private _keyPath: string
     private _constraints: DataColumnConstraint[]
 
     constructor(name: string, constructorOptions: DataColumnConstructorOptions = { keyPath: name }) {
-        this._name = name;
-        if (constructorOptions.keyPath) {
-            var keyPath = this._keyPath = constructorOptions.keyPath;
-            this.getValue = (data: Object) => util.getValueAtKeyPath(keyPath, data)
-            this.setValue = (data: Object, value: any) => util.setValueAtKeyPath(keyPath, data, value)
-        } else {
-
-        }
-        if (constructorOptions.index) {
+        if (constructorOptions.isIndex) {
             console.warn("use IndexedDataColumn for index")
         }
+        this._name = name;
+        if (constructorOptions.keyPath) {
+            this._keyPath = constructorOptions.keyPath;
+        } else {
+            if (typeof constructorOptions.get === 'function' && typeof constructorOptions.set === 'function') {
+                this.getValue = constructorOptions.get;
+                this.setValue = constructorOptions.set;
+            } else {
+                throw new Error("Insufficient parameters supplied for new DataRow(name, ctorOptions)")
+            }
+        }
+        let dataType: DataType;
+        switch (typeof constructorOptions.type) {
+            case "string":
+                let typeName: string = <string>constructorOptions.type
+                dataType = DataType.getType(typeName);
+
+                break;
+            case "object":
+                dataType = (<DataType>constructorOptions.type);
+                break;
+            default:
+                dataType = DataType.getType("object")
+        }
+        this._type = dataType;
     }
 
-    getValue<T>(data: Object): T {
-        return util.getValueAtKeyPath<T>(this._keyPath, data);
+    getValue(data: Object): T {
+        return util.getValueAtKeyPath<T>(this.keyPath(), data);
     }
 
-    setValue<T>(data: Object, value: T): boolean {
-        return util.setValueAtKeyPath(this._keyPath, data, value);
+    setValue(data: Object, value: T): boolean | void {
+        return util.setValueAtKeyPath(this.keyPath(), data, value);
     }
 
     table(): DataTable
@@ -68,18 +87,19 @@ export class DataColumn {
         return this._keyPath;
     }
 
-    find(value: any): DataRow {
+    get type():DataType{
+        return this._type;
+    }
+
+    find(value: T): DataRow {
         var self = this;
         return this.table().rows().toArray().find(function (row) {
             return util.equalKeys(value, self.getValue(row))
         })
     }
 
-    findAll(value: any): DataRow[] {
+    findAll(value: T): DataRow[] {
         throw new Error("not implemented")
     }
 }
-
-class Item<T> {
-    constructor(public key: T, public index: number) { }
-}
+export class DataColumn extends GenericDataColumn<any> { }

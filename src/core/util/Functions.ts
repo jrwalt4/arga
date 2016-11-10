@@ -166,6 +166,10 @@ export function flattenPrototypeChain(obj: Object, depth?: number, doNotCopy?: O
 	return copyObj;
 }
 
+export function deserializeString<T>(value:string):T {
+	return JSON.parse(value);
+}
+
 export function createUUID(): string {
 	var uuid = '0';
 	for (var i = 0; i < 12; i++) {
@@ -173,22 +177,3 @@ export function createUUID(): string {
 	}
 	return uuid;
 }
-
-/*
-export function createContentCompare<K, V>(sKeyPath: string): ContentCompare<K, V> {
-
-	return function compare(objA: K, objB: V): number {
-		var keyA = resolveKeyPath(sKeyPath, objA)
-		var keyB = resolveKeyPath(sKeyPath, objB)
-		return keyA < keyB ? -1 : (keyA > keyB ? 1 : 0);
-	}
-}
-
-export function createContentEquals<K, V>(sKeyPath: string): ContentEquals<K, V> {
-	return function equals(objA: K, objB: V): boolean {
-		var keyA = resolveKeyPath(sKeyPath, objA)
-		var keyB = resolveKeyPath(sKeyPath, objB)
-		return keyA == keyB;
-	}
-}
-//*/

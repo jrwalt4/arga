@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/jrwalt4/arga.svg?branch=master)](https://travis-ci.org/jrwalt4/arga)
 # Arga.js
 
 ## Description

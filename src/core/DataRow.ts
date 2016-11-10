@@ -129,7 +129,7 @@ export class DataRow {
 		if (data === void 0 || data === null) {
 			return void 0;
 		} else {
-			return column.getValue<T>(data);
+			return column.getValue(data);
 		}
 	}
 
