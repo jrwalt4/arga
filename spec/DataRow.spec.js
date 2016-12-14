@@ -3,11 +3,11 @@ var DataTable = require("../build/core/DataTable").DataTable;
 var DataRowState = require("../build/core/DataRowState").DataRowState;
 var DataRowVersion = require("../build/core/DataRowVersion").DataRowVersion;
 
-describe("arga.DataRow", function () {
+describe("DataRow", function () {
     var dt = new DataTable();
-    var dr = new DataRow();
-
-    afterEach(function () {
+    var dr;
+    
+    beforeEach(function () {
         dr = new DataRow();
     })
 

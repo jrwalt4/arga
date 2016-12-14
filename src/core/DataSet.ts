@@ -3,6 +3,7 @@
 import {DataTable} from './DataTable'
 import {DataTableCollection} from './DataTableCollection'
 import {DataRelation} from './DataRelation'
+import {DataRelationCollection} from './DataRelationCollection'
 import {KeyedCollection} from './util'
 
 var ds_counter = 0;
@@ -12,7 +13,7 @@ export class DataSet {
 
 	private _name: string
 	private _tables = new DataTableCollection(this)
-	private _relations = new KeyedCollection<string, DataRelation>('name')
+	private _relations = new DataRelationCollection(this)
 
 	constructor(sName?: string) {
 		++ds_counter;
@@ -38,7 +39,7 @@ export class DataSet {
 		return this._tables.get(name);
 	}
 
-	relations():KeyedCollection<string, DataRelation>
+	relations():DataRelationCollection
 	relations(name:string):DataRelation
 	relations(name?:string):any {
 		if(name === void 0) {

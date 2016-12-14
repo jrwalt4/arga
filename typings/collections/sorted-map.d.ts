@@ -17,7 +17,8 @@ declare module "collections/sorted-map" {
     }
 
     interface SortedMap<TKey, TValue> extends
-        GenericCollection<TValue>,
+        GenericCollection<TKey, TValue>,
         PropertyChanges<SortedMap<TKey, TValue>> {
+            get(key:TKey):TValue
     }
 }

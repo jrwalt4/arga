@@ -1,7 +1,10 @@
+/// <reference path="../build/arga.d.ts" />
 var DataTable = require('../build/core/DataTable').DataTable;
 var DataSet = require('../build/core/DataSet').DataSet;
 
-describe("arga.DataTable", function() {
+var data = require('./helpers/testData');
+
+describe("DataTable", function() {
     var dr = new DataTable();
 
     beforeEach(function() {

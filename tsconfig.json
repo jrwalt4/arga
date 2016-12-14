@@ -13,9 +13,9 @@
     "compilerOptions": {
         "module": "commonjs",
         "target":"es5",
-        "declaration": false,
+        "declaration": true,
         "outDir": "build",
-        "noEmitOnError": false,
+        "noEmitOnError": true,
         "sourceMap": false,
         //"listFiles": true,
         "noLib": false

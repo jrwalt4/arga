@@ -10,7 +10,7 @@ export class DataColumnCollection extends KeyedCollection<string, DataColumn> {
     constructor(dataTable: DataTable) {
         super('name');
         if (dataTable === void 0) {
-            throw new Error("Illegal DataColumnCollection constructor: expected DataTable as first argument")
+            throw new Error("Illegal DataColumnCollection constructor: expected DataTable as first argument");
         }
         this._table = dataTable;
         //this._columns = new Array<DataColumn<any>>();
@@ -22,5 +22,9 @@ export class DataColumnCollection extends KeyedCollection<string, DataColumn> {
             dataColumn.table(this._table);
         }
         return added;
+    }
+
+    table():DataTable {
+        return this._table;
     }
 }

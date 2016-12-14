@@ -1,6 +1,9 @@
 {
     "globalDevDependencies": {
-        "node": "registry:dt/node#6.0.0+20161102143327",
-        "jasmine": "registry:dt/jasmine#2.2.0+20160621224255"
+        "jasmine": "registry:dt/jasmine#2.2.0+20160621224255",
+        "node": "registry:dt/node#6.0.0+20161102143327"
+    },
+    "devDependencies": {
+        "lodash": "registry:npm/lodash#4.0.0+20161015015725"
     }
 }

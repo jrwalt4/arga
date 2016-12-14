@@ -1,6 +1,6 @@
 var util = require('../build/core/Util');
 
-describe("arga.Util", function () {
+describe("Util", function () {
 
     var obj = {
         name: {

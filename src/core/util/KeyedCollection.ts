@@ -4,12 +4,13 @@ import { resolveKeyPath } from './Functions'
 import './Shim'
 
 export interface IKeyedCollection<TKey, TValue> {
-	size:number 
+	size: number
 	has(key: TKey): boolean
 	get(key: TKey): TValue
 	//set(value: TValue): boolean
 	add(value: TValue): boolean
 	delete(key: TKey): boolean
+	find(predicate: (value: TValue, key: TKey, collection: this) => boolean): TValue
 }
 
 export class KeyedCollection<TKey, TValue> implements IKeyedCollection<TKey, TValue> {
@@ -77,25 +78,32 @@ export class KeyedCollection<TKey, TValue> implements IKeyedCollection<TKey, TVa
 	}
 
 	private indexOf(key: TKey): number {
-		var self = this;
-		return findIndex(this._data, function (value: TValue): boolean {
-			return resolveKeyPath(self._keyPath, value) === key;
-		})
+		for (var i = 0; i < this._data.length; i++) {
+			if (resolveKeyPath(this._keyPath, this._data[i]) == key) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
-	find(predicate:ContentCompare<TValue>): TValue {
-		var index = findIndex(this._data, predicate);
-		if (index > -1) {
-			return this._data[index]
+	find(predicate: (value: TValue, key: TKey, collection: this) => boolean, thisArg?:any): TValue {
+		for (var i = 0 ; i < this._data.length ; i++) {
+			let value = this._data[i];
+			if(predicate.call(thisArg, value, resolveKeyPath(this._keyPath, value), this)) {
+				return value;
+			}
 		}
 		return void 0;
 	}
 
-	forEach(callback:(value:TValue, index:number, collection:TValue[])=>any) {
-		return this._data.forEach(callback);
+	forEach(callback: (value: TValue, key: TKey, collection: this) => any, thisArg?:any) {
+		for (var i = 0 ; i < this._data.length ; i++) {
+			let value = this._data[i];
+			callback.call(thisArg, value, resolveKeyPath(this._keyPath, value), this);
+		}
 	}
 
-	toArray():TValue[] {
+	toArray(): TValue[] {
 		return this.valuesArray();
 	}
 
@@ -133,9 +141,7 @@ export class KeyedCollection<TKey, TValue> implements IKeyedCollection<TKey, TVa
 	}
 }
 
-export type ContentCompare<T> = (value: T, index: number, array: T[]) => boolean
-
-function findIndex(array: any[], predicate: ContentCompare<any>): number {
+function findIndex(array: any[], predicate: (value: any, index: number, array: any[]) => boolean): number {
 	'use strict';
 	if (array === null) {
 		throw new TypeError('Array.prototype.findIndex called on null or undefined');

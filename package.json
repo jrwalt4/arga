@@ -14,7 +14,8 @@
     "lib": "src"
   },
   "scripts": {
-    "prepublish":"npm run build-node && npm run build-web",
+    "build":"tsc",
+    "prepublish": "npm run build-node && npm run build-web",
     "build-web": "node build-web.js",
     "build-node": "tsc --d --noEmitOnError --sourceMap",
     "test": "tsc && jasmine"
@@ -31,7 +32,8 @@
   "license": "MIT",
   "dependencies": {
     "collections": "latest",
-    "eventemitter2": "latest"
+    "eventemitter2": "latest",
+    "lodash": "^4.16.6"
   },
   "devDependencies": {
     "browserify": "latest",

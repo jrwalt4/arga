@@ -1,6 +1,6 @@
 declare module "collections/sorted-set" {
 
-    import GenericCollection = require('collections/generic-collection')
+    import GenericSet = require('collections/generic-set')
     import PropertyChanges = require('collections/listen/property-changes')
     import RangeChanges = require('collections/listen/range-changes');
 
@@ -17,7 +17,7 @@ declare module "collections/sorted-set" {
     }
 
     interface SortedSet<T> extends
-        GenericCollection<T>,
+        GenericSet<T>,
         PropertyChanges<SortedSet<T>>,
         RangeChanges<T> {
 

@@ -1,0 +1,42 @@
+{
+    "people": [
+        {
+            "id": "person1",
+            "name": "Reese",
+            "age": 28,
+            "jobID":"job1"
+        },
+        {
+            "id": "person2",
+            "name": "Matt",
+            "age": 30,
+            "jobID":"job2"
+        },
+        {
+            "id": "person3",
+            "name": "Anna",
+            "age": 30,
+            "jobID":"job2"
+        },
+        {
+            "id":"person4",
+            "name":"Melissa",
+            "age":30,
+            "jobID":"job3"
+        }
+    ],
+    "jobs":[
+        {
+            "id":"job1",
+            "name":"Engineer"
+        },
+        {
+            "id":"job2",
+            "name":"Social Worker"
+        },
+        {
+            "id":"job3",
+            "name":"Manager"
+        }
+    ]
+}

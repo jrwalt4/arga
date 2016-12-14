@@ -1,15 +1,31 @@
 // DataRelation.ts
 
+import { DataSet } from './DataSet'
 import { DataColumn } from './DataColumn'
 import { DataRow } from './DataRow'
 
 export class DataRelation {
 
+    public name: string
+    private _dataSet: DataSet
+
     constructor(
         private _name?: string,
         private _parent?: DataColumn,
         private _child?: DataColumn,
-        private _operator?: Function) { }
+        private _operator?: Function) {
+            
+    }
+
+    dataSet(): DataSet
+    dataSet(dataSet: DataSet): this
+    dataSet(dataSet?: DataSet): this | DataSet {
+        if (dataSet !== void 0) {
+            this._dataSet = dataSet;
+            return this;
+        }
+        return this._dataSet;
+    }
 
     parentColumn(): DataColumn
     parentColumn(column: DataColumn): this
@@ -21,19 +37,36 @@ export class DataRelation {
         return this;
     }
 
-    childColumn():DataColumn;
-    childColumn(column:DataColumn):this;
-    childColumn(column?:DataColumn):any {
-        if(column !== undefined) {
+    childColumn(): DataColumn;
+    childColumn(column: DataColumn): this;
+    childColumn(column?: DataColumn): any {
+        if (column !== undefined) {
             this._child = column;
             return this;
         }
         return this._child;
     }
 
-    /*
-    abstract getChildRows(oRow: DataRow): DataRow[]
+    getChildRows(oRow: DataRow): DataRow[] {
+        var parentColumn = this.parentColumn();
+		var childColumn = this.childColumn();
 
-    abstract getParentRow(oRow: DataRow): DataRow
-    //*/
+		if (parentColumn.table() !== oRow.table()) {
+			throw new Error("Parent Row must belong to table: " + parentColumn.table());
+		}
+
+		return childColumn.findAll(oRow.get(parentColumn));
+    }
+
+    getParentRow(oRow: DataRow): DataRow {
+        let parentColumn = this.parentColumn();
+		let childColumn = this.childColumn();
+
+		if (childColumn.table() !== oRow.table()) {
+			throw new Error("Child Row must belong to table : " + childColumn.table());
+		}
+
+		return parentColumn.find(oRow.get(childColumn));
+    }
+
 }

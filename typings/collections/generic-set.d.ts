@@ -1,13 +1,19 @@
 
 declare module "collections/generic-set" {
 
-    import GenericCollection = require('collections/generic-collection')
     export = GenericSet
 
-    interface GenericSet<T> {
-        pop():T
-        shift():T
-        union(values:GenericCollection<T>):this
-        intersection(values:GenericCollection<T>)
+    interface GenericSet<TValue> {
+        isSet:true
+        add(TValue):boolean
+        get(value:any):TValue
+        union(values:GenericSet<TValue>):this
+        intersection(values:GenericSet<TValue>):this
+        difference(values:GenericSet<TValue>):this
+        summetricDifference(value:GenericSet<TValue>):this
+        remove(value:TValue):boolean
+        contains(value:TValue):boolean
+        toggle(value:TValue)
+        deleteAll
     }
 }

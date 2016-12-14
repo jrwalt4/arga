@@ -1,117 +1,68 @@
 
 declare module "collections/generic-collection" {
 
-    import {ContentEquals, ContentCompare} from 'collections/types'
+    //import {ContentEquals, ContentCompare} from 'collections/types'
 
+    let GenericCollection:GenericCollectionConstructor;
     export = GenericCollection;
 
-    interface GenericCollection<T> extends Array<T> {
+    interface GenericCollectionConstructor {
+        from(...arguments:any[]):GenericCollection<any, any>
+        from<TKey, TValue>(...arguments:any[]):GenericCollection<TKey, TValue>
+    }
 
-        has(value: any): boolean
-
-        get(value: any): T
-
-        add(value: T): boolean
-
-        delete(value: any): boolean
-
-        addEach(values: T[]): this
-
-        deleteEach(values: any[], equals?: ContentEquals<any, T>): number
-
-        deleteAll(value: any, equals?: ContentEquals<any, typeof value>): void
-
+    interface GenericCollection<TKey, TValue> /* extends Array<T> */ {
+        addEach(values: TValue[]): this
+        deleteEach(values: any[], equals?: (a: TValue, b: TValue) => boolean): number
+        forEach(callback: (value: TValue, key: TKey, object: this, depth: number) => void, thisp?: any)
+        map<TOut>(callback: (value: TValue, key: TKey, object: this, depth: number) => TOut, thisp?: any): TOut[]
+        enumerate(start?: number): [number, TValue]
+        group<TGroupKey>(callback: (value: TValue, key: TKey, object: this) => TGroupKey):[TGroupKey, TValue[]][]
+        toArray(): TValue[]
         /**
-         * Replaces a length of values from a starting position
-         * with the given values
+         * Returns an object with each property name and value
+         * corresponding to the entries in this collection 
          */
-        swap(start: number, length: number, values?: T[])
-
-        clear()
-
-        lastIndexOf(value: any): number
-
-        //find(value:any, equals?:ContentEquals, start?:number):T
-
-        /**
-         * Finds the first equivalent value
-         * @param equivalent value
-         * @param equivalence test
-         * @param start index to begin search
-         */
-        findValue(value: any, equals?: ContentEquals<typeof value, T>, start?: number): T
-
-        findLastValue(value: any, equals?: ContentEquals<typeof value, T>, start?: number): T
-
-        /**
-         * Returns a sorted array of the values in this collection
-         */
-        sorted(compare?: ContentCompare<T, T>): T[]
-
-        /**
-         * Returns a copy of this collection with the values in reverse order
-         */
-        reversed(): this
-
+        toObject(): Object
+        filter(callback:(value:TValue, key:TKey, object:this, depth:number)=>boolean, thisp?:any):this
+        every(callback:(value:TValue, key:TKey, object:this, depth:number)=>boolean, thisp?:any):boolean
+        some(callback:(value:TValue, key:TKey, object:this, depth:number)=>boolean, thisp?:any):boolean
+        all():boolean
+        any():boolean
+        min(compare:(a:TValue, b:TValue)=>number): TValue
+        max(compare:(a:TValue, b:TValue)=>number): TValue
         /**
          * Returns the sum of all values in this collection
          * @param initial value to begin accumulating the sum (defaults to 0)
          */
         sum(zero?: any): number | string
-
         /**
          * Returns the arithmetic mean of the collection by computing the quotient 
          * of the sum of the collection and the count of its values.
          * @param initial value for the sum and count (defaults to 0)
          */
         average(zero?: number): number
-
-        min(): T
-
-        max(): T
-
-        /**
-         * Returns one, arbitrary value from this collection, 
-         * or <i>undefined</i> if there are none.
-         */
-        one(): T
-
-        /**
-         * Returns the only value in this collection, 
-         * or undefined if there is more than one value, 
-         * or if there are no values in the collection.
-         */
-        only(): T
-
-        /**
-         * Returns an array of the respective values in this collection
-         * and in each collection provided as an argument
-         */
-        zip(...iterables)
-
-        enumerate(start?: number)
-
+        concat(...values:TValue[]):this
         /**
          * Assuming that this is a collection of collections, 
          * returns a new collection that contains all the values 
          * of each nested collection in order.
          */
         flatten(): this
-
-        toArray(): T[]
-
         /**
-         * Returns an object with each property name and value
-         * corresponding to the entries in this collection 
+         * Returns an array of the respective values in this collection
+         * and in each collection provided as an argument
          */
-        toObject(): Object
-
-        toJSON(): string
-
-        equals(value: any, equals?: ContentEquals<typeof value, T>): boolean
-
-        compare(value: any, compare?: ContentCompare<typeof value, T>): number
-
+        zip(...iterables):TValue[]
+        join(delimiter:string):string
+        /**
+         * Returns a sorted array of the values in this collection
+         */
+        sorted(compare?: (a:TValue, b:TValue)=>number, by?:(item:TValue)=>any, order?:number): this
+        /**
+         * Returns a copy of this collection with the values in reverse order
+         */
+        reversed(): this
         /**
          * Creates a deep replica of this collection.
          * 
@@ -125,11 +76,14 @@ declare module "collections/generic-collection" {
          * @param depth to clone. 
          * @param memo map to connect reference cycles.
          */
-        clone(depth?: number, memo?: { has(value): boolean, set(key, value) }): Object
+        clone(depth?: number, memo?: { has(value): boolean, set(key, value) }): this
 
         /**
-         * Creates a shallow clone of this collection.
+         * Returns the only value in this collection, 
+         * or undefined if there is more than one value, 
+         * or if there are no values in the collection.
          */
-        constructClone(values?: T[]): this
+        only(): TValue
+        iterator():IterableIterator<TValue>
     }
 }

@@ -3,8 +3,8 @@
 import { DataTable } from './DataTable'
 import { DataRowState } from './DataRowState'
 import { DataRowVersion } from './DataRowVersion'
-import { DataColumn } from './DataColumn'
-import {DataRelation} from './DataRelation'
+import { DataColumn, GenericDataColumn } from './DataColumn'
+import { DataRelation } from './DataRelation'
 import { KeyedCollection, deepCopy, compareKeys, equalKeys, getValueAtKeyPath, setValueAtKeyPath } from './Util'
 
 import { EventEmitter2 as EventEmitter } from 'eventemitter2'
@@ -101,7 +101,7 @@ export class DataRow {
 		return false;
 	}
 
-	get<T>(column: DataColumn, version?: DataRowVersion): T
+	get<T>(column: GenericDataColumn<T>, version?: DataRowVersion): T
 	get<T>(columns: DataColumn[], version?: DataRowVersion): T[]
 	get<T>(columnName: string, version?: DataRowVersion): T
 	get<T>(columnOrName: any, version?: DataRowVersion): any {
@@ -222,28 +222,12 @@ export class DataRow {
 		}
 	}
 
-	getChildRows(relation:DataRelation):DataRow[] {
-		
-		var parentColumn = relation.parentColumn();
-		var childColumn = relation.childColumn();
-		
-		if(parentColumn.table() !== this.table()) {
-			throw new Error("Parent Table of relation must be: "+this.table());
-		}
-
-		return childColumn.findAll(this.get(parentColumn));
+	getChildRows(relation: DataRelation): DataRow[] {
+		return relation.getChildRows(this);
 	}
 
-	getParentRow(relation:DataRelation):DataRow {
-		
-		let parentColumn = relation.parentColumn();
-		let childColumn = relation.childColumn();
-		
-		if(childColumn.table() !== this.table()) {
-			throw new Error("Parent Table of relation must be: "+this.table());
-		}
-
-		return parentColumn.find(this.get(childColumn));
+	getParentRow(relation: DataRelation): DataRow {
+		return relation.getParentRow(this);
 	}
 
 	beginEdit(): void {

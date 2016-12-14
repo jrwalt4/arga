@@ -24,6 +24,9 @@ var DataColumnCollection = (function (_super) {
         }
         return added;
     };
+    DataColumnCollection.prototype.table = function () {
+        return this._table;
+    };
     return DataColumnCollection;
 }(Util_1.KeyedCollection));
 exports.DataColumnCollection = DataColumnCollection;

@@ -74,6 +74,10 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
         this._rows.clear();
     }
 
+    find(predicate:(value:DataRow, key:any, collection:this)=>boolean):DataRow {
+        throw new Error("DataRowCollection#find not implemented yet");
+    }
+
     entriesArray():[any, DataRow][] {
         var self = this;
         return this._rows.map(function (row:DataRow):[any,DataRow] {

@@ -7,14 +7,14 @@ import { DataRow } from './DataRow'
 import { DataColumnConstraint } from './DataColumnConstraint'
 import { DataType, GenericDataType } from './DataType'
 
-export type DataColumnConstructorOptions = {
+export type DataColumnConstructorOptions<T> = {
     keyPath?: string
-    type?: string | DataType
+    type?: GenericDataType<T> | string
     isPrimaryKey?: boolean
-    isIndex?: boolean
     constraints?: DataColumnConstraint[]
-    get?: (object: {}) => any
-    set?: (object: {}) => boolean
+    get?: (object: {}) => T
+    set?: (object: {}, value: T) => boolean
+    default?: T
 }
 
 export class GenericDataColumn<T> {
@@ -24,35 +24,34 @@ export class GenericDataColumn<T> {
     private _keyPath: string
     private _constraints: DataColumnConstraint[]
 
-    constructor(name: string, constructorOptions: DataColumnConstructorOptions = { keyPath: name }) {
-        if (constructorOptions.isIndex) {
-            console.warn("use IndexedDataColumn for index")
-        }
+    constructor(name: string, constructorOptions: DataColumnConstructorOptions<T> = { keyPath: name }) {
+
         this._name = name;
         if (constructorOptions.keyPath) {
             this._keyPath = constructorOptions.keyPath;
+            this.getValue = util.createKeyPathGetter<T>(this._keyPath);
+            this.setValue = util.createKeyPathSetter<T>(this._keyPath);
         } else {
-            if (typeof constructorOptions.get === 'function' && typeof constructorOptions.set === 'function') {
-                this.getValue = constructorOptions.get;
-                this.setValue = constructorOptions.set;
-            } else {
-                throw new Error("Insufficient parameters supplied for new DataRow(name, ctorOptions)")
-            }
+            let get = constructorOptions.get, set = constructorOptions.set;
+            get = typeof get === 'function' ? get : ()=>{return void 0;}
+            set = typeof set === 'function' ? set : ()=>{return void 0;}
         }
         let dataType: DataType;
         switch (typeof constructorOptions.type) {
             case "string":
                 let typeName: string = <string>constructorOptions.type
                 dataType = DataType.getType(typeName);
-
                 break;
             case "object":
                 dataType = (<DataType>constructorOptions.type);
                 break;
             default:
-                dataType = DataType.getType("object")
+                dataType = DataType.getType("any")
         }
         this._type = dataType;
+        /**
+         * @todo - What to do with constructorOptions.default
+         */
     }
 
     getValue(data: Object): T {
@@ -87,7 +86,7 @@ export class GenericDataColumn<T> {
         return this._keyPath;
     }
 
-    get type():DataType{
+    get type(): DataType {
         return this._type;
     }
 
@@ -102,4 +101,6 @@ export class GenericDataColumn<T> {
         throw new Error("not implemented")
     }
 }
-export class DataColumn extends GenericDataColumn<any> { }
+
+export let DataColumn = GenericDataColumn
+export interface DataColumn extends GenericDataColumn<any> { }

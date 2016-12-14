@@ -1,30 +1,20 @@
 // DataColumn.ts
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var util = require('./Util');
 var DataType_1 = require('./DataType');
 var GenericDataColumn = (function () {
     function GenericDataColumn(name, constructorOptions) {
         if (constructorOptions === void 0) { constructorOptions = { keyPath: name }; }
-        if (constructorOptions.isIndex) {
-            console.warn("use IndexedDataColumn for index");
-        }
         this._name = name;
         if (constructorOptions.keyPath) {
             this._keyPath = constructorOptions.keyPath;
+            this.getValue = util.createKeyPathGetter(this._keyPath);
+            this.setValue = util.createKeyPathSetter(this._keyPath);
         }
         else {
-            if (typeof constructorOptions.get === 'function' && typeof constructorOptions.set === 'function') {
-                this.getValue = constructorOptions.get;
-                this.setValue = constructorOptions.set;
-            }
-            else {
-                throw new Error("Insufficient parameters supplied for new DataRow(name, ctorOptions)");
-            }
+            var get = constructorOptions.get, set = constructorOptions.set;
+            get = typeof get === 'function' ? get : function () { return void 0; };
+            set = typeof set === 'function' ? set : function () { return void 0; };
         }
         var dataType;
         switch (typeof constructorOptions.type) {
@@ -36,9 +26,12 @@ var GenericDataColumn = (function () {
                 dataType = constructorOptions.type;
                 break;
             default:
-                dataType = DataType_1.DataType.getType("object");
+                dataType = DataType_1.DataType.getType("any");
         }
         this._type = dataType;
+        /**
+         * @todo - What to do with constructorOptions.default
+         */
     }
     GenericDataColumn.prototype.getValue = function (data) {
         return util.getValueAtKeyPath(this.keyPath(), data);
@@ -82,11 +75,4 @@ var GenericDataColumn = (function () {
     return GenericDataColumn;
 }());
 exports.GenericDataColumn = GenericDataColumn;
-var DataColumn = (function (_super) {
-    __extends(DataColumn, _super);
-    function DataColumn() {
-        _super.apply(this, arguments);
-    }
-    return DataColumn;
-}(GenericDataColumn));
-exports.DataColumn = DataColumn;
+exports.DataColumn = GenericDataColumn;

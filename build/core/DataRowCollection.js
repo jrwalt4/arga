@@ -58,6 +58,9 @@ var DataRowCollection = (function () {
     DataRowCollection.prototype.clear = function () {
         this._rows.clear();
     };
+    DataRowCollection.prototype.find = function (predicate) {
+        throw new Error("DataRowCollection#find not implemented yet");
+    };
     DataRowCollection.prototype.entriesArray = function () {
         var self = this;
         return this._rows.map(function (row) {

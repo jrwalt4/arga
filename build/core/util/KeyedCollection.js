@@ -61,20 +61,27 @@ var KeyedCollection = (function () {
         return deleted;
     };
     KeyedCollection.prototype.indexOf = function (key) {
-        var self = this;
-        return findIndex(this._data, function (value) {
-            return Functions_1.resolveKeyPath(self._keyPath, value) === key;
-        });
+        for (var i = 0; i < this._data.length; i++) {
+            if (Functions_1.resolveKeyPath(this._keyPath, this._data[i]) == key) {
+                return i;
+            }
+        }
+        return -1;
     };
-    KeyedCollection.prototype.find = function (predicate) {
-        var index = findIndex(this._data, predicate);
-        if (index > -1) {
-            return this._data[index];
+    KeyedCollection.prototype.find = function (predicate, thisArg) {
+        for (var i = 0; i < this._data.length; i++) {
+            var value = this._data[i];
+            if (predicate.call(thisArg, value, Functions_1.resolveKeyPath(this._keyPath, value), this)) {
+                return value;
+            }
         }
         return void 0;
     };
-    KeyedCollection.prototype.forEach = function (callback) {
-        return this._data.forEach(callback);
+    KeyedCollection.prototype.forEach = function (callback, thisArg) {
+        for (var i = 0; i < this._data.length; i++) {
+            var value = this._data[i];
+            callback.call(thisArg, value, Functions_1.resolveKeyPath(this._keyPath, value), this);
+        }
     };
     KeyedCollection.prototype.toArray = function () {
         return this.valuesArray();

@@ -2,13 +2,13 @@
 "use strict";
 var DataTable_1 = require('./DataTable');
 var DataTableCollection_1 = require('./DataTableCollection');
-var util_1 = require('./util');
+var DataRelationCollection_1 = require('./DataRelationCollection');
 var ds_counter = 0;
 var dt_counter = 0;
 var DataSet = (function () {
     function DataSet(sName) {
         this._tables = new DataTableCollection_1.DataTableCollection(this);
-        this._relations = new util_1.KeyedCollection('name');
+        this._relations = new DataRelationCollection_1.DataRelationCollection(this);
         ++ds_counter;
         this._name = sName || "Set " + ds_counter;
     }

@@ -1,14 +1,17 @@
 // IndexedDataColumn.ts
 
-import {DataColumn} from './DataColumn'
-import {DataRow} from './DataRow'
+import { GenericDataColumn } from './DataColumn'
+import { DataRow } from './DataRow'
 
 import SortedMap = require('collections/sorted-map')
 
-export class IndexedDataColumn extends DataColumn {
-    private _index = new SortedMap<any, {value:any, key:any}>();
+export class GenericIndexedDataColumn<T> extends GenericDataColumn<T> {
+    private _index = new SortedMap<any, { value: any, key: any }>();
 
-    find(value:any):DataRow {
+    find(value: any): DataRow {
         return this.table().rows(this._index.get(value).key);
     }
 }
+
+export let IndexedDataColumn = GenericIndexedDataColumn;
+export interface IndexedDataColumn extends GenericIndexedDataColumn<any> { }

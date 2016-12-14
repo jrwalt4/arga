@@ -189,20 +189,10 @@ var DataRow = (function () {
         }
     };
     DataRow.prototype.getChildRows = function (relation) {
-        var parentColumn = relation.parentColumn();
-        var childColumn = relation.childColumn();
-        if (parentColumn.table() !== this.table()) {
-            throw new Error("Parent Table of relation must be: " + this.table());
-        }
-        return childColumn.findAll(this.get(parentColumn));
+        return relation.getChildRows(this);
     };
     DataRow.prototype.getParentRow = function (relation) {
-        var parentColumn = relation.parentColumn();
-        var childColumn = relation.childColumn();
-        if (childColumn.table() !== this.table()) {
-            throw new Error("Parent Table of relation must be: " + this.table());
-        }
-        return parentColumn.find(this.get(childColumn));
+        return relation.getParentRow(this);
     };
     DataRow.prototype.beginEdit = function () {
         if (this.isEditing()) {
