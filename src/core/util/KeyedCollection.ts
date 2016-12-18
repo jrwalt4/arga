@@ -1,9 +1,18 @@
 // util/KeyedCollection.ts
 
-import { resolveKeyPath } from './Functions'
-import './Shim'
+import * as _ from 'lodash'
 
-export interface IKeyedCollection<TKey, TValue> {
+var _get = _.get,
+	_set = _.set,
+	_has = _.has,
+	_property = _.property,
+	_isEqualBy = function (iteratee) {
+		return function (a, b) {
+			return iteratee(a) === iteratee(b);
+		}
+	};
+
+export interface IKeyedCollection<TKey extends string | number, TValue> {
 	size: number
 	has(key: TKey): boolean
 	get(key: TKey): TValue
@@ -13,152 +22,42 @@ export interface IKeyedCollection<TKey, TValue> {
 	find(predicate: (value: TValue, key: TKey, collection: this) => boolean): TValue
 }
 
-export class KeyedCollection<TKey, TValue> implements IKeyedCollection<TKey, TValue> {
-	private _data: TValue[]
-	private _keyPath: string
+export class KeyedCollection<TKey extends string|number, TValue> implements IKeyedCollection<TKey, TValue> {
+	private _store = {}
 
-	constructor(keyPath: string) {
-		this._data = [];
-		this._keyPath = keyPath;
+	constructor(private _keyPath:string, entries?:any[]){
+
 	}
 
-	has(key: TKey): boolean {
-		return this.indexOf(key) > -1
+	get size():number {
+		return Object.keys(this._store).length
 	}
 
 	get(key: TKey): TValue {
-		var index = this.indexOf(key);
-		if (index < 0) {
-			return void 0;
-		} else {
-			return this._data[index];
+		if (this.has(key)) {
+			return _get<TValue>(this._store, key)
 		}
 	}
 
-	/*
-	set(value: TValue): boolean {
-		var added = false;
-		var newKey = resolveKeyPath<TKey>(this._keyPath, value)
-		var index = this.indexOf(newKey);
-		if (index < 0) {
-			added = true;
-			this._data.push(value)
-		} else {
-			
+	add(value: TValue):boolean {
+		let key:TKey;
+		if (!this.has(key = _get<TKey>(value, this._keyPath))) {
+			_set(this._store, key, value);
+			return true;
 		}
-		return added;
-	}
-	//*/
-
-	add(value: TValue): boolean {
-		var added = false;
-		var key = resolveKeyPath<TKey>(this._keyPath, value)
-		var index = this.indexOf(key);
-		if (index < 0) {
-			added = true;
-			this._data.push(value)
-		} else {
-			console.warn("value with key=" + key + " exists in collection. Replacing value")
-			this._data.splice(index, 1, value);
-			added = true;
-		}
-		return added;
+		return false
 	}
 
-	delete(key: TKey): boolean {
-		var deleted = false;
-		var index = this.indexOf(key);
-		if (index < 0) {
-			throw new TypeError("key:" + key + "does not exist in set");
-		} else {
-			deleted = true;
-			this._data.splice(index, 1);
-		}
-		return deleted;
+	has(key: TKey):boolean {
+		return _.hasIn(this._store, key);
 	}
 
-	private indexOf(key: TKey): number {
-		for (var i = 0; i < this._data.length; i++) {
-			if (resolveKeyPath(this._keyPath, this._data[i]) == key) {
-				return i;
-			}
-		}
-		return -1;
+	delete(key: TKey):boolean {
+		return _.unset(this._store, this._keyPath);
 	}
 
-	find(predicate: (value: TValue, key: TKey, collection: this) => boolean, thisArg?:any): TValue {
-		for (var i = 0 ; i < this._data.length ; i++) {
-			let value = this._data[i];
-			if(predicate.call(thisArg, value, resolveKeyPath(this._keyPath, value), this)) {
-				return value;
-			}
-		}
-		return void 0;
-	}
-
-	forEach(callback: (value: TValue, key: TKey, collection: this) => any, thisArg?:any) {
-		for (var i = 0 ; i < this._data.length ; i++) {
-			let value = this._data[i];
-			callback.call(thisArg, value, resolveKeyPath(this._keyPath, value), this);
-		}
-	}
-
-	toArray(): TValue[] {
-		return this.valuesArray();
-	}
-
-	keysArray(): TKey[] {
-		var self = this;
-		return this._data.map(function (value: TValue) {
-			return resolveKeyPath<TKey>(self._keyPath, value);
-		});
-	}
-
-	valuesArray(): TValue[] {
-		return this._data.slice();
-	}
-
-	entriesArray(): [TKey, TValue][] {
-		var self = this;
-		return this._data.map(function (value: TValue): [TKey, TValue] {
-			return [resolveKeyPath<TKey>(this._keyPath, value), value];
-		});
-	}
-
-	toString(): string {
-		return this._data.map((value: TValue, index: number) => {
-			var key = resolveKeyPath<TKey>(this._keyPath, value);
-			return key + ":" + value;
-		}).join(', ');
-	}
-
-	get size(): number {
-		return this._data.length
-	}
-
-	set size(newValue) {
-		this._data.length = newValue;
+	find(callback: (value: TValue, key: TKey, object: this)=>boolean):TValue {
+		
+		return _.find<TValue>(this._store, <_.ObjectIterator<TValue, boolean>>callback);
 	}
 }
-
-function findIndex(array: any[], predicate: (value: any, index: number, array: any[]) => boolean): number {
-	'use strict';
-	if (array === null) {
-		throw new TypeError('Array.prototype.findIndex called on null or undefined');
-	}
-	if (typeof predicate !== 'function') {
-		throw new TypeError('predicate must be a function');
-	}
-	var list = Object(array);
-	var length = list.length >>> 0;
-	var thisArg = arguments[2];
-	var value;
-
-	for (var i = 0; i < length; i++) {
-		value = list[i];
-		if (predicate.call(thisArg, value, i, list)) {
-			return i;
-		}
-	}
-	return -1;
-};
