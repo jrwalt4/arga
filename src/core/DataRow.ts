@@ -5,7 +5,8 @@ import { DataRowState } from './DataRowState'
 import { DataRowVersion } from './DataRowVersion'
 import { DataColumn, GenericDataColumn } from './DataColumn'
 import { DataRelation } from './DataRelation'
-import { KeyedCollection, deepCopy, compareKeys, equalKeys, getValueAtKeyPath, setValueAtKeyPath } from './Util'
+import { KeyedCollection, EmptyObject, deepCopy, compareKeys, 
+	equalKeys, getValueAtKeyPath, setValueAtKeyPath } from './Util'
 
 import { EventEmitter2 as EventEmitter } from 'eventemitter2'
 
@@ -16,8 +17,10 @@ export class DataRow {
 	private _proposed: Object
 	public observable = new EventEmitter()
 
-	constructor(values?: Object) {
+	constructor(values?: Object, table?:DataTable) {
 
+		this._table = table;
+		
 		/**
 		 * _original is set to undefined, and
 		 * _current is an empty object so we 
@@ -30,23 +33,6 @@ export class DataRow {
 			this.set(key, values[key]);
 		}
 
-	}
-
-	/**
-	 * pass 'null' to set the table to 'undefined'
-	 */
-	table(): DataTable;
-	table(oDataTable: DataTable): this;
-	table(oDataTable?: DataTable): any {
-		if (oDataTable !== undefined) {
-			if (oDataTable === null) {
-				this._table = undefined;
-			} else {
-				this._table = oDataTable;
-			}
-			return this;
-		}
-		return this._table;
 	}
 
 	private _createOriginal(): {} {
@@ -91,6 +77,9 @@ export class DataRow {
 		return this._current === void 0 ? DataRowState.UNCHANGED : DataRowState.MODIFIED;
 	}
 
+	/**
+	 * Returns whether the key or column is defined on this row
+	 */
 	has(key: string, version?: DataRowVersion): boolean {
 		var searchObject = this._getVersion(version);
 		for (var member in searchObject) {
@@ -111,24 +100,19 @@ export class DataRow {
 		if (Array.isArray(columnOrName)) {
 			return (<DataColumn[]>columnOrName).map(column => this.get(column))
 		}
-		var column: DataColumn = columnOrName;
-		return this._getItemWithColumn<T>(column, version);
+		return this._getItemWithColumn<T>(<DataColumn>columnOrName, version);
 	}
 
 	private _getItemWithKey<T>(key: string, version?: DataRowVersion): T {
 		var data = this._getVersion(version);
-		if (data === void 0 || data === null) {
-			return void 0;
-		} else {
-			return getValueAtKeyPath<T>(key, data);
+		if (data != null) {
+			return (<GenericDataColumn<T>>this.table().columns(key)).getValue(data);
 		}
 	}
 
-	private _getItemWithColumn<T>(column: DataColumn, version?: DataRowVersion): T {
+	private _getItemWithColumn<T>(column: GenericDataColumn<T>, version?: DataRowVersion): T {
 		var data = this._getVersion(version);
-		if (data === void 0 || data === null) {
-			return void 0;
-		} else {
+		if (data != null) {
 			return column.getValue(data);
 		}
 	}
@@ -154,36 +138,42 @@ export class DataRow {
 		}
 	}
 
-	set<T>(key: string, newValue: T): this
-	set(values: Object): this
-	set<T>(column: DataColumn, value: T): this
-	set<T>(valsOrKeyOrColumn: any, value?: T): this {
+	set<T>(key: string, value: T): boolean
+	set(values: Object): boolean
+	set<T>(column: DataColumn, value: T): boolean
+	set<T>(valsOrKeyOrColumn: any, value?: T): boolean {
+
 		switch (typeof valsOrKeyOrColumn) {
+
 			case "string":
-				var key: string = valsOrKeyOrColumn;
-				//var value: T = valOrVersion;
-				return this._setItem(key, value);
+				return this._setItemWithKey((<string>valsOrKeyOrColumn), value);
+
 			case "object":
 				if (isDataColumn(valsOrKeyOrColumn)) {
-					let column: DataColumn = valsOrKeyOrColumn;
-					column.setValue(this, value);
-					return this;
+					return valsOrKeyOrColumn.setValue(this, value);
 				} else {
-					var values: Object = valsOrKeyOrColumn;
-					return this._setItems(values)
+					return this._setItems(<{}>valsOrKeyOrColumn)
 				}
 		}
-		return this;
+		throw new TypeError("invalid arguments passed to DataRow#set: "+valsOrKeyOrColumn)
 	}
 
-	private _setItems(values: Object): this {
+	private _setItems(values: Object): boolean {
+		let success = true;
 		for (var key in values) {
-			this._setItem(key, values[key]);
+			success = success && this._setItemWithKey(key, values[key])
 		}
-		return this;
+		return success;
+	}
+	/**
+     * @todo
+	 */
+	private _setItemWithColumn(column: DataColumn, value: any): boolean {
+
+		return column.setValue(this._current, value);
 	}
 
-	private _setItem(key: string, newValue: any): this {
+	private _setItemWithKey(key: string, newValue: any): boolean {
 
 		// bitwise check (&) in case rowState() is 
 		// changed to return a set of flags in
@@ -199,12 +189,12 @@ export class DataRow {
 			this._current = this._current || this._createCurrent();
 			setValueAtKeyPath(key, this._current, newValue);
 		}
-		return this;
+		return false;
 	}
 
 	del(key: string): boolean {
 		if (this.has(key)) {
-			this._setItem(key, null);
+			this._setItemWithKey(key, null);
 			return true
 		}
 		return false;
@@ -270,6 +260,23 @@ export class DataRow {
 		delete this._current;
 	}
 
+	/**
+	 * pass 'null' to set the table to 'undefined'
+	 */
+	table(): DataTable;
+	table(oDataTable: DataTable): this;
+	table(oDataTable?: DataTable): any {
+		if (oDataTable !== undefined) {
+			if (oDataTable === null) {
+				this._table = undefined;
+			} else {
+				this._table = oDataTable;
+			}
+			return this;
+		}
+		return this._table;
+	}
+
 	private dispatchBeforeRowChange(args: RowChangeEventArgs) {
 		this.observable.emit("beforechange", args);
 	}
@@ -289,7 +296,7 @@ export class DataRow {
 
 //*
 function isDataColumn(dc: any): dc is DataColumn {
-	return (typeof dc.getValue === "function" && typeof dc.setValue === "function");
+	return dc instanceof GenericDataColumn;
 }
 //*/
 export type RowChangeEventArgs = {

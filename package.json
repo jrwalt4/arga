@@ -32,6 +32,7 @@
   "license": "MIT",
   "dependencies": {
     "collections": "latest",
+    "dict": "^1.4.0",
     "eventemitter2": "latest",
     "lodash": "^4.17.2"
   },
@@ -41,7 +42,7 @@
     "jasmine-node": "latest",
     "minifyify": "latest",
     "tsify": "latest",
-    "typescript": "latest",
+    "typescript": "~2.x.x",
     "uglify": "latest"
   }
 }

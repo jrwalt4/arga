@@ -1,12 +1,14 @@
 // DataRow.js
 "use strict";
-var DataRowState_1 = require('./DataRowState');
-var DataRowVersion_1 = require('./DataRowVersion');
-var Util_1 = require('./Util');
-var eventemitter2_1 = require('eventemitter2');
+var DataRowState_1 = require("./DataRowState");
+var DataRowVersion_1 = require("./DataRowVersion");
+var DataColumn_1 = require("./DataColumn");
+var Util_1 = require("./Util");
+var eventemitter2_1 = require("eventemitter2");
 var DataRow = (function () {
-    function DataRow(values) {
+    function DataRow(values, table) {
         this.observable = new eventemitter2_1.EventEmitter2();
+        this._table = table;
         /**
          * _original is set to undefined, and
          * _current is an empty object so we
@@ -18,18 +20,6 @@ var DataRow = (function () {
             this.set(key, values[key]);
         }
     }
-    DataRow.prototype.table = function (oDataTable) {
-        if (oDataTable !== undefined) {
-            if (oDataTable === null) {
-                this._table = undefined;
-            }
-            else {
-                this._table = oDataTable;
-            }
-            return this;
-        }
-        return this._table;
-    };
     DataRow.prototype._createOriginal = function () {
         return {};
     };
@@ -67,6 +57,9 @@ var DataRow = (function () {
         }
         return this._current === void 0 ? DataRowState_1.DataRowState.UNCHANGED : DataRowState_1.DataRowState.MODIFIED;
     };
+    /**
+     * Returns whether the key or column is defined on this row
+     */
     DataRow.prototype.has = function (key, version) {
         var searchObject = this._getVersion(version);
         for (var member in searchObject) {
@@ -84,24 +77,17 @@ var DataRow = (function () {
         if (Array.isArray(columnOrName)) {
             return columnOrName.map(function (column) { return _this.get(column); });
         }
-        var column = columnOrName;
-        return this._getItemWithColumn(column, version);
+        return this._getItemWithColumn(columnOrName, version);
     };
     DataRow.prototype._getItemWithKey = function (key, version) {
         var data = this._getVersion(version);
-        if (data === void 0 || data === null) {
-            return void 0;
-        }
-        else {
-            return Util_1.getValueAtKeyPath(key, data);
+        if (data != null) {
+            return this.table().columns(key).getValue(data);
         }
     };
     DataRow.prototype._getItemWithColumn = function (column, version) {
         var data = this._getVersion(version);
-        if (data === void 0 || data === null) {
-            return void 0;
-        }
-        else {
+        if (data != null) {
             return column.getValue(data);
         }
     };
@@ -130,29 +116,31 @@ var DataRow = (function () {
     DataRow.prototype.set = function (valsOrKeyOrColumn, value) {
         switch (typeof valsOrKeyOrColumn) {
             case "string":
-                var key = valsOrKeyOrColumn;
-                //var value: T = valOrVersion;
-                return this._setItem(key, value);
+                return this._setItemWithKey(valsOrKeyOrColumn, value);
             case "object":
                 if (isDataColumn(valsOrKeyOrColumn)) {
-                    var column = valsOrKeyOrColumn;
-                    column.setValue(this, value);
-                    return this;
+                    return valsOrKeyOrColumn.setValue(this, value);
                 }
                 else {
-                    var values = valsOrKeyOrColumn;
-                    return this._setItems(values);
+                    return this._setItems(valsOrKeyOrColumn);
                 }
         }
-        return this;
+        return false;
     };
     DataRow.prototype._setItems = function (values) {
+        var success = true;
         for (var key in values) {
-            this._setItem(key, values[key]);
+            success = success && this._setItemWithKey(key, values[key]);
         }
-        return this;
+        return success;
     };
-    DataRow.prototype._setItem = function (key, newValue) {
+    /**
+     * @todo
+     */
+    DataRow.prototype._setItemWithColumn = function (column, value) {
+        return column.setValue(this._current, value);
+    };
+    DataRow.prototype._setItemWithKey = function (key, newValue) {
         // bitwise check (&) in case rowState() is 
         // changed to return a set of flags in
         // future versions
@@ -167,11 +155,11 @@ var DataRow = (function () {
             this._current = this._current || this._createCurrent();
             Util_1.setValueAtKeyPath(key, this._current, newValue);
         }
-        return this;
+        return false;
     };
     DataRow.prototype.del = function (key) {
         if (this.has(key)) {
-            this._setItem(key, null);
+            this._setItemWithKey(key, null);
             return true;
         }
         return false;
@@ -228,6 +216,18 @@ var DataRow = (function () {
         }
         delete this._current;
     };
+    DataRow.prototype.table = function (oDataTable) {
+        if (oDataTable !== undefined) {
+            if (oDataTable === null) {
+                this._table = undefined;
+            }
+            else {
+                this._table = oDataTable;
+            }
+            return this;
+        }
+        return this._table;
+    };
     DataRow.prototype.dispatchBeforeRowChange = function (args) {
         this.observable.emit("beforechange", args);
     };
@@ -245,5 +245,5 @@ var DataRow = (function () {
 exports.DataRow = DataRow;
 //*
 function isDataColumn(dc) {
-    return (typeof dc.getValue === "function" && typeof dc.setValue === "function");
+    return dc instanceof DataColumn_1.GenericDataColumn;
 }

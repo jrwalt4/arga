@@ -78,6 +78,10 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
         throw new Error("DataRowCollection#find not implemented yet");
     }
 
+    forEach(callback:(v,k,c)=>void,thisArg?:any) {
+        //
+    }
+
     entriesArray():[any, DataRow][] {
         var self = this;
         return this._rows.map(function (row:DataRow):[any,DataRow] {

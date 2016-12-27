@@ -5,13 +5,14 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var DataColumn_1 = require('./DataColumn');
-var SortedMap = require('collections/sorted-map');
+var DataColumn_1 = require("./DataColumn");
+var SortedMap = require("collections/sorted-map");
 var GenericIndexedDataColumn = (function (_super) {
     __extends(GenericIndexedDataColumn, _super);
     function GenericIndexedDataColumn() {
-        _super.apply(this, arguments);
-        this._index = new SortedMap();
+        var _this = _super.apply(this, arguments) || this;
+        _this._index = new SortedMap();
+        return _this;
     }
     GenericIndexedDataColumn.prototype.find = function (value) {
         return this.table().rows(this._index.get(value).key);

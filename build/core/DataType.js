@@ -1,6 +1,6 @@
 // DataType.ts
 "use strict";
-var Util_1 = require('./Util');
+var Util_1 = require("./Util");
 var GenericDataType = (function () {
     function GenericDataType(typeOrOptions) {
         var options = typeOrOptions;
@@ -19,9 +19,9 @@ var GenericDataType = (function () {
     };
     GenericDataType.getType = function (typeName) {
         switch (typeName) {
-            case "string": return StringType;
-            case "number": return NumberType;
-            case "object": return ObjectType;
+            case "string": return GenericDataType.StringType;
+            case "number": return GenericDataType.NumberType;
+            case "object": return GenericDataType.ObjectType;
             case "any":
             default:
                 return new GenericDataType();
@@ -29,11 +29,12 @@ var GenericDataType = (function () {
     };
     return GenericDataType;
 }());
-exports.GenericDataType = GenericDataType;
-var StringType = new GenericDataType({
+GenericDataType.StringType = new GenericDataType({
     serialize: function (value) { return value.toString(); },
     deserialize: function (value) { return Util_1.deserializeString(value); }
 });
-var NumberType = new GenericDataType();
-var ObjectType = new GenericDataType();
+GenericDataType.NumberType = new GenericDataType();
+GenericDataType.ObjectType = new GenericDataType();
+GenericDataType.AnyType = new GenericDataType();
+exports.GenericDataType = GenericDataType;
 exports.DataType = GenericDataType;

@@ -1,7 +1,11 @@
 // Util.ts
 // Utilities used by arga.js
 
-export { IKeyedCollection, KeyedCollection } from './KeyedCollection';
+export {IKeyedCollection} from './IKeyedCollection'
+export { KeyedCollection } from './KeyedCollection'
+export {KeyedDictionary} from './KeyedDictionary'
+
+export {EmptyObject} from './EmptyObject'
 
 export {
 	compareKeys, equalKeys, resolveKeyPath, resolveKeyPathArray, createValueWithKeyPath,

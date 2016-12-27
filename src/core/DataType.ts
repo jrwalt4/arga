@@ -26,24 +26,28 @@ export class GenericDataType<T> {
         return JSON.parse(string);
     }
 
-    static getType(typeName:string):DataType {
+    static getType(typeName: string): DataType {
         switch (typeName) {
-            case "string": return StringType
-            case "number": return NumberType
-            case "object":return ObjectType
+            case "string": return GenericDataType.StringType
+            case "number": return GenericDataType.NumberType
+            case "object": return GenericDataType.ObjectType
             case "any":
             default:
                 return new GenericDataType<any>()
         }
     }
-}
 
-let StringType = new GenericDataType<string>({
-    serialize: (value) => value.toString(),
-    deserialize: (value) => deserializeString<string>(value)
-});
-let NumberType = new GenericDataType<number>();
-let ObjectType = new GenericDataType<{}>();
+    static StringType = new GenericDataType<string>({
+        serialize: (value) => value.toString(),
+        deserialize: (value) => deserializeString<string>(value)
+    });
+
+    static NumberType = new GenericDataType<number>();
+    
+    static ObjectType = new GenericDataType<{}>();
+
+    static AnyType = new GenericDataType<any>();
+}
 
 export let DataType = GenericDataType;
 export type DataType = GenericDataType<any>;

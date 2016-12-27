@@ -1,8 +1,8 @@
 // DataRowCollection.ts
 "use strict";
-var SortedArray = require('collections/sorted-array');
-var util = require('./Util');
-var DataRow_1 = require('./DataRow');
+var SortedArray = require("collections/sorted-array");
+var util = require("./Util");
+var DataRow_1 = require("./DataRow");
 var DataRowCollection = (function () {
     function DataRowCollection(dataTable) {
         if (dataTable === void 0) {
@@ -60,6 +60,9 @@ var DataRowCollection = (function () {
     };
     DataRowCollection.prototype.find = function (predicate) {
         throw new Error("DataRowCollection#find not implemented yet");
+    };
+    DataRowCollection.prototype.forEach = function (callback, thisArg) {
+        //
     };
     DataRowCollection.prototype.entriesArray = function () {
         var self = this;

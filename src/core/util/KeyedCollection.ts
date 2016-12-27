@@ -1,6 +1,8 @@
 // util/KeyedCollection.ts
 
 import * as _ from 'lodash'
+import {IKeyedCollection} from './IKeyedCollection'
+import {EmptyObject} from './EmptyObject'
 
 var _get = _.get,
 	_set = _.set,
@@ -12,35 +14,23 @@ var _get = _.get,
 		}
 	};
 
-export interface IKeyedCollection<TKey extends string | number, TValue> {
-	size: number
-	has(key: TKey): boolean
-	get(key: TKey): TValue
-	//set(value: TValue): boolean
-	add(value: TValue): boolean
-	delete(key: TKey): boolean
-	find(predicate: (value: TValue, key: TKey, collection: this) => boolean): TValue
-}
+export class KeyedCollection<TKey extends string | number, TValue> implements IKeyedCollection<TKey, TValue> {
+	private _store:{} = new EmptyObject
 
-export class KeyedCollection<TKey extends string|number, TValue> implements IKeyedCollection<TKey, TValue> {
-	private _store = {}
+	constructor(private _keyPath: string, entries?: any[]) {}
 
-	constructor(private _keyPath:string, entries?:any[]){
-
-	}
-
-	get size():number {
+	get size(): number {
 		return Object.keys(this._store).length
 	}
 
 	get(key: TKey): TValue {
 		if (this.has(key)) {
-			return _get<TValue>(this._store, key)
+			return _get<TValue>(this._store, this._keyPath)
 		}
 	}
 
-	add(value: TValue):boolean {
-		let key:TKey;
+	add(value: TValue): boolean {
+		let key: TKey;
 		if (!this.has(key = _get<TKey>(value, this._keyPath))) {
 			_set(this._store, key, value);
 			return true;
@@ -48,16 +38,24 @@ export class KeyedCollection<TKey extends string|number, TValue> implements IKey
 		return false
 	}
 
-	has(key: TKey):boolean {
+	has(key: TKey): boolean {
 		return _.hasIn(this._store, key);
 	}
 
-	delete(key: TKey):boolean {
+	delete(key: TKey): boolean {
 		return _.unset(this._store, this._keyPath);
 	}
 
-	find(callback: (value: TValue, key: TKey, object: this)=>boolean):TValue {
-		
+	clear() {
+		this._store = new EmptyObject();
+	}
+
+	find(callback: (value: TValue, key: TKey, object: this) => boolean): TValue {
+
 		return _.find<TValue>(this._store, <_.ObjectIterator<TValue, boolean>>callback);
+	}
+
+	forEach(callback: (value: TValue, key: TKey, collection: this) => void, thisArg?: any) {
+		_.forOwn(this._store, <_.ObjectIterator<TValue, void>>callback, thisArg);
 	}
 }

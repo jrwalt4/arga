@@ -6,11 +6,10 @@ import { DataRow } from './DataRow'
 
 export class DataRelation {
 
-    public name: string
     private _dataSet: DataSet
 
     constructor(
-        private _name?: string,
+        public name?: string,
         private _parent?: DataColumn,
         private _child?: DataColumn,
         private _operator?: Function) {

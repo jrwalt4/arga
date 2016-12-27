@@ -5,16 +5,18 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Util_1 = require('./Util');
+var DataColumn_1 = require("./DataColumn");
+var Util_1 = require("./Util");
 var DataColumnCollection = (function (_super) {
     __extends(DataColumnCollection, _super);
     //private _columns: DataColumn<any>[];
     function DataColumnCollection(dataTable) {
-        _super.call(this, 'name');
+        var _this = _super.call(this, 'name') || this;
         if (dataTable === void 0) {
             throw new Error("Illegal DataColumnCollection constructor: expected DataTable as first argument");
         }
-        this._table = dataTable;
+        _this._table = dataTable;
+        return _this;
         //this._columns = new Array<DataColumn<any>>();
     }
     DataColumnCollection.prototype.add = function (dataColumn) {
@@ -23,6 +25,14 @@ var DataColumnCollection = (function (_super) {
             dataColumn.table(this._table);
         }
         return added;
+    };
+    DataColumnCollection.prototype.get = function (columnName) {
+        var column;
+        if (!(column = _super.prototype.get.call(this, columnName))) {
+            column = new DataColumn_1.DataColumn(columnName);
+            this.add(column);
+        }
+        return column;
     };
     DataColumnCollection.prototype.table = function () {
         return this._table;

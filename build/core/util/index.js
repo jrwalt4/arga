@@ -1,9 +1,13 @@
 // Util.ts
 // Utilities used by arga.js
 "use strict";
-var KeyedCollection_1 = require('./KeyedCollection');
+var KeyedCollection_1 = require("./KeyedCollection");
 exports.KeyedCollection = KeyedCollection_1.KeyedCollection;
-var Functions_1 = require('./Functions');
+var KeyedDictionary_1 = require("./KeyedDictionary");
+exports.KeyedDictionary = KeyedDictionary_1.KeyedDictionary;
+var EmptyObject_1 = require("./EmptyObject");
+exports.EmptyObject = EmptyObject_1.EmptyObject;
+var Functions_1 = require("./Functions");
 exports.compareKeys = Functions_1.compareKeys;
 exports.equalKeys = Functions_1.equalKeys;
 exports.resolveKeyPath = Functions_1.resolveKeyPath;

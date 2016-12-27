@@ -1,43 +1,24 @@
 // DataColumn.ts
 "use strict";
-var util = require('./Util');
-var DataType_1 = require('./DataType');
+var util = require("./Util");
+var DataType_1 = require("./DataType");
+var _ = require("lodash");
 var GenericDataColumn = (function () {
-    function GenericDataColumn(name, constructorOptions) {
-        if (constructorOptions === void 0) { constructorOptions = { keyPath: name }; }
-        this._name = name;
-        if (constructorOptions.keyPath) {
-            this._keyPath = constructorOptions.keyPath;
-            this.getValue = util.createKeyPathGetter(this._keyPath);
-            this.setValue = util.createKeyPathSetter(this._keyPath);
-        }
-        else {
-            var get = constructorOptions.get, set = constructorOptions.set;
-            get = typeof get === 'function' ? get : function () { return void 0; };
-            set = typeof set === 'function' ? set : function () { return void 0; };
-        }
-        var dataType;
-        switch (typeof constructorOptions.type) {
-            case "string":
-                var typeName = constructorOptions.type;
-                dataType = DataType_1.DataType.getType(typeName);
-                break;
-            case "object":
-                dataType = constructorOptions.type;
-                break;
-            default:
-                dataType = DataType_1.DataType.getType("any");
-        }
-        this._type = dataType;
-        /**
-         * @todo - What to do with constructorOptions.default
-         */
+    /** TODO */
+    // private _constraints: DataColumnConstraint[]
+    function GenericDataColumn(name, keyPath, type) {
+        if (keyPath === void 0) { keyPath = name; }
+        if (type === void 0) { type = DataType_1.DataType.AnyType; }
+        this.name = name;
+        this.keyPath = keyPath;
+        this.type = type;
     }
     GenericDataColumn.prototype.getValue = function (data) {
-        return util.getValueAtKeyPath(this.keyPath(), data);
+        return _.get(data, this.keyPath);
     };
     GenericDataColumn.prototype.setValue = function (data, value) {
-        return util.setValueAtKeyPath(this.keyPath(), data, value);
+        _.set(data, this.keyPath, value);
+        return true;
     };
     GenericDataColumn.prototype.table = function (dataTable) {
         if (dataTable === void 0) {
@@ -46,31 +27,21 @@ var GenericDataColumn = (function () {
         this._table = dataTable;
         return this;
     };
-    GenericDataColumn.prototype.name = function (sName) {
-        if (sName !== undefined) {
-            this._name = sName;
-            return this;
-        }
-        return this._name;
-    };
-    GenericDataColumn.prototype.keyPath = function () {
-        return this._keyPath;
-    };
-    Object.defineProperty(GenericDataColumn.prototype, "type", {
-        get: function () {
-            return this._type;
-        },
-        enumerable: true,
-        configurable: true
-    });
     GenericDataColumn.prototype.find = function (value) {
         var self = this;
-        return this.table().rows().toArray().find(function (row) {
-            return util.equalKeys(value, self.getValue(row));
+        return this.table().rows().find(function (row) {
+            return util.equalKeys(value, row.get(self));
         });
     };
     GenericDataColumn.prototype.findAll = function (value) {
-        throw new Error("not implemented");
+        var foundRows = [];
+        var self = this;
+        this.table().rows().forEach(function (row) {
+            if (util.equalKeys(value, row.get(self))) {
+                foundRows.push(row);
+            }
+        });
+        return foundRows;
     };
     return GenericDataColumn;
 }());

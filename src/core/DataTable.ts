@@ -1,35 +1,25 @@
 // DataTable.ts
 
-import {DataSet} from './DataSet'
-import {DataColumn} from './DataColumn'
-import {DataColumnCollection} from './DataColumnCollection'
-import {DataRow} from './DataRow'
-import {DataRowCollection} from './DataRowCollection'
+import { DataSet } from './DataSet'
+import { DataColumn } from './DataColumn'
+import { DataColumnCollection } from './DataColumnCollection'
+import { DataRow } from './DataRow'
+import { DataRowCollection } from './DataRowCollection'
+
+let dt_counter = 1;
 
 export class DataTable {
-	private _name: string
-	private _dataSet:DataSet
+
+	private _dataSet: DataSet
 	private _rowCollection = new DataRowCollection(this);
 	private _columnCollection = new DataColumnCollection(this);
 	private _primaryKey: DataColumn[];
 
-	constructor(sName?: string) {
-		this._name = sName || "Table";
-	}
-	
-	name(): string
-	name(sName: string): this
-	name(sName?: string): any {
-		if (sName !== undefined) {
-			this._name = sName;
-			return this;
-		}
-		return this._name;
-	}
+	constructor(public name: string = "Table " + (++dt_counter)) { }
 
-	dataSet():DataSet
-	dataSet(dataSet:DataSet):this 
-	dataSet(dataSet?:DataSet):any {
+	dataSet(): DataSet
+	dataSet(dataSet: DataSet): this
+	dataSet(dataSet?: DataSet): any {
 		if (dataSet === void 0) {
 			return this._dataSet;
 		}
@@ -37,27 +27,27 @@ export class DataTable {
 	}
 
 	rows(): DataRowCollection
-	rows(key:any):DataRow
-	rows(key?:any):any {
-		if(key === void 0) {
+	rows(key: any): DataRow
+	rows(key?: any): any {
+		if (key === void 0) {
 			return this._rowCollection;
 		}
 		return this._rowCollection.get(key);
 	}
 
 	columns(): DataColumnCollection
-	columns(columnName:string):DataColumn
-	columns(columnName?:string):any {
+	columns(columnName: string): DataColumn
+	columns(columnName?: string): any {
 		if (columnName === void 0) {
 			return this._columnCollection;
 		}
 		return this._columnCollection.get(columnName);
 	}
 
-	primaryKey():DataColumn[] 
-	primaryKey(dataColumn:DataColumn):this
-	primaryKey(dataColumnArray:DataColumn[]):this
-	primaryKey(dataColumn?:DataColumn | DataColumn[]):any {
+	primaryKey(): DataColumn[]
+	primaryKey(dataColumn: DataColumn): this
+	primaryKey(dataColumnArray: DataColumn[]): this
+	primaryKey(dataColumn?: DataColumn | DataColumn[]): any {
 		if (dataColumn === void 0) {
 			return this._primaryKey;
 		}
@@ -76,6 +66,6 @@ export class DataTable {
 	}
 
 	toString() {
-		return this.name();
+		return this.name;
 	}
 }

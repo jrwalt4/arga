@@ -1,8 +1,8 @@
 // DataRelation.ts
 "use strict";
 var DataRelation = (function () {
-    function DataRelation(_name, _parent, _child, _operator) {
-        this._name = _name;
+    function DataRelation(name, _parent, _child, _operator) {
+        this.name = name;
         this._parent = _parent;
         this._child = _child;
         this._operator = _operator;

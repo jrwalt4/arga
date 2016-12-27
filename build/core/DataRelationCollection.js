@@ -5,15 +5,17 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var FastSet = require('collections/fast-set');
+var FastSet = require("collections/fast-set");
 var DataRelationCollection = (function (_super) {
     __extends(DataRelationCollection, _super);
     function DataRelationCollection(dataSet) {
-        _super.call(this);
+        var _this;
         if (dataSet === void 0) {
             throw new Error("Illegal DataRealtionCollection constructor: expected DataTable as first argument");
         }
-        this._dataSet = dataSet;
+        _this = _super.call(this) || this;
+        _this._dataSet = dataSet;
+        return _this;
     }
     DataRelationCollection.prototype.dataSet = function () {
         return this._dataSet;

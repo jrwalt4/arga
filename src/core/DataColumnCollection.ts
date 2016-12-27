@@ -24,6 +24,15 @@ export class DataColumnCollection extends KeyedCollection<string, DataColumn> {
         return added;
     }
 
+    get(columnName:string):DataColumn {
+        let column:DataColumn;
+        if(!(column = super.get(columnName))) {
+            column = new DataColumn(columnName);
+            this.add(column);
+        }
+        return column;
+    }
+
     table():DataTable {
         return this._table;
     }

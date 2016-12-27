@@ -1,20 +1,15 @@
 // DataTable.ts
 "use strict";
-var DataColumnCollection_1 = require('./DataColumnCollection');
-var DataRowCollection_1 = require('./DataRowCollection');
+var DataColumnCollection_1 = require("./DataColumnCollection");
+var DataRowCollection_1 = require("./DataRowCollection");
+var dt_counter = 1;
 var DataTable = (function () {
-    function DataTable(sName) {
+    function DataTable(name) {
+        if (name === void 0) { name = "Table " + (++dt_counter); }
+        this.name = name;
         this._rowCollection = new DataRowCollection_1.DataRowCollection(this);
         this._columnCollection = new DataColumnCollection_1.DataColumnCollection(this);
-        this._name = sName || "Table";
     }
-    DataTable.prototype.name = function (sName) {
-        if (sName !== undefined) {
-            this._name = sName;
-            return this;
-        }
-        return this._name;
-    };
     DataTable.prototype.dataSet = function (dataSet) {
         if (dataSet === void 0) {
             return this._dataSet;
@@ -51,7 +46,7 @@ var DataTable = (function () {
         });
     };
     DataTable.prototype.toString = function () {
-        return this.name();
+        return this.name;
     };
     return DataTable;
 }());

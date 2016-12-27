@@ -1,25 +1,15 @@
 // DataSet.ts
 "use strict";
-var DataTable_1 = require('./DataTable');
-var DataTableCollection_1 = require('./DataTableCollection');
-var DataRelationCollection_1 = require('./DataRelationCollection');
-var ds_counter = 0;
-var dt_counter = 0;
+var DataTableCollection_1 = require("./DataTableCollection");
+var DataRelationCollection_1 = require("./DataRelationCollection");
+var ds_counter = 1;
 var DataSet = (function () {
-    function DataSet(sName) {
+    function DataSet(name) {
+        if (name === void 0) { name = "Set " + (++ds_counter); }
+        this.name = name;
         this._tables = new DataTableCollection_1.DataTableCollection(this);
         this._relations = new DataRelationCollection_1.DataRelationCollection(this);
-        ++ds_counter;
-        this._name = sName || "Set " + ds_counter;
     }
-    DataSet.prototype.name = function (newName) {
-        if (newName === void 0) {
-            return this._name;
-        }
-        this._name = newName;
-        return this;
-    };
-    ;
     DataSet.prototype.tables = function (name) {
         if (name === void 0) {
             return this._tables;
@@ -31,11 +21,6 @@ var DataSet = (function () {
             return this._relations;
         }
         return this._relations.get(name);
-    };
-    DataSet.prototype.newTable = function (sName) {
-        ++dt_counter;
-        sName = sName || "Table " + dt_counter;
-        return new DataTable_1.DataTable(sName);
     };
     DataSet.prototype.acceptChanges = function () {
         this._tables.forEach(function (table) {
