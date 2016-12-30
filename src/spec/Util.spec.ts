@@ -1,6 +1,6 @@
-var util = require('../build/core/Util');
+import * as util from '../core/Util'
 
-describe("Util", function () {
+xdescribe("Util", function () {
 
     var obj = {
         name: {

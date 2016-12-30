@@ -1,7 +1,7 @@
 // DataTable.ts
 
 import { DataSet } from './DataSet'
-import { DataColumn } from './DataColumn'
+import { GenericDataColumn, DataColumn } from './DataColumn'
 import { DataColumnCollection } from './DataColumnCollection'
 import { DataRow } from './DataRow'
 import { DataRowCollection } from './DataRowCollection'
@@ -36,7 +36,7 @@ export class DataTable {
 	}
 
 	columns(): DataColumnCollection
-	columns(columnName: string): DataColumn
+	columns<T>(columnName: string): GenericDataColumn<T>
 	columns(columnName?: string): any {
 		if (columnName === void 0) {
 			return this._columnCollection;

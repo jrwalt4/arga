@@ -48,13 +48,9 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     add(row:DataRow):boolean
     add(rowData:{}):boolean
     add(rowOrData:DataRow|{}):boolean {
-        let row:DataRow;
-        if (!(rowOrData instanceof DataRow)) {
-            row = new DataRow(rowOrData);
-        }
+        let row:DataRow = rowOrData instanceof DataRow ? rowOrData : new DataRow(rowOrData);
         if (this._rows.add(row)) {
-            row.table(this.table());
-            return true;
+            return row._addToCollection(this);
         }
         return false;
     }

@@ -125,7 +125,7 @@ var DataRow = (function () {
                     return this._setItems(valsOrKeyOrColumn);
                 }
         }
-        return false;
+        throw new TypeError("invalid arguments passed to DataRow#set: " + valsOrKeyOrColumn);
     };
     DataRow.prototype._setItems = function (values) {
         var success = true;

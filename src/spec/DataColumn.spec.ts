@@ -1,22 +1,15 @@
-var DataTable = require("../build/core/DataTable").DataTable;
-var DataColumn = require("../build/core/DataColumn").DataColumn;
+import {DataTable, DataColumn} from '../arga'
 
 describe("DataColumn", function() {
-    /**
-     * @var {DataColumn} dc
-     */
-    var dc;
-    
-    /**
-     * @param {DataColumn} dac
-     */
-    function do_something(dac) {
-        
-    }
+
+    let dc:DataColumn;
+    let dt:DataTable;
 
     beforeEach(function() {
-        dc = new DataColumn(dt);
+        dc = new DataColumn("name");
     })
 
-    
+    describe ("constructor", function() {
+        
+    })
 })

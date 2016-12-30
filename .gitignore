@@ -3,5 +3,6 @@ archive/
 .vscode/
 typings/globals
 scratch/
-build/**/*.d.ts
-build/**/*.map
+build/
+dist/
+npm-debug.log

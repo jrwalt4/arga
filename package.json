@@ -14,11 +14,11 @@
     "lib": "src"
   },
   "scripts": {
-    "build": "tsc",
+    "build-ts": "rd build /s /q && tsc",
     "prepublish": "npm run build-node && npm run build-web",
     "build-web": "node build-web.js",
     "build-node": "tsc --d --noEmitOnError --sourceMap",
-    "test": "tsc && jasmine"
+    "test": "npm run build-ts && jasmine"
   },
   "keywords": [
     "dataset",

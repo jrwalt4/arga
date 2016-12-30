@@ -1,6 +1,6 @@
-var KeyedCollection = require('../build/core/Util').KeyedCollection
+import {KeyedCollection} from '../core/Util'
 
-describe("arga.util.KeyedCollection", function () {
+xdescribe("arga.util.KeyedCollection", function () {
     var kc;
     beforeEach(function () {
         kc = new KeyedCollection("name.last");

@@ -7,7 +7,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 var EmptyObject = (function (_super) {
     __extends(EmptyObject, _super);
     function EmptyObject() {
-        return _super.apply(this, arguments) || this;
+        var _this;
+        return _this;
     }
     return EmptyObject;
 }(null));

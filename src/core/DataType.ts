@@ -11,10 +11,10 @@ export class GenericDataType<T> {
 
     constructor(typeOrOptions?: DataTypeConstructorOptions) {
         let options: DataTypeConstructorOptions = typeOrOptions;
-        if (options.serialize) {
+        if (options && options.serialize) {
             this.serialize = options.serialize
         }
-        if (options.deserialize) {
+        if (options && options.deserialize) {
             this.deserialize = options.deserialize
         }
 

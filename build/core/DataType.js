@@ -4,10 +4,10 @@ var Util_1 = require("./Util");
 var GenericDataType = (function () {
     function GenericDataType(typeOrOptions) {
         var options = typeOrOptions;
-        if (options.serialize) {
+        if (options && options.serialize) {
             this.serialize = options.serialize;
         }
-        if (options.deserialize) {
+        if (options && options.deserialize) {
             this.deserialize = options.deserialize;
         }
     }

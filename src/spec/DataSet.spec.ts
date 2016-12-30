@@ -1,13 +1,8 @@
-/// <reference path="../build/arga.d.ts" />
-var DataSet = require('../build/core/DataSet').DataSet;
-var DataTable = require('../build/core/DataTable').DataTable;
-//var DataTableCollection = require('../build/core/DataTableCollection').DataTableCollection;
-var DataRelation = require('../build/core/DataRelation').DataRelation;
-//var DataRelationCollection = require('../build/core/DataRelationCollection').DataRelationCollection
+import {DataSet, DataTable, DataRelation} from '../arga'
 
 describe("DataSet", function () {
 
-    var ds = new DataSet();;
+    let ds = new DataSet();;
 
     beforeEach(function () {
         ds = new DataSet();
@@ -17,7 +12,7 @@ describe("DataSet", function () {
         it("should create a DataSet with provided name", function () {
             var dsName = "My DataSet";
             var ds = new DataSet(dsName);
-            expect(ds.name()).toEqual(dsName);
+            expect(ds.name).toEqual(dsName);
         })
     })
 

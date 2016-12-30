@@ -1,26 +1,31 @@
 // DataRow.js
 
 import { DataTable } from './DataTable'
+import { DataRowCollection } from './DataRowCollection'
 import { DataRowState } from './DataRowState'
 import { DataRowVersion } from './DataRowVersion'
 import { DataColumn, GenericDataColumn } from './DataColumn'
 import { DataRelation } from './DataRelation'
-import { KeyedCollection, EmptyObject, deepCopy, compareKeys, 
-	equalKeys, getValueAtKeyPath, setValueAtKeyPath } from './Util'
+import {
+	KeyedCollection, EmptyObject, deepCopy, compareKeys,
+	equalKeys, getValueAtKeyPath, setValueAtKeyPath
+} from './Util'
 
 import { EventEmitter2 as EventEmitter } from 'eventemitter2'
+import Dict = require('dict');
 
 export class DataRow {
 	private _table: DataTable
 	private _original: Object
 	private _current: Object
 	private _proposed: Object
-	public observable = new EventEmitter()
+	private _detachedCache: Dict<any>
+	private _observable = new EventEmitter()
 
-	constructor(values?: Object, table?:DataTable) {
+	constructor(values?: Object, table?: DataTable) {
 
 		this._table = table;
-		
+
 		/**
 		 * _original is set to undefined, and
 		 * _current is an empty object so we 
@@ -138,6 +143,11 @@ export class DataRow {
 		}
 	}
 
+	private _getCache<T>(key: string): T {
+		let dict = this._detachedCache || (this._detachedCache = Dict<any>());
+		return dict.get(key);
+	}
+
 	set<T>(key: string, value: T): boolean
 	set(values: Object): boolean
 	set<T>(column: DataColumn, value: T): boolean
@@ -155,7 +165,7 @@ export class DataRow {
 					return this._setItems(<{}>valsOrKeyOrColumn)
 				}
 		}
-		throw new TypeError("invalid arguments passed to DataRow#set: "+valsOrKeyOrColumn)
+		throw new TypeError("invalid arguments passed to DataRow#set: " + valsOrKeyOrColumn)
 	}
 
 	private _setItems(values: Object): boolean {
@@ -169,25 +179,62 @@ export class DataRow {
      * @todo
 	 */
 	private _setItemWithColumn(column: DataColumn, value: any): boolean {
-
-		return column.setValue(this._current, value);
+		let store = this.isEditing() ? this._proposed : this._current
+		return column.setValue(store, value);
 	}
 
-	private _setItemWithKey(key: string, newValue: any): boolean {
+	private _setItemWithKey(key: string, value: any): boolean {
 
-		// bitwise check (&) in case rowState() is 
-		// changed to return a set of flags in
-		// future versions
-		if (this.rowState() & DataRowState.DELETED) {
+		let state: DataRowState = this.rowState();
+
+		/**
+		 * bitwise check (&) in case rowState() is 
+		 * changed to return a set of flags in
+		 * future versions
+		 */
+		if (state & DataRowState.DELETED) {
 			throw new Error("Row already deleted");
 		}
 
-		if (this.isEditing()) {
-			this._proposed = this._proposed || this._createProposed();
-			setValueAtKeyPath(key, this._proposed, newValue);
+		/**
+		 * if DataRow hasn't been added to a 
+		 * DataRowCollection yet, cache the
+		 * key(i.e. ColumnName) and value to 
+		 * be set when the row is added.
+		 */
+		if (state & DataRowState.DETACHED) {
+			return this._setCache(key, value);
+		}
+
+		/**
+		 * search for column on parent table
+		 * and use it to set the value;
+		 */
+		let table: DataTable, column: DataColumn;
+		if (table = this.table()) {// double check that we have a valid parent table
+			if (column = table.columns().get(key)) {
+				return this._setItemWithColumn(column, value);
+			} else {
+				/**
+				 * if the column could not be found on the table
+				 * we create one with that key, add it to the table,
+				 * and use it to set the value
+				 */
+				column = new DataColumn(key);
+				if (table.columns().add(column)) {// check for successful addition
+					return this._setItemWithColumn(column, value);
+				}
+			}
 		} else {
-			this._current = this._current || this._createCurrent();
-			setValueAtKeyPath(key, this._current, newValue);
+			// somehow the row is not DETACHED but the table is not defined
+			throw new Error("Cannot find DataRow#table")
+		}
+	}
+
+	private _setCache(key: string, value: any): boolean {
+		let dict = this._detachedCache || (this._detachedCache = Dict<any>());
+		if (dict.set(key, value)) {
+			return true;
 		}
 		return false;
 	}
@@ -200,7 +247,7 @@ export class DataRow {
 		return false;
 	}
 
-	delete() {
+	deleteRow() {
 		if (this.isEditing()) {
 			this._proposed = null;
 		} else {
@@ -277,20 +324,56 @@ export class DataRow {
 		return this._table;
 	}
 
+	/**
+	 * Semi-private (i.e. friendly?) method 
+	 * for adding row to the row collection.
+	 * Used by DataRowCollection#add()
+	 */
+	_addToCollection(collection: DataRowCollection): boolean {
+		// set the reference to the parent table 
+		this.table(collection.table());
+
+		// flush the cache
+		let success:boolean = true;
+		let self = this;
+		this._detachedCache.forEach(function(value:any, key:string, dict:Dict<any>) {
+			success = success && self._setItemWithKey(key, value);
+		})
+		this._detachedCache.clear();
+		delete this._detachedCache;
+		return success;
+	}
+
 	private dispatchBeforeRowChange(args: RowChangeEventArgs) {
-		this.observable.emit("beforechange", args);
+		this._observable.emit("beforechange", args);
 	}
 
 	private dispatchRowChange(args: RowChangeEventArgs) {
-		this.observable.emit("change", args);
+		this._observable.emit("change", args);
 	}
 
 	private dispatchBeforeDelete() {
-		this.observable.emit("beforedeleted");
+		this._observable.emit("beforedeleted");
 	}
 
 	private dispatchDelete() {
-		this.observable.emit("deleted");
+		this._observable.emit("deleted");
+	}
+
+	/**
+	 * Facade for the _observable#on
+	 */
+	on(event:string, listener:EventEmitter.Listener):this {
+		this._observable.on(event, listener);
+		return this;
+	}
+
+	/**
+	 * Facade for the _observable#on
+	 */
+	off(event:string, listener:EventEmitter.Listener):this {
+		this._observable.off(event, listener);
+		return this;
 	}
 }
 

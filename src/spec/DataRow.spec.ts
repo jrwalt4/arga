@@ -1,11 +1,8 @@
-var DataRow = require("../build/core/DataRow").DataRow;
-var DataTable = require("../build/core/DataTable").DataTable;
-var DataRowState = require("../build/core/DataRowState").DataRowState;
-var DataRowVersion = require("../build/core/DataRowVersion").DataRowVersion;
+import {DataRow, DataTable, DataRowState, DataRowVersion} from '../arga'
 
 describe("DataRow", function () {
-    var dt = new DataTable();
-    var dr;
+    let dt = new DataTable();
+    var dr:DataRow;
     
     beforeEach(function () {
         dr = new DataRow();
