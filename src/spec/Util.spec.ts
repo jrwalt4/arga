@@ -1,6 +1,7 @@
 import * as util from '../core/Util'
 
-xdescribe("Util", function () {
+describe("Util", function () {
+    pending("Util is in flux")
 
     var obj = {
         name: {

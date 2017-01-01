@@ -41,7 +41,7 @@ export class DataRow {
 	}
 
 	private _createOriginal(): {} {
-		return {};
+		return new EmptyObject();
 	}
 
 	private _createCurrent(): {} {
@@ -53,33 +53,39 @@ export class DataRow {
 	}
 
 	/**
-	 * 
+	 * returns The DataRowState that this row is currently in
+	 * @return {DataRowState} rowState - the current DataRowState
 	 */
 	rowState(): DataRowState {
 		/**
-		 *  __________________________________
-		 * | _original | _current |   state   |
-		 * |-----------|----------|-----------|
-		 * | undefined | undefined|   ERROR   |
-		 * | undefined |    {}    |   ADDED   |
-		 * | undefined |   null   |  DELETED  | deleted immediately (won't wait to sync)
-		 * |     {}    | undefined| UNCHANGED |
-		 * |     {}    |    {}    | MODIFIED  |
-		 * |     {}    |   null   |  DELETED  |
-		 * |___________|__________|___________|
-		 * 
+		 * _______________________________________________ 
+		 *|   _table  |  _current | _original |   state   | 
+		 *|-----------|-----------|-----------|-----------| 
+		 *| undefined | undefined | undefined |  DETACHED | 
+		 *| undefined | undefined |     {}    |  DETACHED | 
+		 *| undefined |    null   | undefined |  DETACHED | 
+		 *| undefined |    null   |     {}    |  DETACHED | 
+		 *| undefined |     {}    | undefined |  DETACHED | 
+		 *| undefined |     {}    |     {}    |  DETACHED | 
+		 *| DataTable | undefined | undefined |     ??    | 
+		 *| DataTable | undefined |     {}    | UNCHANGED | 
+		 *| DataTable |    null   | undefined |  DELETED  | should be deleted immediately without waiting for 'acceptChanges()'
+		 *| DataTable |    null   |     {}    |  DELETED  | 
+		 *| DataTable |     {}    | undefined |   ADDED   | 
+		 *| DataTable |     {}    |     {}    |  MODIFIED | 
+		 *|___________|___________|___________|___________| 
 		 */
 
-		if (this._table === void 0) {
-			return DataRowState.DETACHED;
+		if (this._table != null) { // either 'null' or 'undefined'
+			if (this._current === void 0) {
+				return DataRowState.UNCHANGED;
+			}
+			if (this._current === null) {
+				return DataRowState.DELETED;
+			}
+			return this._original ? DataRowState.MODIFIED : DataRowState.ADDED;
 		}
-		if (this._current === null) {
-			return DataRowState.DELETED;
-		}
-		if (this._original === void 0) {
-			return DataRowState.ADDED
-		}
-		return this._current === void 0 ? DataRowState.UNCHANGED : DataRowState.MODIFIED;
+		return DataRowState.DETACHED;
 	}
 
 	/**
@@ -149,7 +155,7 @@ export class DataRow {
 	}
 
 	set<T>(key: string, value: T): boolean
-	set(values: Object): boolean
+	set(values: {}): boolean
 	set<T>(column: DataColumn, value: T): boolean
 	set<T>(valsOrKeyOrColumn: any, value?: T): boolean {
 
@@ -168,7 +174,7 @@ export class DataRow {
 		throw new TypeError("invalid arguments passed to DataRow#set: " + valsOrKeyOrColumn)
 	}
 
-	private _setItems(values: Object): boolean {
+	private _setItems(values: {}): boolean {
 		let success = true;
 		for (var key in values) {
 			success = success && this._setItemWithKey(key, values[key])
@@ -232,7 +238,7 @@ export class DataRow {
 	}
 
 	private _setCache(key: string, value: any): boolean {
-		let dict = this._detachedCache || (this._detachedCache = Dict<any>());
+		let dict = this._detachedCache || (this._detachedCache = new Dict<any>());
 		if (dict.set(key, value)) {
 			return true;
 		}
@@ -267,6 +273,13 @@ export class DataRow {
 		return relation.getParentRow(this);
 	}
 
+	/**
+     * @todo
+     */
+	setParentRow(relation: DataRelation) {
+
+	}
+
 	beginEdit(): void {
 		if (this.isEditing()) {
 			throw new Error("already editing");
@@ -279,13 +292,13 @@ export class DataRow {
 	}
 
 	endEdit(): void {
-		this.dispatchBeforeRowChange({ type: "modify" });
+		this.dispatchBeforeChange({ type: "change", key: "proposed" });
 		var self = this;
 		Object.keys(this._proposed).forEach(function (key) {
 			self._current[key] = self._proposed[key];
 		})
 		delete this._proposed;
-		this.dispatchRowChange({ type: "modify" });
+		this.dispatchChange({ type: "change", key: "proposed" });
 	}
 
 	acceptChanges() {
@@ -308,47 +321,56 @@ export class DataRow {
 	}
 
 	/**
-	 * pass 'null' to set the table to 'undefined'
+	 * Get reference to parent DataTable
 	 */
 	table(): DataTable;
-	table(oDataTable: DataTable): this;
-	table(oDataTable?: DataTable): any {
-		if (oDataTable !== undefined) {
-			if (oDataTable === null) {
-				this._table = undefined;
-			} else {
-				this._table = oDataTable;
-			}
+	table(table: DataTable): this;
+	table(table?: DataTable): any {
+		if (table instanceof DataTable) {
+			this._table = table;
 			return this;
 		}
 		return this._table;
 	}
 
 	/**
-	 * Semi-private (i.e. friendly?) method 
-	 * for adding row to the row collection.
-	 * Used by DataRowCollection#add()
+	 * Semi-private (i.e. friendly?) method for adding row
+	 * to a row collection. Used by DataRowCollection#add()
 	 */
 	_addToCollection(collection: DataRowCollection): boolean {
 		// set the reference to the parent table 
 		this.table(collection.table());
 
-		// flush the cache
-		let success:boolean = true;
-		let self = this;
-		this._detachedCache.forEach(function(value:any, key:string, dict:Dict<any>) {
-			success = success && self._setItemWithKey(key, value);
-		})
-		this._detachedCache.clear();
-		delete this._detachedCache;
+		let success = true;
+
+		if (this._detachedCache) {
+			// flush the cache
+			let self = this;
+			this._detachedCache.forEach(function (value: any, key: string, dict: Dict<any>) {
+				success = success && self._setItemWithKey(key, value);
+			})
+
+			// cleanup cache to prevent memory leaks
+			this._detachedCache.clear();
+			delete this._detachedCache;
+		}
+
 		return success;
 	}
 
-	private dispatchBeforeRowChange(args: RowChangeEventArgs) {
+	private dispatchBeforeAdd(args: RowChangeEventArgs) {
+
+	}
+
+	private dispatchAdd(args: RowChangeEventArgs) {
+
+	}
+
+	private dispatchBeforeChange(args: RowChangeEventArgs) {
 		this._observable.emit("beforechange", args);
 	}
 
-	private dispatchRowChange(args: RowChangeEventArgs) {
+	private dispatchChange(args: RowChangeEventArgs) {
 		this._observable.emit("change", args);
 	}
 
@@ -360,30 +382,31 @@ export class DataRow {
 		this._observable.emit("deleted");
 	}
 
-	/**
-	 * Facade for the _observable#on
-	 */
-	on(event:string, listener:EventEmitter.Listener):this {
+	on(event: string, listener: EventEmitter.Listener): this {
+		/**
+		 * Facade for the _observable#off
+		 */
 		this._observable.on(event, listener);
 		return this;
 	}
 
-	/**
-	 * Facade for the _observable#on
-	 */
-	off(event:string, listener:EventEmitter.Listener):this {
+	off(event: string, listener: EventEmitter.Listener): this {
+		/**
+		 * Facade for the _observable#off
+		 */
 		this._observable.off(event, listener);
 		return this;
 	}
 }
 
-//*
 function isDataColumn(dc: any): dc is DataColumn {
 	return dc instanceof GenericDataColumn;
 }
-//*/
+
+export type RowChangeListener = (row: DataRow, newValue: any, oldValue: any) => void
+
 export type RowChangeEventArgs = {
 	type: RowChangeType,
-	key?: any
+	key: any
 }
-export type RowChangeType = "modify" | "delete" | "add"
+export type RowChangeType = "add" | "change" | "delete"

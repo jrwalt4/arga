@@ -1,6 +1,7 @@
 import {KeyedCollection} from '../core/Util'
 
-xdescribe("arga.util.KeyedCollection", function () {
+describe("arga.util.KeyedCollection", function () {
+    pending("keyed cllection is in flux")
     var kc;
     beforeEach(function () {
         kc = new KeyedCollection("name.last");

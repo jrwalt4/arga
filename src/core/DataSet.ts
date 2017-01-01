@@ -6,14 +6,17 @@ import { DataRelation } from './DataRelation'
 import { DataRelationCollection } from './DataRelationCollection'
 import { KeyedCollection } from './util'
 
-var ds_counter = 1;
+var ds_counter = 0;
 
 export class DataSet {
 
 	private _tables = new DataTableCollection(this)
 	private _relations = new DataRelationCollection(this)
 
-	constructor(public name: string = "Set " + (++ds_counter)) { }
+	constructor(public name?: string) {
+		ds_counter++;
+		this.name = name ||  "Set " + ds_counter;
+	}
 
 	tables(): DataTableCollection
 	tables(name: string): DataTable

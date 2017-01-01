@@ -16,10 +16,13 @@ export class DataColumnCollection extends KeyedCollection<string, DataColumn> {
         //this._columns = new Array<DataColumn<any>>();
     }
 
-    add(dataColumn:DataColumn):boolean {
-        let added = super.add(dataColumn);
+    add(columnName:string):boolean
+    add(dataColumn:DataColumn):boolean
+    add(columnOrName:any):boolean {
+        let column:DataColumn = (typeof columnOrName == "string") ? new DataColumn(columnOrName) : columnOrName
+        let added = super.add(column);
         if(added) {
-            dataColumn.table(this._table);
+            column.table(this._table);
         }
         return added;
     }

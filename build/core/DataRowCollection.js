@@ -35,13 +35,9 @@ var DataRowCollection = (function () {
         return this._rows.get(key);
     };
     DataRowCollection.prototype.add = function (rowOrData) {
-        var row;
-        if (!(rowOrData instanceof DataRow_1.DataRow)) {
-            row = new DataRow_1.DataRow(rowOrData);
-        }
+        var row = rowOrData instanceof DataRow_1.DataRow ? rowOrData : new DataRow_1.DataRow(rowOrData);
         if (this._rows.add(row)) {
-            row.table(this.table());
-            return true;
+            return row._addToCollection(this);
         }
         return false;
     };

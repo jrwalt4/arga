@@ -1,51 +1,76 @@
-import {DataRow, DataTable, DataRowState, DataRowVersion} from '../arga'
+import { DataRow, DataRowState, DataRowVersion, DataTable, DataColumn } from '../arga'
 
 describe("DataRow", function () {
-    let dt = new DataTable();
-    var dr:DataRow;
-    
-    beforeEach(function () {
-        dr = new DataRow();
+
+    describe("getter/setters", function () {
+
+        let values = {
+            task: "clean",
+            duration: 10,
+            priority: 1
+        };
+
+        function testGetterSetter(dr: DataRow, values: {}) {
+            it("should set and get single property", function () {
+                let key: string = Object.keys(values)[0];
+                dr.set(key, values[key]);
+                expect(dr.get(key)).toEqual(values[key]);
+            })
+
+            it("should set and get multiple properties", function () {
+                dr.set(values);
+                for (let key in values) {
+                    expect(dr.get(key)).toEqual(values[key]);
+                }
+            })
+        }
+
+        describe("while detached", function () {
+            let dr = new DataRow();
+            testGetterSetter(dr, values);
+        })
+
+        describe("after adding to collection", function () {
+
+            let dr = new DataRow();
+            let dt = new DataTable();
+            for (let key in values) {
+                dt.columns().add(key);
+            }
+
+            testGetterSetter(dr, values);
+        })
     })
 
-    it("should set property from key and value", function () {
-        dr.set("name", "Reese");
-        expect(dr.get("name")).toEqual("Reese");
-    })
+    describe("rowState", function () {
 
-    it("should set property from object's key and value", function () {
-        dr.set({
-            name: "Reese"
-        });
-        expect(dr.get("name")).toEqual("Reese");
-    })
+        function checkState(dr: DataRow, state: DataRowState) {
+            /** 
+             * use bitwise operator '&' since a rowState could match
+             * multiple conditions (i.e. DETACHED and MODIFIED)
+             */
+            expect(DataRowState[dr.rowState() & state]).toEqual(DataRowState[state]);
+        }
 
-    it("should set multiple properties from object's keys and values", function () {
-        dr.set({
-            name: "Reese",
-            age: 27,
-            job: "Engineer"
-        });
-        expect(dr.get("name")).toEqual("Reese");
-        expect(dr.get("age")).toEqual(27);
-        expect(dr.get("job")).toEqual("Engineer");
-    })
+        it("should begin as DETACHED", function () {
+            let dr = new DataRow();
+            checkState(dr, DataRowState.DETACHED);
+        })
 
-    it("should start with rowState equals DETACHED", function() {
-        expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.DETACHED]);
-    })
+        it("should be UNCHANGED when added to collection", function () {
+            let dr = new DataRow();
+            let dt = new DataTable();
 
-    it("should set rowState to UNCHANGED", function(){
-        dt.rows().add(dr);
-        dr.acceptChanges();
-        expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.UNCHANGED]);
-    })
+            dt.rows().add(dr);
 
-    it("should update the rowState to MODIFIED", function () {
-        dt.rows().add(dr);
-        dr.acceptChanges();
-        dr.set("name", "Reese");
-        expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.MODIFIED]);
+            checkState(dr, DataRowState.UNCHANGED);
+        })
+
+        it("should update the rowState to MODIFIED", function () {
+            dt.rows().add(dr);
+            dr.acceptChanges();
+            dr.set("name", "Reese");
+            expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.MODIFIED]);
+        })
     })
-    
 })

@@ -6,7 +6,7 @@ import { DataColumnCollection } from './DataColumnCollection'
 import { DataRow } from './DataRow'
 import { DataRowCollection } from './DataRowCollection'
 
-let dt_counter = 1;
+let dt_counter = 0;
 
 export class DataTable {
 
@@ -15,7 +15,10 @@ export class DataTable {
 	private _columnCollection = new DataColumnCollection(this);
 	private _primaryKey: DataColumn[];
 
-	constructor(public name: string = "Table " + (++dt_counter)) { }
+	constructor(public name?: string) {
+		dt_counter++
+		this.name = name || "Table " + dt_counter;
+	}
 
 	dataSet(): DataSet
 	dataSet(dataSet: DataSet): this
