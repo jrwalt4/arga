@@ -19,10 +19,11 @@ var DataColumnCollection = (function (_super) {
         return _this;
         //this._columns = new Array<DataColumn<any>>();
     }
-    DataColumnCollection.prototype.add = function (dataColumn) {
-        var added = _super.prototype.add.call(this, dataColumn);
+    DataColumnCollection.prototype.add = function (columnOrName) {
+        var column = (typeof columnOrName == "string") ? new DataColumn_1.DataColumn(columnOrName) : columnOrName;
+        var added = _super.prototype.add.call(this, column);
         if (added) {
-            dataColumn.table(this._table);
+            column.table(this._table);
         }
         return added;
     };
@@ -38,5 +39,5 @@ var DataColumnCollection = (function (_super) {
         return this._table;
     };
     return DataColumnCollection;
-}(Util_1.KeyedCollection));
+}(Util_1.KeyedDictionary));
 exports.DataColumnCollection = DataColumnCollection;

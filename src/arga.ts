@@ -2,6 +2,7 @@
 export {DataSet} from './core/DataSet'
 
 export {DataTable} from './core/DataTable'
+export {DataTableCollection} from './core/DataTableCollection'
 export {DataView} from './core/DataView'
 
 export {DataRow} from './core/DataRow'

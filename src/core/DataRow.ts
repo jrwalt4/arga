@@ -1,13 +1,13 @@
 // DataRow.js
 
-import { DataTable } from './DataTable'
+import { DataTable, RowChangeEvent } from './DataTable'
 import { DataRowCollection } from './DataRowCollection'
 import { DataRowState } from './DataRowState'
 import { DataRowVersion } from './DataRowVersion'
 import { DataColumn, GenericDataColumn } from './DataColumn'
 import { DataRelation } from './DataRelation'
 import {
-	KeyedCollection, EmptyObject, deepCopy, compareKeys,
+	EmptyObject, deepCopy, compareKeys,
 	equalKeys, getValueAtKeyPath, setValueAtKeyPath
 } from './Util'
 
@@ -113,9 +113,12 @@ export class DataRow {
 	}
 
 	private _getItemWithKey<T>(key: string, version?: DataRowVersion): T {
-		var data = this._getVersion(version);
-		if (data != null) {
-			return (<GenericDataColumn<T>>this.table().columns(key)).getValue(data);
+		if(this.rowState() & DataRowState.DETACHED) {
+			return this._getCache<T>(key);
+		}
+		var store = this._getVersion(version);
+		if (store != null) {
+			return (<GenericDataColumn<T>>this.table().columns(key)).getValue(store);
 		}
 	}
 
@@ -183,7 +186,7 @@ export class DataRow {
      * @todo
 	 */
 	private _setItemWithColumn(column: DataColumn, value: any): boolean {
-		let store = this.isEditing() ? this._proposed : this._current
+		let store = this.isEditing() ? this._proposed : this._current || (this._current = this._createCurrent());
 		return column.setValue(store, value);
 	}
 
@@ -268,7 +271,7 @@ export class DataRow {
 
 	getParentRow(relation: DataRelation): DataRow {
 		return relation.getParentRow(this);
-	}
+	} 
 
 	/**
      * @todo
@@ -303,9 +306,8 @@ export class DataRow {
 		/**
 		 * copy all the changes from _current onto _original,
 		 */
-
 		this._original = deepCopy(this._current) || this._createOriginal();
-		delete this._current;
+		this._current = void 0;
 	}
 
 	rejectChanges() {
@@ -357,18 +359,18 @@ export class DataRow {
 
 	}
 
-	private dispatchChange<T>(key:string, newValue:T, oldValue?:T)
-	private dispatchChange<T>(column:DataColumn, newValue:T, oldValue?:T)
-	private dispatchChange<T>(keyOrColumn:string | DataColumn, newValue:T, oldValue?:T) {
+	private dispatchChange<T>(key: string, newValue: T, oldValue?: T)
+	private dispatchChange<T>(column: DataColumn, newValue: T, oldValue?: T)
+	private dispatchChange<T>(keyOrColumn: string | DataColumn, newValue: T, oldValue?: T) {
 		this.table().emit({
-			row:this,
-			type:'rowchange',
+			row: this,
+			type: 'rowchanged',
 			column: keyOrColumn instanceof DataColumn ? keyOrColumn : this.table().columns(keyOrColumn)
 		})
 	}
 
 	private dispatchDelete() {
-		
+
 	}
 
 }

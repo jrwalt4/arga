@@ -43,6 +43,9 @@ var GenericDataColumn = (function () {
         });
         return foundRows;
     };
+    GenericDataColumn.prototype._addToCollection = function (collection) {
+        this.table(collection.table());
+    };
     return GenericDataColumn;
 }());
 exports.GenericDataColumn = GenericDataColumn;

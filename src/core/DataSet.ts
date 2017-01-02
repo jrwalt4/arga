@@ -4,7 +4,6 @@ import { DataTable } from './DataTable'
 import { DataTableCollection } from './DataTableCollection'
 import { DataRelation } from './DataRelation'
 import { DataRelationCollection } from './DataRelationCollection'
-import { KeyedCollection } from './util'
 
 var ds_counter = 0;
 

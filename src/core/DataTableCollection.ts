@@ -1,10 +1,10 @@
 // DataTableCollection.ts
 
-import {KeyedCollection} from './Util'
+import {KeyedDictionary} from './Util'
 import {DataTable} from './DataTable'
 import {DataSet} from './DataSet'
 
-export class DataTableCollection extends KeyedCollection<string, DataTable> {
+export class DataTableCollection extends KeyedDictionary<DataTable> {
     private _set:DataSet
     constructor(dataSet:DataSet) {
         if (dataSet === void 0) {

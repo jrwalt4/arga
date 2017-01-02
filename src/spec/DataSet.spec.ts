@@ -1,4 +1,4 @@
-import {DataSet, DataTable, DataRelation} from '../arga'
+import {DataSet, DataTable, DataRelation, DataTableCollection} from '../arga'
 
 describe("DataSet", function () {
 
@@ -17,8 +17,15 @@ describe("DataSet", function () {
     })
 
     describe("tables()", function(){
-        it("should add a single table", function(){
-            var dtName = "Table1";
+        it("should return a reference to the tables' DataRowCollection", function(){
+            let ds = new DataSet();
+            expect(ds.tables() instanceof DataTableCollection).toBeTruthy();
+        })
+    })
+
+    describe("tables(name)", function(){
+        it("should retrieve the table with the indicated name", function(){
+            var dtName = "Table 1";
             var dt = new DataTable(dtName);
             ds.tables().add(dt);
             expect(ds.tables(dtName)).toBe(dt);

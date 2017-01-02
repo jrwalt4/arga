@@ -1,10 +1,10 @@
-import {KeyedCollection} from '../core/Util'
+import {KeyedDictionary} from '../core/Util'
 
 describe("arga.util.KeyedCollection", function () {
     pending("keyed cllection is in flux")
     var kc;
     beforeEach(function () {
-        kc = new KeyedCollection("name.last");
+        kc = new KeyedDictionary("name.last");
         kc.add({
             name: {
                 first: "Reese",

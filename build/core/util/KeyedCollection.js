@@ -11,6 +11,7 @@ var KeyedCollection = (function () {
     function KeyedCollection(_keyPath, entries) {
         this._keyPath = _keyPath;
         this._store = new EmptyObject_1.EmptyObject;
+        throw new Error("not implemented yet");
     }
     Object.defineProperty(KeyedCollection.prototype, "size", {
         get: function () {

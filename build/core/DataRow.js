@@ -1,14 +1,13 @@
 // DataRow.js
 "use strict";
+var DataTable_1 = require("./DataTable");
 var DataRowState_1 = require("./DataRowState");
 var DataRowVersion_1 = require("./DataRowVersion");
 var DataColumn_1 = require("./DataColumn");
 var Util_1 = require("./Util");
-var eventemitter2_1 = require("eventemitter2");
 var Dict = require("dict");
 var DataRow = (function () {
     function DataRow(values, table) {
-        this._observable = new eventemitter2_1.EventEmitter2();
         this._table = table;
         /**
          * _original is set to undefined, and
@@ -22,7 +21,7 @@ var DataRow = (function () {
         }
     }
     DataRow.prototype._createOriginal = function () {
-        return {};
+        return new Util_1.EmptyObject();
     };
     DataRow.prototype._createCurrent = function () {
         return Object.create(this._original || null);
@@ -31,32 +30,38 @@ var DataRow = (function () {
         return Object.create(this._current || null);
     };
     /**
-     *
+     * returns The DataRowState that this row is currently in
+     * @return {DataRowState} rowState - the current DataRowState
      */
     DataRow.prototype.rowState = function () {
         /**
-         *  __________________________________
-         * | _original | _current |   state   |
-         * |-----------|----------|-----------|
-         * | undefined | undefined|   ERROR   |
-         * | undefined |    {}    |   ADDED   |
-         * | undefined |   null   |  DELETED  | deleted immediately (won't wait to sync)
-         * |     {}    | undefined| UNCHANGED |
-         * |     {}    |    {}    | MODIFIED  |
-         * |     {}    |   null   |  DELETED  |
-         * |___________|__________|___________|
-         *
+         * _______________________________________________
+         *|   _table  |  _current | _original |   state   |
+         *|-----------|-----------|-----------|-----------|
+         *| undefined | undefined | undefined |  DETACHED |
+         *| undefined | undefined |     {}    |  DETACHED |
+         *| undefined |    null   | undefined |  DETACHED |
+         *| undefined |    null   |     {}    |  DETACHED |
+         *| undefined |     {}    | undefined |  DETACHED |
+         *| undefined |     {}    |     {}    |  DETACHED |
+         *| DataTable | undefined | undefined |     ??    |
+         *| DataTable | undefined |     {}    | UNCHANGED |
+         *| DataTable |    null   | undefined |  DELETED  | should be deleted immediately without waiting for 'acceptChanges()'
+         *| DataTable |    null   |     {}    |  DELETED  |
+         *| DataTable |     {}    | undefined |   ADDED   |
+         *| DataTable |     {}    |     {}    |  MODIFIED |
+         *|___________|___________|___________|___________|
          */
-        if (this._table === void 0) {
-            return DataRowState_1.DataRowState.DETACHED;
+        if (this._table != null) {
+            if (this._current === void 0) {
+                return DataRowState_1.DataRowState.UNCHANGED;
+            }
+            if (this._current === null) {
+                return DataRowState_1.DataRowState.DELETED;
+            }
+            return this._original ? DataRowState_1.DataRowState.MODIFIED : DataRowState_1.DataRowState.ADDED;
         }
-        if (this._current === null) {
-            return DataRowState_1.DataRowState.DELETED;
-        }
-        if (this._original === void 0) {
-            return DataRowState_1.DataRowState.ADDED;
-        }
-        return this._current === void 0 ? DataRowState_1.DataRowState.UNCHANGED : DataRowState_1.DataRowState.MODIFIED;
+        return DataRowState_1.DataRowState.DETACHED;
     };
     /**
      * Returns whether the key or column is defined on this row
@@ -81,9 +86,12 @@ var DataRow = (function () {
         return this._getItemWithColumn(columnOrName, version);
     };
     DataRow.prototype._getItemWithKey = function (key, version) {
-        var data = this._getVersion(version);
-        if (data != null) {
-            return this.table().columns(key).getValue(data);
+        if (this.rowState() & DataRowState_1.DataRowState.DETACHED) {
+            return this._getCache(key);
+        }
+        var store = this._getVersion(version);
+        if (store != null) {
+            return this.table().columns(key).getValue(store);
         }
     };
     DataRow.prototype._getItemWithColumn = function (column, version) {
@@ -143,7 +151,7 @@ var DataRow = (function () {
      * @todo
      */
     DataRow.prototype._setItemWithColumn = function (column, value) {
-        var store = this.isEditing() ? this._proposed : this._current;
+        var store = this.isEditing() ? this._proposed : this._current || (this._current = this._createCurrent());
         return column.setValue(store, value);
     };
     DataRow.prototype._setItemWithKey = function (key, value) {
@@ -213,7 +221,6 @@ var DataRow = (function () {
             this._current = null;
         }
         if (this.rowState() & DataRowState_1.DataRowState.ADDED) {
-            this.dispatchBeforeDelete();
             this.dispatchDelete();
         }
     };
@@ -222,6 +229,11 @@ var DataRow = (function () {
     };
     DataRow.prototype.getParentRow = function (relation) {
         return relation.getParentRow(this);
+    };
+    /**
+     * @todo
+     */
+    DataRow.prototype.setParentRow = function (relation) {
     };
     DataRow.prototype.beginEdit = function () {
         if (this.isEditing()) {
@@ -233,13 +245,11 @@ var DataRow = (function () {
         return !!this._proposed;
     };
     DataRow.prototype.endEdit = function () {
-        this.dispatchBeforeRowChange({ type: "modify" });
         var self = this;
         Object.keys(this._proposed).forEach(function (key) {
             self._current[key] = self._proposed[key];
         });
         delete this._proposed;
-        this.dispatchRowChange({ type: "modify" });
     };
     DataRow.prototype.acceptChanges = function () {
         if (this.isEditing()) {
@@ -249,7 +259,7 @@ var DataRow = (function () {
          * copy all the changes from _current onto _original,
          */
         this._original = Util_1.deepCopy(this._current) || this._createOriginal();
-        delete this._current;
+        this._current = void 0;
     };
     DataRow.prototype.rejectChanges = function () {
         if (this.isEditing()) {
@@ -257,68 +267,47 @@ var DataRow = (function () {
         }
         delete this._current;
     };
-    DataRow.prototype.table = function (oDataTable) {
-        if (oDataTable !== undefined) {
-            if (oDataTable === null) {
-                this._table = undefined;
-            }
-            else {
-                this._table = oDataTable;
-            }
+    DataRow.prototype.table = function (table) {
+        if (table instanceof DataTable_1.DataTable) {
+            this._table = table;
             return this;
         }
         return this._table;
     };
     /**
-     * Semi-private (i.e. friendly?) method
-     * for adding row to the row collection.
-     * Used by DataRowCollection#add()
+     * Semi-private (i.e. friendly?) method for adding row
+     * to a row collection. Used by DataRowCollection#add()
      */
     DataRow.prototype._addToCollection = function (collection) {
         // set the reference to the parent table 
         this.table(collection.table());
-        // flush the cache
         var success = true;
-        var self = this;
         if (this._detachedCache) {
+            // flush the cache
+            var self_1 = this;
             this._detachedCache.forEach(function (value, key, dict) {
-                success = success && self._setItemWithKey(key, value);
+                success = success && self_1._setItemWithKey(key, value);
             });
+            // cleanup cache to prevent memory leaks
             this._detachedCache.clear();
+            delete this._detachedCache;
         }
-        delete this._detachedCache;
         return success;
     };
-    DataRow.prototype.dispatchBeforeRowChange = function (args) {
-        this._observable.emit("beforechange", args);
+    DataRow.prototype.dispatchAdd = function () {
     };
-    DataRow.prototype.dispatchRowChange = function (args) {
-        this._observable.emit("change", args);
-    };
-    DataRow.prototype.dispatchBeforeDelete = function () {
-        this._observable.emit("beforedeleted");
+    DataRow.prototype.dispatchChange = function (keyOrColumn, newValue, oldValue) {
+        this.table().emit({
+            row: this,
+            type: 'rowchanged',
+            column: keyOrColumn instanceof DataColumn_1.DataColumn ? keyOrColumn : this.table().columns(keyOrColumn)
+        });
     };
     DataRow.prototype.dispatchDelete = function () {
-        this._observable.emit("deleted");
-    };
-    /**
-     * Facade for the _observable#on
-     */
-    DataRow.prototype.on = function (event, listener) {
-        this._observable.on(event, listener);
-        return this;
-    };
-    /**
-     * Facade for the _observable#on
-     */
-    DataRow.prototype.off = function (event, listener) {
-        this._observable.off(event, listener);
-        return this;
     };
     return DataRow;
 }());
 exports.DataRow = DataRow;
-//*
 function isDataColumn(dc) {
     return dc instanceof DataColumn_1.GenericDataColumn;
 }

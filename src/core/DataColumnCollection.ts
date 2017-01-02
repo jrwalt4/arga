@@ -2,9 +2,9 @@
 
 import {DataColumn} from './DataColumn'
 import {DataTable} from './DataTable'
-import {KeyedCollection} from './Util'
+import {KeyedDictionary} from './Util'
 
-export class DataColumnCollection extends KeyedCollection<string, DataColumn> {
+export class DataColumnCollection extends KeyedDictionary<DataColumn> {
     private _table: DataTable
     //private _columns: DataColumn<any>[];
     constructor(dataTable: DataTable) {
@@ -17,7 +17,7 @@ export class DataColumnCollection extends KeyedCollection<string, DataColumn> {
     }
 
     add(columnName:string):boolean
-    add(dataColumn:DataColumn):boolean
+    add(column:DataColumn):boolean
     add(columnOrName:any):boolean {
         let column:DataColumn = (typeof columnOrName == "string") ? new DataColumn(columnOrName) : columnOrName
         let added = super.add(column);

@@ -2,13 +2,14 @@
 "use strict";
 var DataTableCollection_1 = require("./DataTableCollection");
 var DataRelationCollection_1 = require("./DataRelationCollection");
-var ds_counter = 1;
+var ds_counter = 0;
 var DataSet = (function () {
     function DataSet(name) {
-        if (name === void 0) { name = "Set " + (++ds_counter); }
         this.name = name;
         this._tables = new DataTableCollection_1.DataTableCollection(this);
         this._relations = new DataRelationCollection_1.DataRelationCollection(this);
+        ds_counter++;
+        this.name = name || "Set " + ds_counter;
     }
     DataSet.prototype.tables = function (name) {
         if (name === void 0) {

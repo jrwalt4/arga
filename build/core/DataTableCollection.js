@@ -25,5 +25,5 @@ var DataTableCollection = (function (_super) {
         return added;
     };
     return DataTableCollection;
-}(Util_1.KeyedCollection));
+}(Util_1.KeyedDictionary));
 exports.DataTableCollection = DataTableCollection;

@@ -1,8 +1,7 @@
 // Util.ts
 // Utilities used by arga.js
 "use strict";
-var KeyedCollection_1 = require("./KeyedCollection");
-exports.KeyedCollection = KeyedCollection_1.KeyedCollection;
+//export { KeyedCollection } from './KeyedCollection'
 var KeyedDictionary_1 = require("./KeyedDictionary");
 exports.KeyedDictionary = KeyedDictionary_1.KeyedDictionary;
 var EmptyObject_1 = require("./EmptyObject");

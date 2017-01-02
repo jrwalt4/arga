@@ -57,16 +57,18 @@ describe("DataRow", function () {
             checkState(dr, DataRowState.DETACHED);
         })
 
-        it("should be UNCHANGED when added to collection", function () {
+        it("should be ADDED when added to collection", function () {
             let dr = new DataRow();
             let dt = new DataTable();
 
             dt.rows().add(dr);
 
-            checkState(dr, DataRowState.UNCHANGED);
+            checkState(dr, DataRowState.ADDED);
         })
 
         it("should update the rowState to MODIFIED", function () {
+            let dr = new DataRow();
+            let dt = new DataTable();
             dt.rows().add(dr);
             dr.acceptChanges();
             dr.set("name", "Reese");

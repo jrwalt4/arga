@@ -2,13 +2,15 @@
 "use strict";
 var DataColumnCollection_1 = require("./DataColumnCollection");
 var DataRowCollection_1 = require("./DataRowCollection");
-var dt_counter = 1;
+var EventEmitter2_1 = require("EventEmitter2");
+var dt_counter = 0;
 var DataTable = (function () {
     function DataTable(name) {
-        if (name === void 0) { name = "Table " + (++dt_counter); }
         this.name = name;
         this._rowCollection = new DataRowCollection_1.DataRowCollection(this);
         this._columnCollection = new DataColumnCollection_1.DataColumnCollection(this);
+        dt_counter++;
+        this.name = name || "Table " + dt_counter;
     }
     DataTable.prototype.dataSet = function (dataSet) {
         if (dataSet === void 0) {
@@ -47,6 +49,15 @@ var DataTable = (function () {
     };
     DataTable.prototype.toString = function () {
         return this.name;
+    };
+    DataTable.prototype.emit = function (event) {
+        this._emitter.emit(event.type, event);
+    };
+    DataTable.prototype.on = function (event, listener) {
+        (this._emitter || (this._emitter = new EventEmitter2_1.EventEmitter2())).on(event, listener);
+    };
+    DataTable.prototype.off = function (event, listener) {
+        (this._emitter || (this._emitter = new EventEmitter2_1.EventEmitter2())).off(event, listener);
     };
     return DataTable;
 }());

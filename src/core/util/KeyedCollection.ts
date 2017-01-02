@@ -17,7 +17,9 @@ var _get = _.get,
 export class KeyedCollection<TKey extends string | number, TValue> implements IKeyedCollection<TKey, TValue> {
 	private _store:{} = new EmptyObject
 
-	constructor(private _keyPath: string, entries?: any[]) {}
+	constructor(private _keyPath: string, entries?: any[]) {
+		throw new Error("not implemented yet")
+	}
 
 	get size(): number {
 		return Object.keys(this._store).length
