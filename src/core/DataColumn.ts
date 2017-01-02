@@ -4,25 +4,11 @@ import SortedArray = require('collections/sorted-array');
 import * as util from './Util'
 import { DataTable } from './DataTable'
 import { DataRow } from './DataRow'
+import {DataColumnCollection} from './DataColumnCollection'
 import { DataColumnConstraint } from './DataColumnConstraint'
 import { DataType, GenericDataType } from './DataType'
 
 import * as _ from 'lodash'
-
-export type DataColumnConstructorOptions<T> = {
-    keyPath?: string
-    type?: GenericDataType<T> | string
-    isPrimaryKey?: boolean
-    // TODO
-    constraints?: DataColumnConstraint[]
-
-    // TODO 
-    get?: (object: {}) => T
-    set?: (object: {}, value: T) => boolean
-
-    // TODO
-    default?: T
-}
 
 export class GenericDataColumn<T> {
 
@@ -70,6 +56,10 @@ export class GenericDataColumn<T> {
             }
         });
         return foundRows;
+    }
+
+    _addToCollection(collection:DataColumnCollection) {
+        this.table(collection.table());
     }
 }
 

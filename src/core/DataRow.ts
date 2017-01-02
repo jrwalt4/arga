@@ -11,7 +11,6 @@ import {
 	equalKeys, getValueAtKeyPath, setValueAtKeyPath
 } from './Util'
 
-import { EventEmitter2 as EventEmitter } from 'eventemitter2'
 import Dict = require('dict');
 
 export class DataRow {
@@ -20,7 +19,6 @@ export class DataRow {
 	private _current: Object
 	private _proposed: Object
 	private _detachedCache: Dict<any>
-	private _observable = new EventEmitter()
 
 	constructor(values?: Object, table?: DataTable) {
 
@@ -260,7 +258,6 @@ export class DataRow {
 			this._current = null;
 		}
 		if (this.rowState() & DataRowState.ADDED) {
-			this.dispatchBeforeDelete();
 			this.dispatchDelete();
 		}
 	}
@@ -292,13 +289,11 @@ export class DataRow {
 	}
 
 	endEdit(): void {
-		this.dispatchBeforeChange({ type: "change", key: "proposed" });
 		var self = this;
 		Object.keys(this._proposed).forEach(function (key) {
 			self._current[key] = self._proposed[key];
 		})
 		delete this._proposed;
-		this.dispatchChange({ type: "change", key: "proposed" });
 	}
 
 	acceptChanges() {
@@ -358,55 +353,26 @@ export class DataRow {
 		return success;
 	}
 
-	private dispatchBeforeAdd(args: RowChangeEventArgs) {
+	private dispatchAdd() {
 
 	}
 
-	private dispatchAdd(args: RowChangeEventArgs) {
-
-	}
-
-	private dispatchBeforeChange(args: RowChangeEventArgs) {
-		this._observable.emit("beforechange", args);
-	}
-
-	private dispatchChange(args: RowChangeEventArgs) {
-		this._observable.emit("change", args);
-	}
-
-	private dispatchBeforeDelete() {
-		this._observable.emit("beforedeleted");
+	private dispatchChange<T>(key:string, newValue:T, oldValue?:T)
+	private dispatchChange<T>(column:DataColumn, newValue:T, oldValue?:T)
+	private dispatchChange<T>(keyOrColumn:string | DataColumn, newValue:T, oldValue?:T) {
+		this.table().emit({
+			row:this,
+			type:'rowchange',
+			column: keyOrColumn instanceof DataColumn ? keyOrColumn : this.table().columns(keyOrColumn)
+		})
 	}
 
 	private dispatchDelete() {
-		this._observable.emit("deleted");
+		
 	}
 
-	on(event: string, listener: EventEmitter.Listener): this {
-		/**
-		 * Facade for the _observable#off
-		 */
-		this._observable.on(event, listener);
-		return this;
-	}
-
-	off(event: string, listener: EventEmitter.Listener): this {
-		/**
-		 * Facade for the _observable#off
-		 */
-		this._observable.off(event, listener);
-		return this;
-	}
 }
 
 function isDataColumn(dc: any): dc is DataColumn {
 	return dc instanceof GenericDataColumn;
 }
-
-export type RowChangeListener = (row: DataRow, newValue: any, oldValue: any) => void
-
-export type RowChangeEventArgs = {
-	type: RowChangeType,
-	key: any
-}
-export type RowChangeType = "add" | "change" | "delete"

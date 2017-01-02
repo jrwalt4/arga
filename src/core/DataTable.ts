@@ -6,6 +6,8 @@ import { DataColumnCollection } from './DataColumnCollection'
 import { DataRow } from './DataRow'
 import { DataRowCollection } from './DataRowCollection'
 
+import { EventEmitter2 as EventEmitter } from 'EventEmitter2'
+
 let dt_counter = 0;
 
 export class DataTable {
@@ -14,6 +16,7 @@ export class DataTable {
 	private _rowCollection = new DataRowCollection(this);
 	private _columnCollection = new DataColumnCollection(this);
 	private _primaryKey: DataColumn[];
+	private _emitter: EventEmitter.emitter
 
 	constructor(public name?: string) {
 		dt_counter++
@@ -71,4 +74,43 @@ export class DataTable {
 	toString() {
 		return this.name;
 	}
+
+	emit(event:RowChangeEvent)
+	emit(event:ColumnChangeEvent)
+	emit(event:RowChangeEvent | ColumnChangeEvent) {
+		this._emitter.emit(event.type, event);
+	}
+
+	on(event: RowChangeEventType, listener: RowChangeListener)
+	on(event: ColumnChangeEventType, listener: ColumnChangeListener)
+	on(event: string, listener: (...values: any[]) => void) {
+		(this._emitter || (this._emitter = new EventEmitter())).on(event, listener);
+	}
+
+	off(event: RowChangeEventType, listener: RowChangeListener)
+	off(event: ColumnChangeEventType, listener: ColumnChangeListener)
+	off(event: string, listener: (...values: any[]) => void) {
+		(this._emitter || (this._emitter = new EventEmitter())).off(event, listener);
+	}
 }
+
+export type RowChangeEventType = "rowadded" | "rowchanged" | "rowdeleted"
+
+export interface RowChangeEvent {
+	type: RowChangeEventType
+	row: DataRow
+	column?:DataColumn
+	oldValue?: any
+	newValue?: any
+}
+
+export type RowChangeListener = (event: RowChangeEvent) => void
+
+export type ColumnChangeEventType = "columnadded" | "columndeleted"
+
+export interface ColumnChangeEvent {
+	type:ColumnChangeEventType
+	column:DataColumn
+}
+
+export type ColumnChangeListener = (event:ColumnChangeEvent)=>void
