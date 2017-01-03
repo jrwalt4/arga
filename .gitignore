@@ -1,7 +1,8 @@
 node_modules/
 archive/
 .vscode/
-typings/globals
+typings/
+!typings/collections/
 scratch/
 build/
 dist/

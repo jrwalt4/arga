@@ -5,7 +5,7 @@ import {IKeyedCollection} from './Util'
 import * as util from './Util'
 
 import {DataTable} from './DataTable'
-import {DataRow} from './DataRow'
+import {DataRow, addRowToCollection} from './DataRow'
 import {DataColumn} from './DataColumn'
 
 export class DataRowCollection implements IKeyedCollection<any, DataRow> {
@@ -50,7 +50,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     add(rowOrData:DataRow|{}):boolean {
         let row:DataRow = rowOrData instanceof DataRow ? rowOrData : new DataRow(rowOrData);
         if (this._rows.add(row)) {
-            return row._addToCollection(this);
+            return addRowToCollection(row, this);
         }
         return false;
     }

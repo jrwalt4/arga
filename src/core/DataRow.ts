@@ -113,7 +113,7 @@ export class DataRow {
 	}
 
 	private _getItemWithKey<T>(key: string, version?: DataRowVersion): T {
-		if(this.rowState() & DataRowState.DETACHED) {
+		if (this.rowState() & DataRowState.DETACHED) {
 			return this._getCache<T>(key);
 		}
 		var store = this._getVersion(version);
@@ -271,7 +271,7 @@ export class DataRow {
 
 	getParentRow(relation: DataRelation): DataRow {
 		return relation.getParentRow(this);
-	} 
+	}
 
 	/**
      * @todo
@@ -330,31 +330,6 @@ export class DataRow {
 		return this._table;
 	}
 
-	/**
-	 * Semi-private (i.e. friendly?) method for adding row
-	 * to a row collection. Used by DataRowCollection#add()
-	 */
-	_addToCollection(collection: DataRowCollection): boolean {
-		// set the reference to the parent table 
-		this.table(collection.table());
-
-		let success = true;
-
-		if (this._detachedCache) {
-			// flush the cache
-			let self = this;
-			this._detachedCache.forEach(function (value: any, key: string, dict: Dict<any>) {
-				success = success && self._setItemWithKey(key, value);
-			})
-
-			// cleanup cache to prevent memory leaks
-			this._detachedCache.clear();
-			delete this._detachedCache;
-		}
-
-		return success;
-	}
-
 	private dispatchAdd() {
 
 	}
@@ -373,6 +348,33 @@ export class DataRow {
 
 	}
 
+}
+
+/* internal module methods */
+
+/**
+ * Semi-private (i.e. friendly?) method for adding row
+ * to a collection. Used by DataRowCollection#add()
+ */
+export function addRowToCollection(row: DataRow, collection: DataRowCollection) {
+	// set the reference to the parent table 
+	row.table(collection.table());
+
+	let success = true;
+
+	if ((row as any)._detachedCache) {
+		// flush the cache
+		(row as any)._detachedCache.forEach(function (value: any, key: string, dict: Dict<any>) {
+			success = success && (row as any)._setItemWithKey(key, value);
+		})
+
+			// cleanup cache to mitigate memory leaks
+			(row as any)._detachedCache.clear();
+		(row as any)._detachedCache = null;
+		delete (row as any)._detachedCache;
+	}
+
+	return success;
 }
 
 function isDataColumn(dc: any): dc is DataColumn {
