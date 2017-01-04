@@ -51,10 +51,10 @@ export class DataRow {
 	}
 
 	/**
-	 * returns The DataRowState that this row is currently in
+	 * The DataRowState that this row is currently in
 	 * @return {DataRowState} rowState - the current DataRowState
 	 */
-	rowState(): DataRowState {
+	get rowState(): DataRowState {
 		/**
 		 * _______________________________________________ 
 		 *|   _table  |  _current | _original |   state   | 
@@ -89,14 +89,36 @@ export class DataRow {
 	/**
 	 * Returns whether the key or column is defined on this row
 	 */
-	has(key: string, version?: DataRowVersion): boolean {
-		var searchObject = this._getVersion(version);
-		for (var member in searchObject) {
-			if (member === key) {
-				return true;
+	has(column: DataColumn, version?: DataRowVersion): boolean
+	has(key: string, version?: DataRowVersion): boolean
+	has(keyOrColumn: string | DataColumn, version?: DataRowVersion): boolean {
+		let store: {};
+		if (store = this._getVersion(version)) {
+
+			if (isDataColumn(keyOrColumn)) {
+				return !!keyOrColumn.getValue(store);
 			}
+			// keyOrColumn is a column name
+			let column: DataColumn;
+			if (this.rowState ^ DataRowState.DETACHED) {
+				return (column = this._getColumnWithName(keyOrColumn)) ?
+					column.hasValue(store) : /* column doesn't exist */ false
+			}
+
+			// row is DETACHED, so check the cache
+			return this._detachedCache && this._detachedCache.has(keyOrColumn as string)
 		}
+		// the store doesn't exist
 		return false;
+	}
+
+	private _getColumnWithName(key: string): DataColumn | undefined {
+		if (this.rowState & DataRowState.DETACHED) {
+			return
+		}
+		if (this._table) { //check to make sure
+			return this._table.columns.get(key);
+		}
 	}
 
 	get<T>(column: GenericDataColumn<T>, version?: DataRowVersion): T
@@ -104,7 +126,7 @@ export class DataRow {
 	get<T>(columnName: string, version?: DataRowVersion): T
 	get<T>(columnOrName: any, version?: DataRowVersion): any {
 		if (typeof columnOrName === "string") {
-			return this._getItemWithKey<T>(columnOrName, version);
+			return this._getItemWithKey(columnOrName, version);
 		}
 		if (Array.isArray(columnOrName)) {
 			return (<DataColumn[]>columnOrName).map(column => this.get(column))
@@ -112,13 +134,13 @@ export class DataRow {
 		return this._getItemWithColumn<T>(<DataColumn>columnOrName, version);
 	}
 
-	private _getItemWithKey<T>(key: string, version?: DataRowVersion): T {
-		if (this.rowState() & DataRowState.DETACHED) {
-			return this._getCache<T>(key);
+	private _getItemWithKey(key: string, version?: DataRowVersion): any {
+		if (this.rowState & DataRowState.DETACHED) {
+			return this._getFromCache(key);
 		}
 		var store = this._getVersion(version);
 		if (store != null) {
-			return (<GenericDataColumn<T>>this.table.columns.get(key)).getValue(store);
+			return this.table.columns.get(key).getValue(store);
 		}
 	}
 
@@ -150,7 +172,7 @@ export class DataRow {
 		}
 	}
 
-	private _getCache<T>(key: string): T {
+	private _getFromCache<T>(key: string): T {
 		let dict = this._detachedCache || (this._detachedCache = Dict<any>());
 		return dict.get(key);
 	}
@@ -185,14 +207,14 @@ export class DataRow {
 	/**
      * @todo
 	 */
-	private _setItemWithColumn(column: DataColumn, value: any): boolean {
+	private _setItemWithColumn<T>(column: GenericDataColumn<T>, value: T): boolean {
 		let store = this.isEditing() ? this._proposed : this._current || (this._current = this._createCurrent());
 		return column.setValue(store, value);
 	}
 
 	private _setItemWithKey(key: string, value: any): boolean {
 
-		let state: DataRowState = this.rowState();
+		let state: DataRowState = this.rowState;
 
 		/**
 		 * bitwise check (&) in case rowState() is 
@@ -210,7 +232,7 @@ export class DataRow {
 		 * be set when the row is added.
 		 */
 		if (state & DataRowState.DETACHED) {
-			return this._setCache(key, value);
+			return this._setOnCache(key, value);
 		}
 
 		/**
@@ -238,7 +260,7 @@ export class DataRow {
 		}
 	}
 
-	private _setCache(key: string, value: any): boolean {
+	private _setOnCache(key: string, value: any): boolean {
 		let dict = this._detachedCache || (this._detachedCache = new Dict<any>());
 		if (dict.set(key, value)) {
 			return true;
@@ -260,7 +282,7 @@ export class DataRow {
 		} else {
 			this._current = null;
 		}
-		if (this.rowState() & DataRowState.ADDED) {
+		if (this.rowState & DataRowState.ADDED) {
 			this.dispatchDelete();
 		}
 	}

@@ -49,7 +49,7 @@ describe("DataRow", function () {
              * use bitwise operator '&' since a rowState could match
              * multiple conditions (i.e. DETACHED and MODIFIED)
              */
-            expect(DataRowState[dr.rowState() & state]).toEqual(DataRowState[state]);
+            expect(DataRowState[dr.rowState & state]).toEqual(DataRowState[state]);
         }
 
         it("should begin as DETACHED", function () {
@@ -72,7 +72,7 @@ describe("DataRow", function () {
             dt.rows.add(dr);
             dr.acceptChanges();
             dr.set("name", "Reese");
-            expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.MODIFIED]);
+            expect(DataRowState[dr.rowState]).toEqual(DataRowState[DataRowState.MODIFIED]);
         })
     })
 })

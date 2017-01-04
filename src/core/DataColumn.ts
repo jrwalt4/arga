@@ -30,6 +30,10 @@ export class GenericDataColumn<T> {
         return true;
     }
 
+    hasValue(data:Object):boolean {
+        return _.has(data, this.keyPath);
+    }
+
     get table(): DataTable {
         return this._table;
     }
