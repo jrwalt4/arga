@@ -118,7 +118,7 @@ export class DataRow {
 		}
 		var store = this._getVersion(version);
 		if (store != null) {
-			return (<GenericDataColumn<T>>this.table().columns(key)).getValue(store);
+			return (<GenericDataColumn<T>>this.table.columns.get(key)).getValue(store);
 		}
 	}
 
@@ -218,8 +218,8 @@ export class DataRow {
 		 * and use it to set the value;
 		 */
 		let table: DataTable, column: DataColumn;
-		if (table = this.table()) {// double check that we have a valid parent table
-			if (column = table.columns().get(key)) {
+		if (table = this.table) {// double check that we have a valid parent table
+			if (column = table.columns.get(key)) {
 				return this._setItemWithColumn(column, value);
 			} else {
 				/**
@@ -228,7 +228,7 @@ export class DataRow {
 				 * and use it to set the value
 				 */
 				column = new DataColumn(key);
-				if (table.columns().add(column)) {// check for successful addition
+				if (table.columns.add(column)) {// check for successful addition
 					return this._setItemWithColumn(column, value);
 				}
 			}
@@ -317,17 +317,14 @@ export class DataRow {
 		delete this._current;
 	}
 
-	/**
-	 * Get reference to parent DataTable
-	 */
-	table(): DataTable;
-	table(table: DataTable): this;
-	table(table?: DataTable): any {
+	get table(): DataTable {
+		return this._table;
+	}
+	set table(table: DataTable) {
 		if (table instanceof DataTable) {
 			this._table = table;
-			return this;
 		}
-		return this._table;
+		throw new TypeError("table is not a DataTable");
 	}
 
 	private dispatchAdd() {
@@ -337,10 +334,10 @@ export class DataRow {
 	private dispatchChange<T>(key: string, newValue: T, oldValue?: T)
 	private dispatchChange<T>(column: DataColumn, newValue: T, oldValue?: T)
 	private dispatchChange<T>(keyOrColumn: string | DataColumn, newValue: T, oldValue?: T) {
-		this.table().emit({
+		this.table.emit({
 			row: this,
 			type: 'rowchanged',
-			column: keyOrColumn instanceof DataColumn ? keyOrColumn : this.table().columns(keyOrColumn)
+			column: keyOrColumn instanceof DataColumn ? keyOrColumn : this.table.columns.get(keyOrColumn)
 		})
 	}
 
@@ -358,7 +355,7 @@ export class DataRow {
  */
 export function addRowToCollection(row: DataRow, collection: DataRowCollection) {
 	// set the reference to the parent table 
-	row.table(collection.table());
+	(row as any)._table = collection.table;
 
 	let success = true;
 

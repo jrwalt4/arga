@@ -14,25 +14,15 @@ export class DataSet {
 
 	constructor(public name?: string) {
 		ds_counter++;
-		this.name = name ||  "Set " + ds_counter;
+		this.name = name || "Set " + ds_counter;
 	}
 
-	tables(): DataTableCollection
-	tables(name: string): DataTable
-	tables(name?: string): DataTable | DataTableCollection {
-		if (name === void 0) {
-			return this._tables;
-		}
-		return this._tables.get(name);
+	get tables(): DataTableCollection {
+		return this._tables;
 	}
 
-	relations(): DataRelationCollection
-	relations(name: string): DataRelation
-	relations(name?: string): any {
-		if (name === void 0) {
-			return this._relations;
-		}
-		return this._relations.get(name);
+	get relations(): DataRelationCollection {
+		return this._relations;
 	}
 
 	acceptChanges(): void {

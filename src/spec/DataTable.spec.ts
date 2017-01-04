@@ -1,17 +1,29 @@
-import {DataTable, DataSet} from '../arga'
+import { DataTable, DataSet } from '../arga'
 
 var data = require('../../spec/data/test-data');
 
-describe("DataTable", function() {
-    var dr = new DataTable();
+describe("DataTable", function () {
 
-    beforeEach(function() {
-        dr = new DataTable();
-    });
+    describe('constructor()', function () {
+        var tblName = "Test Table";
+        let dt = new DataTable(tblName);
+        it("should create a DataTable with provided name", function () {
+            expect(dt.name).toBe(tblName);
+        })
 
-    it("should create a DataTable with provided name", function() {
-        var tblName = "DataTable 1";
-        var dt = new DataTable(tblName);
-        expect(dt.name).toBe(tblName);
+        it("should have a row collection", function(){
+            expect(dt.rows.table).toBe(dt);
+        })
+
+        it("should have a column collection", function(){
+            expect(dt.columns.table).toBe(dt);
+        })
     })
+
+    describe("data retrieval", function(){
+        let dt = new DataTable("Table w/ Data");
+        dt.columns.add("id");
+        dt.primaryKey = [dt.columns.get("id")];
+    })
+
 })

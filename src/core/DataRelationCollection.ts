@@ -16,13 +16,12 @@ export class DataRelationCollection extends KeyedDictionary<DataRelation> {
         this._dataSet = dataSet;
     }
 
-    dataSet():DataSet {
+    get dataSet():DataSet {
         return this._dataSet;
     }
 
     add(relation:DataRelation):boolean {
         if(super.add(relation)) {
-            relation.dataSet(this._dataSet)
             return true;
         }
         return false;

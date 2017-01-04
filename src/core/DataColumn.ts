@@ -30,19 +30,17 @@ export class GenericDataColumn<T> {
         return true;
     }
 
-    table(): DataTable
-    table(dataTable: DataTable): this
-    table(dataTable?: DataTable): any {
-        if (dataTable === void 0) {
-            return this._table;
-        }
+    get table(): DataTable {
+        return this._table;
+    }
+
+    set table(dataTable: DataTable) {
         this._table = dataTable;
-        return this;
     }
 
     find(value: T): DataRow {
         var self = this;
-        return this.table().rows().find(function (row) {
+        return this.table.rows.find(function (row) {
             return util.equalKeys(value, row.get(self))
         })
     }
@@ -50,7 +48,7 @@ export class GenericDataColumn<T> {
     findAll(value: T): DataRow[] {
         let foundRows: DataRow[] = [];
         var self = this;
-        this.table().rows().forEach(function(row) {
+        this.table.rows.forEach(function(row) {
             if (util.equalKeys(value, row.get(self))) {
                 foundRows.push(row);
             }
@@ -58,10 +56,11 @@ export class GenericDataColumn<T> {
         return foundRows;
     }
 
-    _addToCollection(collection:DataColumnCollection) {
-        this.table(collection.table());
-    }
 }
 
 export let DataColumn = GenericDataColumn
 export type DataColumn = GenericDataColumn<any>
+
+export function addColumnToCollection(column:DataColumn, collection:DataColumnCollection) {
+    (column as any)._table = collection.table;
+}

@@ -1,6 +1,7 @@
 // DataTable.ts
 
 import { DataSet } from './DataSet'
+import { DataTableCollection } from './DataTableCollection'
 import { GenericDataColumn, DataColumn } from './DataColumn'
 import { DataColumnCollection } from './DataColumnCollection'
 import { DataRow } from './DataRow'
@@ -23,50 +24,33 @@ export class DataTable {
 		this.name = name || "Table " + dt_counter;
 	}
 
-	dataSet(): DataSet
-	dataSet(dataSet: DataSet): this
-	dataSet(dataSet?: DataSet): any {
-		if (dataSet === void 0) {
-			return this._dataSet;
-		}
+	get dataSet(): DataSet {
+		return this._dataSet;
+	}
+	set dataSet(dataSet: DataSet) {
 		this._dataSet = dataSet;
 	}
 
-	rows(): DataRowCollection
-	rows(key: any): DataRow
-	rows(key?: any): any {
-		if (key === void 0) {
-			return this._rowCollection;
-		}
-		return this._rowCollection.get(key);
+	get rows(): DataRowCollection {
+		return this._rowCollection;
 	}
 
-	columns(): DataColumnCollection
-	columns<T>(columnName: string): GenericDataColumn<T>
-	columns(columnName?: string): any {
-		if (columnName === void 0) {
-			return this._columnCollection;
-		}
-		return this._columnCollection.get(columnName);
+	get columns(): DataColumnCollection {
+		return this._columnCollection
 	}
 
-	primaryKey(): DataColumn[]
-	primaryKey(dataColumn: DataColumn): this
-	primaryKey(dataColumnArray: DataColumn[]): this
-	primaryKey(dataColumn?: DataColumn | DataColumn[]): any {
-		if (dataColumn === void 0) {
-			return this._primaryKey;
+	get primaryKey(): DataColumn[] {
+		return this._primaryKey;
+	}
+
+	set primaryKey(columns: DataColumn[]) {
+		if (Array.isArray(columns)) {
+			this._primaryKey = columns;
 		}
-		if (Array.isArray(dataColumn)) {
-			this._primaryKey = dataColumn;
-		} else {
-			this._primaryKey = [dataColumn];
-		}
-		return this;
 	}
 
 	acceptChanges() {
-		this.rows().toArray().forEach((dr: DataRow) => {
+		this.rows.forEach((dr: DataRow) => {
 			dr.acceptChanges();
 		})
 	}
@@ -75,9 +59,9 @@ export class DataTable {
 		return this.name;
 	}
 
-	emit(event:RowChangeEvent)
-	emit(event:ColumnChangeEvent)
-	emit(event:RowChangeEvent | ColumnChangeEvent) {
+	emit(event: RowChangeEvent)
+	emit(event: ColumnChangeEvent)
+	emit(event: RowChangeEvent | ColumnChangeEvent) {
 		this._emitter.emit(event.type, event);
 	}
 
@@ -94,12 +78,17 @@ export class DataTable {
 	}
 }
 
+/** internal module methods */
+export function addTableToCollection(table: DataTable, collection: DataTableCollection) {
+	table.dataSet = collection.dataSet;
+}
+
 export type RowChangeEventType = "rowadded" | "rowchanged" | "rowdeleted"
 
 export interface RowChangeEvent {
 	type: RowChangeEventType
 	row: DataRow
-	column?:DataColumn
+	column?: DataColumn
 	oldValue?: any
 	newValue?: any
 }
@@ -109,8 +98,8 @@ export type RowChangeListener = (event: RowChangeEvent) => void
 export type ColumnChangeEventType = "columnadded" | "columndeleted"
 
 export interface ColumnChangeEvent {
-	type:ColumnChangeEventType
-	column:DataColumn
+	type: ColumnChangeEventType
+	column: DataColumn
 }
 
-export type ColumnChangeListener = (event:ColumnChangeEvent)=>void
+export type ColumnChangeListener = (event: ColumnChangeEvent) => void

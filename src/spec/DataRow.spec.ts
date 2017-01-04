@@ -35,7 +35,7 @@ describe("DataRow", function () {
             let dr = new DataRow();
             let dt = new DataTable();
             for (let key in values) {
-                dt.columns().add(key);
+                dt.columns.add(key);
             }
 
             testGetterSetter(dr, values);
@@ -61,7 +61,7 @@ describe("DataRow", function () {
             let dr = new DataRow();
             let dt = new DataTable();
 
-            dt.rows().add(dr);
+            dt.rows.add(dr);
 
             checkState(dr, DataRowState.ADDED);
         })
@@ -69,7 +69,7 @@ describe("DataRow", function () {
         it("should update the rowState to MODIFIED", function () {
             let dr = new DataRow();
             let dt = new DataTable();
-            dt.rows().add(dr);
+            dt.rows.add(dr);
             dr.acceptChanges();
             dr.set("name", "Reese");
             expect(DataRowState[dr.rowState()]).toEqual(DataRowState[DataRowState.MODIFIED]);

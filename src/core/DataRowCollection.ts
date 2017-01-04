@@ -22,12 +22,12 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
         var drc = this;
 
         this._rows = new SortedArray<DataRow>([], function(key:any, row:DataRow):boolean {
-            var primaryKey = drc.table().primaryKey();
+            var primaryKey = drc.table.primaryKey;
             return primaryKey.every(function(column:DataColumn, index:number){
                 return key === row.get(column);
             })
         }, function (key, row:DataRow):number {
-            var keyColumns = drc.table().primaryKey();
+            var keyColumns = drc.table.primaryKey;
             return util.compareKeys(key, row.get(keyColumns))
         });
     }
@@ -50,6 +50,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     add(rowOrData:DataRow|{}):boolean {
         let row:DataRow = rowOrData instanceof DataRow ? rowOrData : new DataRow(rowOrData);
         if (this._rows.add(row)) {
+            // internal module method
             return addRowToCollection(row, this);
         }
         return false;
@@ -81,7 +82,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     entriesArray():[any, DataRow][] {
         var self = this;
         return this._rows.map(function (row:DataRow):[any,DataRow] {
-            return [row.get(self.table().primaryKey()),row]
+            return [row.get(self.table.primaryKey),row]
         })
     }
 
@@ -92,7 +93,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     keysArray():any[] {
         var self = this;
         return this._rows.map(function(row:DataRow):any {
-            return row.get(self.table().primaryKey());
+            return row.get(self.table.primaryKey);
         })
     }
 
@@ -101,7 +102,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     }
     //*/
 
-    table() {
+    get table():DataTable {
         return this._table;
     }
 }
