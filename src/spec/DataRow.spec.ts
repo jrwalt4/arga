@@ -1,15 +1,15 @@
-import { DataRow, DataRowState, DataRowVersion, DataTable, DataColumn } from '../arga'
+import {
+    DataRow, DataRowState, DataRowVersion, DataTable, DataColumn
+} from '../arga'
 
 describe("DataRow", function () {
 
     describe("getter/setters", function () {
-
         let values = {
             task: "clean",
             duration: 10,
             priority: 1
         };
-
         function testGetterSetter(dr: DataRow, values: {}) {
             it("should set and get single property", function () {
                 let key: string = Object.keys(values)[0];
@@ -31,13 +31,11 @@ describe("DataRow", function () {
         })
 
         describe("after adding to collection", function () {
-
             let dr = new DataRow();
             let dt = new DataTable();
             for (let key in values) {
                 dt.columns.add(key);
             }
-
             testGetterSetter(dr, values);
         })
     })

@@ -14,11 +14,7 @@
     "lib": "src"
   },
   "scripts": {
-    "build-ts": "rd build /s /q && tsc",
-    "prepublish": "npm run build-node && npm run build-web",
-    "build-web": "node build-web.js",
-    "build-node": "tsc --d --noEmitOnError --sourceMap",
-    "test": "npm run build-ts && jasmine"
+    "test": "jasmine"
   },
   "keywords": [
     "dataset",
