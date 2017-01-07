@@ -13,11 +13,11 @@ export class KeyedDictionary<TValue> implements IKeyedCollection<string, TValue>
         this._getKey = _property<{}, string>(keyPath);
     }
 
-    get size() {
+    get size():number {
         return this._store.size;
     }
 
-    set size(newSize) {
+    set size(newSize:number) {
         // just in case dictjs changes to implement size setter
         this._store.size = newSize;
     }

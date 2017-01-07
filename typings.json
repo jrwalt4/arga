@@ -7,6 +7,7 @@
     "devDependencies": {
         "gulp": "registry:dt/gulp#3.8.0+20160916183637",
         "lodash": "registry:npm/lodash#4.0.0+20161015015725",
-        "orchestrator": "registry:dt/orchestrator#0.0.0+20160708004655"
+        "orchestrator": "registry:dt/orchestrator#0.0.0+20160708004655",
+        "q": "registry:dt/q#0.0.0+20161119044246"
     }
 }
