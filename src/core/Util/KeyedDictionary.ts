@@ -1,7 +1,8 @@
 
 import { IKeyedCollection } from './IKeyedCollection'
-import Dict = require('dict')
+import {Dictionary as Dict} from './Dictionary'
 
+//import Dict = require('dict')
 import * as _ from 'lodash'
 let {get: _get, property:_property} = _;
 

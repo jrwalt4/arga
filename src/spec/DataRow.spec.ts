@@ -25,7 +25,7 @@ describe("DataRow", function () {
             let dt = new DataTable();
             dt.rows.add(dr);
             for (let key in values) {
-                expect(dr.get(key)).toEqual(values[key]);
+                expect(dr.get(key)).toEqual(values[key], "failed on key: "+key);
             }
         })
     })

@@ -7,6 +7,8 @@ export { KeyedDictionary } from './KeyedDictionary'
 
 export { EmptyObject } from './EmptyObject'
 
+export { Dictionary } from './Dictionary'
+
 export {
 	compareKeys, equalKeys, resolveKeyPath, resolveKeyPathArray, createValueWithKeyPath,
 	deepCopy, flattenPrototypeChain, getValueAtKeyPath, setValueAtKeyPath,

@@ -7,13 +7,13 @@ import { DataRowVersion } from './DataRowVersion'
 import { DataColumn, GenericDataColumn } from './DataColumn'
 import { DataRelation } from './DataRelation'
 import {
-	EmptyObject, deepCopy, compareKeys,
+	Dictionary as Dict, EmptyObject, deepCopy, compareKeys,
 	equalKeys, getValueAtKeyPath, setValueAtKeyPath
 } from './Util'
 
 import { uniqueId } from 'lodash'
 
-import Dict = require('dict');
+//import Dict = require('dict');
 
 export class DataRow {
 
@@ -177,7 +177,7 @@ export class DataRow {
 	}
 
 	private _getFromCache<T>(key: string): T {
-		let dict = this._detachedCache || (this._detachedCache = Dict<any>());
+		let dict = this._detachedCache || (this._detachedCache = new Dict<any>());
 		return dict.get(key);
 	}
 
