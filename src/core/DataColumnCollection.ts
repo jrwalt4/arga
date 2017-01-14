@@ -1,6 +1,6 @@
 // DataColumnCollection.ts
 
-import {DataColumn, addColumnToCollection} from './DataColumn'
+import {DataColumn} from './DataColumn'
 import {DataTable} from './DataTable'
 import {KeyedDictionary} from './Util'
 
@@ -22,7 +22,7 @@ export class DataColumnCollection extends KeyedDictionary<DataColumn> {
         let column:DataColumn = (typeof columnOrName == "string") ? new DataColumn(columnOrName) : columnOrName
         let added = super.add(column);
         if(added) {
-            addColumnToCollection(column, this);
+            (column as any)._addColumnToCollection(this);
         }
         return added;
     }

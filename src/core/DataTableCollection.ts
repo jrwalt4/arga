@@ -1,7 +1,7 @@
 // DataTableCollection.ts
 
 import {KeyedDictionary} from './Util'
-import {DataTable, addTableToCollection} from './DataTable'
+import {DataTable} from './DataTable'
 import {DataSet} from './DataSet'
 
 export class DataTableCollection extends KeyedDictionary<DataTable> {
@@ -15,7 +15,7 @@ export class DataTableCollection extends KeyedDictionary<DataTable> {
     add(table:DataTable):boolean {
         let added = super.add(table);
         if(added) {
-            addTableToCollection(table, this);
+            (table as any)._addTableToCollection(this);
         }
         return added;
     }

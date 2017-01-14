@@ -3,6 +3,7 @@
 import { DataSet } from './DataSet'
 import { DataColumn } from './DataColumn'
 import { DataRow } from './DataRow'
+import { DataRelationCollection } from './DataRelationCollection'
 
 export class DataRelation {
 
@@ -53,4 +54,12 @@ export class DataRelation {
         return parentColumn.find(oRow.get(childColumn));
     }
 
+    private _addRelationToCollection(
+        collection: DataRelationCollection
+    ): boolean {
+        if (this._dataSet = collection.dataSet) {
+            return true;
+        }
+        return false;
+    }
 }

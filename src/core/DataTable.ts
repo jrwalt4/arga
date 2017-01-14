@@ -76,11 +76,14 @@ export class DataTable {
 	off(event: string, listener: (...values: any[]) => void) {
 		(this._emitter || (this._emitter = new EventEmitter())).off(event, listener);
 	}
-}
 
-/** internal module methods */
-export function addTableToCollection(table: DataTable, collection: DataTableCollection) {
-	table.dataSet = collection.dataSet;
+	/** internal module methods */
+	private _addTableToCollection(collection: DataTableCollection):boolean {
+		if(this.dataSet = collection.dataSet){
+			return true;
+		}
+		return false;
+	}
 }
 
 export type RowChangeEventType = "rowadded" | "rowchanged" | "rowdeleted"

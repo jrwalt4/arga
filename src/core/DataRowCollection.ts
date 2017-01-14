@@ -1,16 +1,17 @@
 // DataRowCollection.ts
 
-import SortedArray = require('collections/sorted-array')
+import FastSet = require('collections/fast-set')
 import {IKeyedCollection} from './Util'
 import * as util from './Util'
 
 import {DataTable} from './DataTable'
-import {DataRow, addRowToCollection} from './DataRow'
+import {DataRow} from './DataRow'
 import {DataColumn} from './DataColumn'
 
 export class DataRowCollection implements IKeyedCollection<any, DataRow> {
 
-    private _rows:SortedArray<DataRow>
+    private _store:FastSet<DataRow>
+    private _index:FastSet<any>
     private _table:DataTable
 
     constructor(dataTable:DataTable) {
@@ -21,7 +22,14 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
         
         var drc = this;
 
-        this._rows = new SortedArray<DataRow>([], function(key:any, row:DataRow):boolean {
+        this._store = new FastSet<DataRow>([],(a,b)=>{
+            return (a as any)._id === (b as any)._id;
+        }, (row)=>{
+            return <string>(row as any)._id
+        }
+        );
+        /*
+         ([], function(key:any, row:DataRow):boolean {
             var primaryKey = drc.table.primaryKey;
             return primaryKey.every(function(column:DataColumn, index:number){
                 return key === row.get(column);
@@ -30,28 +38,29 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
             var keyColumns = drc.table.primaryKey;
             return util.compareKeys(key, row.get(keyColumns))
         });
+        //*/
     }
 
     //*
     get size():number {
-        return this._rows.length;
+        return this._store.length;
     }
 
     has(key:any):boolean {
-        return this._rows.has(key); // TODO
+        return this._store.contains(key); // TODO
     }
 
     get(key:any):DataRow {
-        return this._rows.get(key);
+        return this._store.get(key);
     }
 
     add(row:DataRow):boolean
     add(rowData:{}):boolean
     add(rowOrData:DataRow|{}):boolean {
         let row:DataRow = rowOrData instanceof DataRow ? rowOrData : new DataRow(rowOrData);
-        if (this._rows.add(row)) {
+        if (this._store.add(row)) {
             // internal module method
-            return addRowToCollection(row, this);
+            return (row as any)._addRowToCollection(this);
         }
         return false;
     }
@@ -64,11 +73,11 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
         } else {
             dataRow = this.get(keyOrRow);
         }
-        return this._rows.delete(dataRow);
+        return this._store.delete(dataRow);
     }
 
     clear() {
-        this._rows.clear();
+        this._store.clear();
     }
 
     find(predicate:(value:DataRow, key:any, collection:this)=>boolean):DataRow {
@@ -81,7 +90,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
 
     entriesArray():[any, DataRow][] {
         var self = this;
-        return this._rows.map(function (row:DataRow):[any,DataRow] {
+        return this._store.map(function (row:DataRow):[any,DataRow] {
             return [row.get(self.table.primaryKey),row]
         })
     }
@@ -92,13 +101,13 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
 
     keysArray():any[] {
         var self = this;
-        return this._rows.map(function(row:DataRow):any {
+        return this._store.map(function(row:DataRow):any {
             return row.get(self.table.primaryKey);
         })
     }
 
     toArray():DataRow[] {
-        return this._rows.toArray();
+        return this._store.toArray();
     }
     //*/
 

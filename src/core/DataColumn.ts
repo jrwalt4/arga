@@ -4,7 +4,7 @@ import SortedArray = require('collections/sorted-array');
 import * as util from './Util'
 import { DataTable } from './DataTable'
 import { DataRow } from './DataRow'
-import {DataColumnCollection} from './DataColumnCollection'
+import { DataColumnCollection } from './DataColumnCollection'
 import { DataColumnConstraint } from './DataColumnConstraint'
 import { DataType, GenericDataType } from './DataType'
 
@@ -30,7 +30,7 @@ export class GenericDataColumn<T> {
         return true;
     }
 
-    hasValue(data:Object):boolean {
+    hasValue(data: Object): boolean {
         return _.has(data, this.keyPath);
     }
 
@@ -52,7 +52,7 @@ export class GenericDataColumn<T> {
     findAll(value: T): DataRow[] {
         let foundRows: DataRow[] = [];
         var self = this;
-        this.table.rows.forEach(function(row) {
+        this.table.rows.forEach(function (row) {
             if (util.equalKeys(value, row.get(self))) {
                 foundRows.push(row);
             }
@@ -60,11 +60,13 @@ export class GenericDataColumn<T> {
         return foundRows;
     }
 
+    private _addColumnToCollection(collection: DataColumnCollection): boolean {
+        if (this._table = collection.table) {
+            return true;
+        }
+        return false;
+    }
 }
 
 export let DataColumn = GenericDataColumn
 export type DataColumn = GenericDataColumn<any>
-
-export function addColumnToCollection(column:DataColumn, collection:DataColumnCollection) {
-    (column as any)._table = collection.table;
-}

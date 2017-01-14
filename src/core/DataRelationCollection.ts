@@ -22,7 +22,7 @@ export class DataRelationCollection extends KeyedDictionary<DataRelation> {
 
     add(relation:DataRelation):boolean {
         if(super.add(relation)) {
-            return true;
+            return (relation as any)._addRelationToCollection(this);
         }
         return false;
     }

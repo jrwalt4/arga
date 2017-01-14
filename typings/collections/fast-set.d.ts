@@ -9,7 +9,7 @@ declare module 'collections/fast-set' {
 
     interface FastSetConstructor {
         <T>():FastSet<T>
-        new <T>():FastSet<T>
+        new <T>(values?:T[], equals?:(a:T,b:T)=>boolean, hash?:(a:T)=>string):FastSet<T>
         from<T>(values:T[]):FastSet<T>
     }
     interface FastSet<T> extends GenericSet<T>,  PropertyChanges<T> {

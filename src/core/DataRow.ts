@@ -11,9 +11,13 @@ import {
 	equalKeys, getValueAtKeyPath, setValueAtKeyPath
 } from './Util'
 
+import { uniqueId } from 'lodash'
+
 import Dict = require('dict');
 
 export class DataRow {
+
+	private _id: string
 	private _table: DataTable
 	private _original: Object
 	private _current: Object
@@ -21,7 +25,7 @@ export class DataRow {
 	private _detachedCache: Dict<any>
 
 	constructor(values?: Object, table?: DataTable) {
-
+		this._id = uniqueId();
 		this._table = table;
 
 		/**
@@ -367,34 +371,35 @@ export class DataRow {
 
 	}
 
+	/**
+	 * Semi-private (i.e. friendly?) method for adding row
+	 * to a collection. Used by DataRowCollection#add()
+	 */
+	private _addRowToCollection(collection: DataRowCollection):boolean {
+		// set the reference to the parent table 
+		this._table = collection.table;
+
+		let success = true;
+
+		if (this._detachedCache) {
+			// flush the cache
+			this._detachedCache.forEach(
+				function (value: any, key: string, dict: Dict<any>) {
+					success = success && this._setItemWithKey(key, value);
+				}
+			);
+			// cleanup cache to mitigate memory leaks
+			this._detachedCache.clear();
+			this._detachedCache = null;
+			delete this._detachedCache;
+		}
+
+		return success;
+	}
 }
 
 /* internal module methods */
 
-/**
- * Semi-private (i.e. friendly?) method for adding row
- * to a collection. Used by DataRowCollection#add()
- */
-export function addRowToCollection(row: DataRow, collection: DataRowCollection) {
-	// set the reference to the parent table 
-	(row as any)._table = collection.table;
-
-	let success = true;
-
-	if ((row as any)._detachedCache) {
-		// flush the cache
-		(row as any)._detachedCache.forEach(function (value: any, key: string, dict: Dict<any>) {
-			success = success && (row as any)._setItemWithKey(key, value);
-		})
-
-			// cleanup cache to mitigate memory leaks
-			(row as any)._detachedCache.clear();
-		(row as any)._detachedCache = null;
-		delete (row as any)._detachedCache;
-	}
-
-	return success;
-}
 
 function isDataColumn(dc: any): dc is DataColumn {
 	return dc instanceof GenericDataColumn;

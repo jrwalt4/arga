@@ -3,6 +3,7 @@ archive/
 .vscode/
 typings/
 !typings/collections/
+!typings/globals/dict/*
 scratch/
 build/
 dist/
