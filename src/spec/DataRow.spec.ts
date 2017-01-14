@@ -3,7 +3,32 @@ import {
 } from '../arga'
 
 describe("DataRow", function () {
-
+    describe("constructor", function () {
+        it("should take an object", function () {
+            let values = {
+                task: "clean",
+                duration: 10,
+                priority: 1
+            };
+            let dr = new DataRow(values);
+            for (let key in values) {
+                expect(dr.get(key)).toEqual(values[key]);
+            }
+        })
+        it("should maintain values after adding to DataTable", function(){
+            let values = {
+                task: "clean",
+                duration: 10,
+                priority: 1
+            };
+            let dr = new DataRow(values);
+            let dt = new DataTable();
+            dt.rows.add(dr);
+            for (let key in values) {
+                expect(dr.get(key)).toEqual(values[key]);
+            }
+        })
+    })
     describe("getter/setters", function () {
         let values = {
             task: "clean",
