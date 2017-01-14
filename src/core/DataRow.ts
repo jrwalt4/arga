@@ -383,9 +383,10 @@ export class DataRow {
 
 		if (this._detachedCache) {
 			// flush the cache
+			let self = this;
 			this._detachedCache.forEach(
 				function (value: any, key: string, dict: Dict<any>) {
-					success = success && this._setItemWithKey(key, value);
+					success = success && self._setItemWithKey(key, value);
 				}
 			);
 			// cleanup cache to mitigate memory leaks
