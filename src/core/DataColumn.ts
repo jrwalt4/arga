@@ -1,6 +1,5 @@
 // DataColumn.ts
 
-import SortedArray = require('collections/sorted-array');
 import * as util from './Util'
 import { DataTable } from './DataTable'
 import { DataRow } from './DataRow'
@@ -12,60 +11,60 @@ import * as _ from 'lodash'
 
 export class GenericDataColumn<T> {
 
-    private _table: DataTable
+  private _table: DataTable
 
-    /** TODO */
-    // private _constraints: DataColumnConstraint[]
+  /** TODO */
+  // private _constraints: DataColumnConstraint[]
 
-    constructor(public name: string, public keyPath: string = name, public type: DataType = DataType.AnyType) {
+  constructor(public name: string, public keyPath: string = name, public type: DataType = DataType.AnyType) {
 
+  }
+
+  getValue(data: Object): T {
+    return _.get<T>(data, this.keyPath);
+  }
+
+  setValue(data: Object, value: T): boolean {
+    _.set<T, {}>(data, this.keyPath, value)
+    return true;
+  }
+
+  hasValue(data: Object): boolean {
+    return _.has(data, this.keyPath);
+  }
+
+  get table(): DataTable {
+    return this._table;
+  }
+
+  set table(dataTable: DataTable) {
+    this._table = dataTable;
+  }
+
+  find(value: T): DataRow {
+    var self = this;
+    return this.table.rows.find(function (row) {
+      return util.equalKeys(value, row.get(self))
+    })
+  }
+
+  findAll(value: T): DataRow[] {
+    let foundRows: DataRow[] = [];
+    var self = this;
+    this.table.rows.forEach(function (row) {
+      if (util.equalKeys(value, row.get(self))) {
+        foundRows.push(row);
+      }
+    });
+    return foundRows;
+  }
+
+  private _addColumnToCollection(collection: DataColumnCollection): boolean {
+    if (this._table = collection.table) {
+      return true;
     }
-
-    getValue(data: Object): T {
-        return _.get<T>(data, this.keyPath);
-    }
-
-    setValue(data: Object, value: T): boolean {
-        _.set<T, {}>(data, this.keyPath, value)
-        return true;
-    }
-
-    hasValue(data: Object): boolean {
-        return _.has(data, this.keyPath);
-    }
-
-    get table(): DataTable {
-        return this._table;
-    }
-
-    set table(dataTable: DataTable) {
-        this._table = dataTable;
-    }
-
-    find(value: T): DataRow {
-        var self = this;
-        return this.table.rows.find(function (row) {
-            return util.equalKeys(value, row.get(self))
-        })
-    }
-
-    findAll(value: T): DataRow[] {
-        let foundRows: DataRow[] = [];
-        var self = this;
-        this.table.rows.forEach(function (row) {
-            if (util.equalKeys(value, row.get(self))) {
-                foundRows.push(row);
-            }
-        });
-        return foundRows;
-    }
-
-    private _addColumnToCollection(collection: DataColumnCollection): boolean {
-        if (this._table = collection.table) {
-            return true;
-        }
-        return false;
-    }
+    return false;
+  }
 }
 
 export let DataColumn = GenericDataColumn

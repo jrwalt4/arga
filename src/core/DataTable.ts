@@ -13,87 +13,101 @@ let dt_counter = 0;
 
 export class DataTable {
 
-	private _dataSet: DataSet
-	private _rowCollection = new DataRowCollection(this);
-	private _columnCollection = new DataColumnCollection(this);
-	private _primaryKey: DataColumn[];
-	private _emitter: EventEmitter.emitter
+  private _dataSet: DataSet
+  private _rowCollection = new DataRowCollection(this);
+  private _columnCollection = new DataColumnCollection(this);
+  private _primaryKey: DataColumn[];
+  private _emitter: EventEmitter.emitter
 
-	constructor(public name?: string) {
-		dt_counter++
-		this.name = name || "Table " + dt_counter;
-	}
+  constructor(public name?: string) {
+    dt_counter++
+    this.name = name || "Table " + dt_counter;
+  }
 
-	get dataSet(): DataSet {
-		return this._dataSet;
-	}
-	set dataSet(dataSet: DataSet) {
-		this._dataSet = dataSet;
-	}
+  get dataSet(): DataSet {
+    return this._dataSet;
+  }
+  set dataSet(dataSet: DataSet) {
+    this._dataSet = dataSet;
+  }
 
-	get rows(): DataRowCollection {
-		return this._rowCollection;
-	}
+  get rows(): DataRowCollection {
+    return this._rowCollection;
+  }
 
-	get columns(): DataColumnCollection {
-		return this._columnCollection
-	}
+  get columns(): DataColumnCollection {
+    return this._columnCollection
+  }
 
-	get primaryKey(): DataColumn[] {
-		return this._primaryKey;
-	}
+  get primaryKey(): DataColumn[] {
+    return this._primaryKey;
+  }
 
-	set primaryKey(columns: DataColumn[]) {
-		if (Array.isArray(columns)) {
-			this._primaryKey = columns;
-		}
-	}
+  set primaryKey(columns: DataColumn[]) {
+    if (Array.isArray(columns)) {
+      if (this._primaryKey && this._primaryKey.every((col, ndx) => {
+        return col === columns[ndx]
+      })) {
+        // primary key hasn't changed, so skip
+        return;
+      }
+      this._primaryKey = columns;
+      this._onPrimaryKeyChange();
+    } else {
+      throw new TypeError("primary key must be a DataColumn array")
+    }
+  }
 
-	acceptChanges() {
-		this.rows.forEach((dr: DataRow) => {
-			dr.acceptChanges();
-		})
-	}
+  private _onPrimaryKeyChange() {
+    (this._rowCollection as any)._buildIndex();
+  }
 
-	toString() {
-		return this.name;
-	}
+  acceptChanges() {
+    this.rows.forEach((dr: DataRow) => {
+      dr.acceptChanges();
+    })
+  }
 
-	emit(event: RowChangeEvent)
-	emit(event: ColumnChangeEvent)
-	emit(event: RowChangeEvent | ColumnChangeEvent) {
-		this._emitter.emit(event.type, event);
-	}
+  toString() {
+    return this.name;
+  }
 
-	on(event: RowChangeEventType, listener: RowChangeListener)
-	on(event: ColumnChangeEventType, listener: ColumnChangeListener)
-	on(event: string, listener: (...values: any[]) => void) {
-		(this._emitter || (this._emitter = new EventEmitter())).on(event, listener);
-	}
+  emit(event: RowChangeEvent)
+  emit(event: ColumnChangeEvent)
+  emit(event: RowChangeEvent | ColumnChangeEvent) {
+    let emitter = this._emitter || (this._emitter = new EventEmitter())
+    emitter.emit(event.type, event);
+  }
 
-	off(event: RowChangeEventType, listener: RowChangeListener)
-	off(event: ColumnChangeEventType, listener: ColumnChangeListener)
-	off(event: string, listener: (...values: any[]) => void) {
-		(this._emitter || (this._emitter = new EventEmitter())).off(event, listener);
-	}
+  on(event: RowChangeEventType, listener: RowChangeListener)
+  on(event: ColumnChangeEventType, listener: ColumnChangeListener)
+  on(event: string, listener: (...values: any[]) => void) {
+    (this._emitter || (this._emitter = new EventEmitter())).on(event, listener);
+  }
 
-	/** internal module methods */
-	private _addTableToCollection(collection: DataTableCollection):boolean {
-		if(this.dataSet = collection.dataSet){
-			return true;
-		}
-		return false;
-	}
+  off(event: RowChangeEventType, listener: RowChangeListener)
+  off(event: ColumnChangeEventType, listener: ColumnChangeListener)
+  off(event: string, listener: (...values: any[]) => void) {
+    (this._emitter || (this._emitter = new EventEmitter())).off(event, listener);
+  }
+
+  /** internal module methods */
+  private _addTableToCollection(collection: DataTableCollection): boolean {
+    if (this.dataSet = collection.dataSet) {
+      return true;
+    }
+    return false;
+  }
 }
 
 export type RowChangeEventType = "rowadded" | "rowchanged" | "rowdeleted"
 
 export interface RowChangeEvent {
-	type: RowChangeEventType
-	row: DataRow
-	column?: DataColumn
-	oldValue?: any
-	newValue?: any
+  type: RowChangeEventType
+  row: DataRow
+  column?: DataColumn
+  oldValue?: any
+  newValue?: any
 }
 
 export type RowChangeListener = (event: RowChangeEvent) => void
@@ -101,8 +115,8 @@ export type RowChangeListener = (event: RowChangeEvent) => void
 export type ColumnChangeEventType = "columnadded" | "columndeleted"
 
 export interface ColumnChangeEvent {
-	type: ColumnChangeEventType
-	column: DataColumn
+  type: ColumnChangeEventType
+  column: DataColumn
 }
 
 export type ColumnChangeListener = (event: ColumnChangeEvent) => void
