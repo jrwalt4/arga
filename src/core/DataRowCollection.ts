@@ -3,7 +3,7 @@
 import { IKeyedCollection } from './Util'
 import * as util from './Util'
 
-import { DataTable } from './DataTable'
+import { DataTable, RowChangeEvent } from './DataTable'
 import { DataRow } from './DataRow'
 import { DataColumn } from './DataColumn'
 
@@ -12,12 +12,14 @@ import FastMap = require('collections/fast-map')
 
 export class DataRowCollection implements IKeyedCollection<any, DataRow> {
 
-  private _store: FastSet<DataRow> = new FastSet<DataRow>([], (a, b) => {
-    return (a as any)._id === (b as any)._id;
-  }, (row) => {
-    return <string>(row as any)._id
-  });
-  private _index: FastMap<[any], string>
+  private _store: FastSet<DataRow> = new FastSet<DataRow>(
+    [],
+    (a, b) => {
+      return (a as any)._id === (b as any)._id;
+    }, (row) => {
+      return <string>(row as any)._id
+    });
+  private _index: FastMap<any[], string>
   private _table: DataTable
 
   constructor(dataTable: DataTable) {
@@ -34,6 +36,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
 
   has(key: any): boolean {
     if (this._table.primaryKey) {
+      key = Array.isArray(key) ? key : [key];
       return this._index.has(key); // TODO
     }
     return false;
@@ -41,8 +44,11 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
 
   get(key: any): DataRow {
     if (this._table.primaryKey) {
-      let index = this._index.get(key);
-      return this._store.get(index);
+      key = Array.isArray(key) ? key : [key];
+      let index: string;
+      if (index = this._index.get(key)) {
+        return this._store.get({ _id: index });
+      }
     }
   }
 
@@ -52,8 +58,9 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     let row: DataRow = rowOrData instanceof DataRow ?
       rowOrData : new DataRow(rowOrData);
     if (this._store.add(row)) {
-      if (this._table.primaryKey) {
-        // look for row._id in index
+      let primaryKey: DataColumn[];
+      if (primaryKey = this._table.primaryKey) {
+        this._index.set(row.get(primaryKey), (row as any)._id);
       }
       // internal module method
       return (row as any)._addRowToCollection(this);
@@ -76,7 +83,9 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     this._store.clear();
   }
 
-  find(predicate: (value: DataRow, key: any, collection: this) => boolean): DataRow {
+  find(
+    predicate: (value: DataRow, key: any, collection: this) => boolean
+  ): DataRow {
     throw new Error("DataRowCollection#find not implemented yet");
   }
 
@@ -88,8 +97,17 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     return this._table;
   }
 
-  private _updateIndexForRow(row: DataRow) {
-
+  private _updateIndexForRow(rowChangeEvent: RowChangeEvent) {
+    let primaryKey = this._table.primaryKey;
+    let keys: DataColumn[] = [];
+    let {row, column: changedColumn, oldValue, newValue} = rowChangeEvent;
+    for (let i = 0; i < primaryKey.length; i++) {
+      keys.push(changedColumn === primaryKey[i] ?
+        oldValue :
+        row.get(primaryKey[i]));
+    }
+    this._index.delete(keys);
+    this._index.set(row.get(primaryKey), <string>(row as any)._id);
   }
 
   private _buildIndex() {
@@ -109,7 +127,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
         return true;
       },
       (pKey: any[]) => {
-        return pKey.join('');
+        return pKey.join(':');
       });
   }
 }

@@ -8,15 +8,21 @@ import { DataColumnConstraint } from './DataColumnConstraint'
 import { DataType, GenericDataType } from './DataType'
 
 import * as _ from 'lodash'
+import {EventEmitter2 as EventEmitter} from 'EventEmitter2'
 
 export class GenericDataColumn<T> {
 
   private _table: DataTable
 
+
   /** TODO */
   // private _constraints: DataColumnConstraint[]
 
-  constructor(public name: string, public keyPath: string = name, public type: DataType = DataType.AnyType) {
+  constructor(
+    public name: string,
+    public keyPath: string = name,
+    public type: DataType = DataType.AnyType
+  ) {
 
   }
 
@@ -64,6 +70,10 @@ export class GenericDataColumn<T> {
       return true;
     }
     return false;
+  }
+
+  toString():string {
+    return `DataColumn(${JSON.stringify({keyPath:this.keyPath})})`;
   }
 }
 

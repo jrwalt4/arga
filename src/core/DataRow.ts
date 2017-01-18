@@ -209,11 +209,26 @@ export class DataRow {
 		return success;
 	}
 	/**
-     * @todo
+	 * @todo
 	 */
-	private _setItemWithColumn<T>(column: GenericDataColumn<T>, value: T): boolean {
-		let store = this.isEditing() ? this._proposed : this._current || (this._current = this._createCurrent());
-		return column.setValue(store, value);
+	private _setItemWithColumn<T>(
+		column: GenericDataColumn<T>,
+		value: T): boolean {
+		let store = this.isEditing() ?
+			this._proposed : this._current ||
+			(this._current = this._createCurrent());
+		let oldValue = column.getValue(store);
+		if (column.setValue(store, value)) {
+			this._table.emit({
+				type: 'rowchanged',
+				row: this,
+				column: column,
+				oldValue,
+				newValue: value
+			});
+			return true;
+		}
+		return false;
 	}
 
 	private _setItemWithKey(key: string, value: any): boolean {
@@ -300,8 +315,8 @@ export class DataRow {
 	}
 
 	/**
-     * @todo
-     */
+   * @todo
+   */
 	setParentRow(relation: DataRelation) {
 
 	}
@@ -375,7 +390,7 @@ export class DataRow {
 	 * Semi-private (i.e. friendly?) method for adding row
 	 * to a collection. Used by DataRowCollection#add()
 	 */
-	private _addRowToCollection(collection: DataRowCollection):boolean {
+	private _addRowToCollection(collection: DataRowCollection): boolean {
 		// set the reference to the parent table 
 		this._table = collection.table;
 
@@ -396,6 +411,10 @@ export class DataRow {
 		}
 
 		return success;
+	}
+
+	toString():string {
+		return `DataRow(${JSON.stringify(this._getVersion())})`;
 	}
 }
 

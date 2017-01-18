@@ -22,6 +22,16 @@ export class DataTable {
   constructor(public name?: string) {
     dt_counter++
     this.name = name || "Table " + dt_counter;
+    this.on('rowchanged', (event) => {
+      if(!this._primaryKey) {
+        return;
+      }
+      for (let index = 0; index < this._primaryKey.length; index++) {
+        if (event.column === this._primaryKey[index]) {
+          (this._rowCollection as any)._updateIndex(event);
+        }
+      }
+    });
   }
 
   get dataSet(): DataSet {
