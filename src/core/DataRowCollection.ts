@@ -28,6 +28,32 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
         "expected DataTable as first argument")
     }
     this._table = dataTable;
+    this._initializeListeners();
+  }
+
+  private _initializeListeners() {
+    let columnListeners: Array<() => void> = [];
+    this._table.onPrimaryKeyChange.subscribe(
+      ({newPrimaryKey, oldPrimaryKey}) => {
+        this._buildIndex(newPrimaryKey);
+        let unsubscribeFn: () => void;
+        // unsubscribe all previous listeners
+        while (unsubscribeFn = columnListeners.pop()) {
+          unsubscribeFn();
+        }
+        for (let column of newPrimaryKey) {
+          columnListeners.push(column.onValueChanged.subscribe((changeArgs) => {
+            // need to find a way of knowing which row it is
+            this._updateIndexForRow({
+              type: "rowchanged",
+              row: changeArgs.row,
+              column,
+              newValue: changeArgs.newValue,
+              oldValue: changeArgs.oldValue
+            })
+          }))
+        }
+      })
   }
 
   get size(): number {
@@ -110,8 +136,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     this._index.set(row.get(primaryKey), <string>(row as any)._id);
   }
 
-  private _buildIndex() {
-    let primaryKey = this._table.primaryKey;
+  private _buildIndex(primaryKey: DataColumn[]) {
     this._index = new FastMap<any, string>(
       this._store.map<[any[], string]>((row) => {
         let id = <string>(row as any)._id;

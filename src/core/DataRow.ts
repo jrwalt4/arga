@@ -213,14 +213,14 @@ export class DataRow {
 	 */
 	private _setItemWithColumn<T>(
 		column: GenericDataColumn<T>,
-		value: T): boolean {
+		value: T
+	): boolean {
 		let store = this.isEditing() ?
 			this._proposed : this._current ||
 			(this._current = this._createCurrent());
 		let oldValue = column.getValue(store);
 		if (column.setValue(store, value)) {
-			this._table.emit({
-				type: 'rowchanged',
+			column.onValueChanged.publish({
 				row: this,
 				column: column,
 				oldValue,
@@ -413,7 +413,7 @@ export class DataRow {
 		return success;
 	}
 
-	toString():string {
+	toString(): string {
 		return `DataRow(${JSON.stringify(this._getVersion())})`;
 	}
 }

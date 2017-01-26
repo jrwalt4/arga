@@ -6,6 +6,7 @@ import { GenericDataColumn, DataColumn } from './DataColumn'
 import { DataColumnCollection } from './DataColumnCollection'
 import { DataRow } from './DataRow'
 import { DataRowCollection } from './DataRowCollection'
+import { ObservableEvent } from './Util'
 
 import { EventEmitter2 as EventEmitter } from 'EventEmitter2'
 
@@ -14,24 +15,24 @@ let dt_counter = 0;
 export class DataTable {
 
   private _dataSet: DataSet
-  private _rowCollection = new DataRowCollection(this);
-  private _columnCollection = new DataColumnCollection(this);
+  private _rowCollection: DataRowCollection;
+  private _columnCollection: DataColumnCollection;
   private _primaryKey: DataColumn[];
   private _emitter: EventEmitter.emitter
+
+  public onPrimaryKeyChange = new ObservableEvent<{
+    newPrimaryKey: DataColumn[],
+    oldPrimaryKey: DataColumn[]
+  }>()
 
   constructor(public name?: string) {
     dt_counter++
     this.name = name || "Table " + dt_counter;
-    this.on('rowchanged', (event) => {
-      if(!this._primaryKey) {
-        return;
-      }
-      for (let index = 0; index < this._primaryKey.length; index++) {
-        if (event.column === this._primaryKey[index]) {
-          (this._rowCollection as any)._updateIndex(event);
-        }
-      }
-    });
+
+    // collections are created here so they can be initialized
+    // after all Observables have been created
+    this._rowCollection = new DataRowCollection(this);
+    this._columnCollection = new DataColumnCollection(this);
   }
 
   get dataSet(): DataSet {
@@ -61,15 +62,15 @@ export class DataTable {
         // primary key hasn't changed, so skip
         return;
       }
+      let oldKeys = this._primaryKey;
       this._primaryKey = columns;
-      this._onPrimaryKeyChange();
+      this.onPrimaryKeyChange.publish({
+        newPrimaryKey: columns,
+        oldPrimaryKey: oldKeys
+      });
     } else {
       throw new TypeError("primary key must be a DataColumn array")
     }
-  }
-
-  private _onPrimaryKeyChange() {
-    (this._rowCollection as any)._buildIndex();
   }
 
   acceptChanges() {

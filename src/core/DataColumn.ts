@@ -1,6 +1,6 @@
 // DataColumn.ts
 
-import * as util from './Util'
+import { ObservableEvent, equalKeys} from './Util'
 import { DataTable } from './DataTable'
 import { DataRow } from './DataRow'
 import { DataColumnCollection } from './DataColumnCollection'
@@ -14,6 +14,12 @@ export class GenericDataColumn<T> {
 
   private _table: DataTable
 
+  public onValueChanged = new ObservableEvent<{
+    row:DataRow,
+    column:GenericDataColumn<T>,
+    newValue:T,
+    oldValue:T
+  }>();
 
   /** TODO */
   // private _constraints: DataColumnConstraint[]
@@ -30,8 +36,10 @@ export class GenericDataColumn<T> {
     return _.get<T>(data, this.keyPath);
   }
 
-  setValue(data: Object, value: T): boolean {
-    _.set<T, {}>(data, this.keyPath, value)
+  setValue(data: Object, newValue: T): boolean {
+    let oldValue = this.getValue(data);
+    _.set<T, {}>(data, this.keyPath, newValue)
+    // let DataRow publish the onValueChanged event
     return true;
   }
 
@@ -50,7 +58,7 @@ export class GenericDataColumn<T> {
   find(value: T): DataRow {
     var self = this;
     return this.table.rows.find(function (row) {
-      return util.equalKeys(value, row.get(self))
+      return equalKeys(value, row.get(self))
     })
   }
 
@@ -58,7 +66,7 @@ export class GenericDataColumn<T> {
     let foundRows: DataRow[] = [];
     var self = this;
     this.table.rows.forEach(function (row) {
-      if (util.equalKeys(value, row.get(self))) {
+      if (equalKeys(value, row.get(self))) {
         foundRows.push(row);
       }
     });
