@@ -65,7 +65,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
    * @internal
    */
   _getWithId(id: string): DataRow {
-    return this._store.get({_id:id});
+    return this._store.get({ _id: id });
   }
 
   add(row: DataRow): boolean
@@ -116,24 +116,26 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
 
   find(
     predicate: (value: DataRow, key: any, collection: this) => boolean,
-    thisArg?:any
+    thisArg?: any
   ): DataRow {
-    let primaryKey: DataColumn[]
-    if (primaryKey = this._table.primaryKey) {
-      let row: DataRow,
-        key: any,
-        iterator: Iterator<DataRow> = this._store.iterate(),
-        result: IteratorResult<DataRow>;
+    let primaryKey = this._table.primaryKey
+    let row: DataRow,
+      key: any,
+      iterator: Iterator<DataRow> = this._store.iterate(),
+      result: IteratorResult<DataRow>;
 
-      while (!(result = iterator.next()).done) {
-        row = result.value;
-        // only support single column (non-compound) primary keys
-        key = row.get(primaryKey);
-        if (predicate.call(thisArg, row, key, this)) {
-          return row;
-        }
+    while (!(result = iterator.next()).done) {
+      row = result.value;
+      // only support single column (non-compound) primary keys
+      key = primaryKey ? row.get(primaryKey) : void 0;
+      if (predicate.call(thisArg, row, key, this)) {
+        return row;
       }
     }
+  }
+
+  iterate(): Iterator<DataRow> {
+    return this._store.iterate();
   }
 
   forEach(

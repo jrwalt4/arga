@@ -1,15 +1,34 @@
-import {DataTable, DataColumn} from '../arga'
+import { DataTable, DataColumn, DataRow } from '../arga'
 
-describe("DataColumn", function() {
+export function testColumn(ColumnCtor: typeof DataColumn) {
+    describe(ColumnCtor.name, function () {
 
-    let dc:DataColumn;
-    let dt:DataTable;
+        let dc: DataColumn, dt: DataTable, dr: DataRow;
 
-    beforeEach(function() {
-        dc = new DataColumn("name");
+        it("should set value on row", ()=>{
+            dc = new ColumnCtor("name");
+            dr = new DataRow();
+            dr.set(dc, "Reese");
+            expect(dr.get(dc)).toEqual("Reese");
+        })
+
+        it("should find value in row collection", ()=>{
+            dt = new DataTable();
+            dc = new ColumnCtor("name");
+            dt.columns.add(dc);
+            let names = ["Reese", "Matt", "Anna"]
+            let rows:DataRow[] = names.map<DataRow>((name)=>{
+                let row = new DataRow();
+                row.set(dc, name);
+                dt.rows.add(row);
+                return row;
+            });
+            names.forEach((name, i)=>{
+                //console.log(name, rows[i].get(dc));
+                expect(dc.find(name)).toBe(rows[i], "couldn't find "+name);
+            })
+        })
     })
+}
 
-    describe ("constructor", function() {
-        
-    })
-})
+testColumn(DataColumn);

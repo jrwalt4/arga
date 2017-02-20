@@ -182,8 +182,8 @@ export class DataRow {
 	}
 
 	set<T>(key: string, value: T): boolean
-	set(values: {}): boolean
 	set<T>(column: DataColumn, value: T): boolean
+	set(values: {}): boolean
 	set<T>(valsOrKeyOrColumn: any, value?: T): boolean {
 
 		switch (typeof valsOrKeyOrColumn) {

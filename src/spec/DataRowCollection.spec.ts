@@ -1,5 +1,5 @@
 import {
-  DataRowCollection, DataRow, DataTable
+  DataRowCollection, DataRow, DataTable, DataColumn
 } from '../arga'
 
 describe("DataRowCollection", function () {
@@ -25,6 +25,8 @@ describe("DataRowCollection", function () {
   })
   describe("get", function () {
     let dt = new DataTable();
+    let dc = new DataColumn("name");
+    dt.columns.add(dc);
     let dr = new DataRow({ name: "Reese" });
     dt.rows.add(dr);
     it("should fail w/o primaryKey, but pass with", () => {
