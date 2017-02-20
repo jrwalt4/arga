@@ -106,8 +106,10 @@ export class DataTable {
     (this._emitter || (this._emitter = new EventEmitter())).off(event, listener);
   }
 
-  /** internal module methods */
-  private _addTableToCollection(collection: DataTableCollection): boolean {
+  /** 
+   * @internal 
+   */
+  _addTableToCollection(collection: DataTableCollection): boolean {
     if (this.dataSet = collection.dataSet) {
       return true;
     }

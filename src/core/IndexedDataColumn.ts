@@ -11,7 +11,7 @@ export class GenericIndexedDataColumn<T> extends GenericDataColumn<T> {
     private _index = new FastMap<T, string>();
 
     find(value: T): DataRow {
-        return (this.table.rows as any)._getWithId(this._index.get(value));
+        return this.table.rows._getWithId(this._index.get(value));
     }
 
     findId(value: T): string {
@@ -22,8 +22,8 @@ export class GenericIndexedDataColumn<T> extends GenericDataColumn<T> {
         let oldValue:T = this.getValue(store, row);
         if (super.setValue(store, value, row)) {
             this._index.delete(oldValue);
-            this._index.set(value, (row as any)._id)
-            return true
+            this._index.set(value, row._id);
+            return true;
         }
         return false;
     }
@@ -34,6 +34,7 @@ export class GenericIndexedDataColumn<T> extends GenericDataColumn<T> {
             this._index.delete(oldValue);
             return true;
         }
+        return false;
     }
 }
 

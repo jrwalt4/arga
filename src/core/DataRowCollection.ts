@@ -16,9 +16,9 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
   private _store: FastSet<DataRow> = new FastSet<DataRow>(
     [],
     (a, b) => {
-      return (a as any)._id === (b as any)._id;
+      return a._id === b._id;
     }, (row) => {
-      return <string>(row as any)._id
+      return row._id
     });
   private _table: DataTable
   private _stagedRowDeletions: string[]
@@ -61,8 +61,11 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     }
   }
 
-  private _getWithId(id: string): DataRow {
-    return this._store.get(id);
+  /**
+   * @internal
+   */
+  _getWithId(id: string): DataRow {
+    return this._store.get({_id:id});
   }
 
   add(row: DataRow): boolean
@@ -71,15 +74,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     let row: DataRow = rowOrData instanceof DataRow ?
       rowOrData : new DataRow(rowOrData);
     if (this._store.add(row)) {
-      /*
-      let primaryKey: DataColumn[];
-      if (primaryKey = this._table.primaryKey) {
-        this._index.set(row.get(primaryKey), (row as any)._id);
-      }
-      //*/
-
-      // internal module method
-      return (row as any)._addRowToCollection(this);
+      return row._addRowToCollection(this);
     }
     this.size
     return false;
@@ -90,7 +85,7 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
     let row: DataRow = (keyOrRow instanceof DataRow) ?
       keyOrRow : this.get(keyOrRow);
     if (row) {
-      (row as any)._onDelete();
+      row._onDelete();
       // check if row is new (i.e. recently added)
       if (row.rowState & (DataRowState.ADDED | DataRowState.DETACHED)) {
         this._commitDelete(row);
@@ -105,13 +100,13 @@ export class DataRowCollection implements IKeyedCollection<any, DataRow> {
 
   private _stageDelete(row: DataRow) {
     let rows = this._stagedRowDeletions = this._stagedRowDeletions || [];
-    if (rows.indexOf((row as any)._id) < 0) {
-      rows.push((row as any)._id);
+    if (rows.indexOf(row._id) < 0) {
+      rows.push(row._id);
     }
   }
 
   private _commitDelete(row: DataRow) {
-    (row as any)._free();
+    row._free();
     return this._store.delete(row);
   }
 

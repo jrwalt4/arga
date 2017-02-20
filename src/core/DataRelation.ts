@@ -54,7 +54,11 @@ export class DataRelation {
     return parentColumn.find(oRow.get(childColumn));
   }
 
-  private _addRelationToCollection(
+  /**
+   * @internal
+   * Prepare relation to be added to DataRelationCollection
+   */
+  _addRelationToCollection(
     collection: DataRelationCollection
   ): boolean {
     if (this._dataSet = collection.dataSet) {

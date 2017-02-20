@@ -17,7 +17,7 @@ import { uniqueId } from 'lodash'
 
 export class DataRow {
 
-	private _id: string
+	/** @internal */ _id: string
 	private _table: DataTable
 	private _original: Object
 	private _current: Object
@@ -299,7 +299,11 @@ export class DataRow {
 		return false;
 	}
 
-	private _onDelete() {
+	/**
+	 * @internal
+	 * Called to prepare row to be deleted
+	 */
+	_onDelete() {
 		if (this.isEditing()) {
 			this._proposed = null;
 		} else {
@@ -307,7 +311,11 @@ export class DataRow {
 		}
 	}
 
-	private _free() {
+	/**
+	 * @internal
+	 * Called to ensure row doesn't cause memory leak
+	 */
+	_free() {
 		this._original = null;
 		this._current = null;
 		this._proposed = null;
@@ -396,10 +404,11 @@ export class DataRow {
 	}
 
 	/**
+	 * @internal 
 	 * Semi-private (i.e. friendly?) method for adding row
 	 * to a collection. Used by DataRowCollection#add()
 	 */
-	private _addRowToCollection(collection: DataRowCollection): boolean {
+	_addRowToCollection(collection: DataRowCollection): boolean {
 		// set the reference to the parent table 
 		this._table = collection.table;
 

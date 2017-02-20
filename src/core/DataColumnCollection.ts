@@ -22,7 +22,7 @@ export class DataColumnCollection extends KeyedDictionary<DataColumn> {
         let column:DataColumn = (typeof columnOrName == "string") ? new DataColumn(columnOrName) : columnOrName
         let added = super.add(column);
         if(added) {
-            (column as any)._addColumnToCollection(this);
+            column._addColumnToCollection(this);
         }
         return added;
     }

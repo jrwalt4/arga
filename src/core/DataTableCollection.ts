@@ -15,7 +15,7 @@ export class DataTableCollection extends KeyedDictionary<DataTable> {
     add(table:DataTable):boolean {
         let added = super.add(table);
         if(added) {
-            (table as any)._addTableToCollection(this);
+            table._addTableToCollection(this);
         }
         return added;
     }

@@ -64,7 +64,7 @@ export class GenericDataColumn<T> {
     let row = this.table.rows.find(function (row) {
       return equalKeys(value, row.get(self))
     })
-    return ((row as any)._id as string);
+    return row._id;
   }
 
   find(value: T): DataRow {
@@ -85,7 +85,11 @@ export class GenericDataColumn<T> {
     return foundRows;
   }
 
-  private _addColumnToCollection(collection: DataColumnCollection): boolean {
+  /**
+   * @internal
+   * Prepare column to be added to DataColumnCollection
+   */
+  _addColumnToCollection(collection: DataColumnCollection): boolean {
     if (this._table = collection.table) {
       return true;
     }
