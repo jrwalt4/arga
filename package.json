@@ -38,7 +38,7 @@
     "jasmine-node": "latest",
     "minifyify": "latest",
     "tsify": "latest",
-    "typescript": "~2.x.x",
+    "typescript": "latest",
     "uglify": "latest"
   }
 }

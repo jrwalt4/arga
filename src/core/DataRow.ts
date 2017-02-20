@@ -100,13 +100,13 @@ export class DataRow {
 		if (store = this._getVersion(version)) {
 
 			if (isDataColumn(keyOrColumn)) {
-				return !!keyOrColumn.getValue(store);
+				return !!keyOrColumn.getValue(store, this);
 			}
 			// keyOrColumn is a column name
 			let column: DataColumn;
 			if (this.rowState ^ DataRowState.DETACHED) {
 				return (column = this._getColumnWithName(keyOrColumn)) ?
-					column.hasValue(store) : /* column doesn't exist */ false
+					column.hasValue(store, this) : /* column doesn't exist */ false
 			}
 
 			// row is DETACHED, so check the cache
@@ -126,7 +126,7 @@ export class DataRow {
 	}
 
 	get<T>(column: GenericDataColumn<T>, version?: DataRowVersion): T
-	get<T>(columns: DataColumn[], version?: DataRowVersion): T[]
+	get<T>(columns: DataColumn[], version?: DataRowVersion): T
 	get<T>(columnName: string, version?: DataRowVersion): T
 	get<T>(columnOrName: any, version?: DataRowVersion): any {
 		if (typeof columnOrName === "string") {
@@ -144,14 +144,14 @@ export class DataRow {
 		}
 		var store = this._getVersion(version);
 		if (store != null) {
-			return this.table.columns.get(key).getValue(store);
+			return this.table.columns.get(key).getValue(store, this);
 		}
 	}
 
 	private _getItemWithColumn<T>(column: GenericDataColumn<T>, version?: DataRowVersion): T {
 		var data = this._getVersion(version);
 		if (data != null) {
-			return column.getValue(data);
+			return column.getValue(data, this);
 		}
 	}
 
@@ -193,12 +193,13 @@ export class DataRow {
 
 			case "object":
 				if (isDataColumn(valsOrKeyOrColumn)) {
-					return valsOrKeyOrColumn.setValue(this, value);
+					return valsOrKeyOrColumn.setValue(this._getVersion(), value, this);
 				} else {
-					return this._setItems(<{}>valsOrKeyOrColumn)
+					return this._setItems(valsOrKeyOrColumn as {})
 				}
 		}
-		throw new TypeError("invalid arguments passed to DataRow#set: " + valsOrKeyOrColumn)
+		throw new TypeError("invalid arguments passed to DataRow#set: " +
+			valsOrKeyOrColumn)
 	}
 
 	private _setItems(values: {}): boolean {
@@ -218,8 +219,8 @@ export class DataRow {
 		let store = this.isEditing() ?
 			this._proposed : this._current ||
 			(this._current = this._createCurrent());
-		let oldValue = column.getValue(store);
-		if (column.setValue(store, value)) {
+		let oldValue = column.getValue(store, this);
+		if (column.setValue(store, value, this)) {
 			column.onValueChanged.publish({
 				row: this,
 				column: column,
@@ -287,23 +288,31 @@ export class DataRow {
 		return false;
 	}
 
-	del(key: string): boolean {
-		if (this.has(key)) {
-			this._setItemWithKey(key, null);
-			return true
+	del(column: DataColumn): boolean
+	del(key: string): boolean
+	del(keyOrColumn: string | DataColumn): boolean {
+		let column = keyOrColumn instanceof DataColumn ?
+			keyOrColumn : this._getColumnWithName(keyOrColumn);
+		if (this.has(column)) {
+			return column.deleteValue(this._getVersion(), this);
 		}
 		return false;
 	}
 
-	deleteRow() {
+	private _onDelete() {
 		if (this.isEditing()) {
 			this._proposed = null;
 		} else {
 			this._current = null;
 		}
-		if (this.rowState & DataRowState.ADDED) {
-			this.dispatchDelete();
-		}
+	}
+
+	private _free() {
+		this._original = null;
+		this._current = null;
+		this._proposed = null;
+		this._table = null;
+		this._detachedCache = null;
 	}
 
 	getChildRows(relation: DataRelation): DataRow[] {

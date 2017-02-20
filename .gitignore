@@ -1,6 +1,5 @@
 node_modules/
 archive/
-.vscode/
 typings/
 !typings/collections/
 !typings/globals/dict/*

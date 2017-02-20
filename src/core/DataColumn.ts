@@ -32,19 +32,23 @@ export class GenericDataColumn<T> {
 
   }
 
-  getValue(data: Object): T {
+  getValue(data: Object, row:DataRow): T {
     return _.get<T>(data, this.keyPath);
   }
 
-  setValue(data: Object, newValue: T): boolean {
-    let oldValue = this.getValue(data);
+  setValue(data: Object, newValue: T, row:DataRow): boolean {
+    let oldValue = this.getValue(data, row);
     _.set<T, {}>(data, this.keyPath, newValue)
     // let DataRow publish the onValueChanged event
     return true;
   }
 
-  hasValue(data: Object): boolean {
+  hasValue(data: Object, row:DataRow): boolean {
     return _.has(data, this.keyPath);
+  }
+
+  deleteValue(data:Object, row:DataRow):boolean {
+    return this.setValue(data, null, row);
   }
 
   get table(): DataTable {
@@ -55,8 +59,16 @@ export class GenericDataColumn<T> {
     this._table = dataTable;
   }
 
+  findId(value:T):string {
+    let self = this;
+    let row = this.table.rows.find(function (row) {
+      return equalKeys(value, row.get(self))
+    })
+    return ((row as any)._id as string);
+  }
+
   find(value: T): DataRow {
-    var self = this;
+    let self = this;
     return this.table.rows.find(function (row) {
       return equalKeys(value, row.get(self))
     })
@@ -81,7 +93,7 @@ export class GenericDataColumn<T> {
   }
 
   toString():string {
-    return `DataColumn(${JSON.stringify({keyPath:this.keyPath})})`;
+    return `DataColumn(keyPath:"${this.keyPath}")`;
   }
 }
 

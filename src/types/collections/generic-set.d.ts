@@ -12,7 +12,7 @@ declare module "collections/generic-set" {
         union(values:GenericSet<TValue>):this
         intersection(values:GenericSet<TValue>):this
         difference(values:GenericSet<TValue>):this
-        summetricDifference(value:GenericSet<TValue>):this
+        symmetricDifference(value:GenericSet<TValue>):this
         map<TOut>(callback: (value: TValue, index:number, object: this, depth: number) => TOut, thisp?: any): TOut[]
         remove(value:TValue):boolean
         delete(value:TValue):boolean

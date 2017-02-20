@@ -25,6 +25,10 @@ export class DataTable {
     oldPrimaryKey: DataColumn[]
   }>()
 
+  public onRowDeleted = new ObservableEvent<{
+    row:DataRow
+  }>()
+
   constructor(public name?: string) {
     dt_counter++
     this.name = name || "Table " + dt_counter;
