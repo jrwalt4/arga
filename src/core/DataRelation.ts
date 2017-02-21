@@ -12,8 +12,7 @@ export class DataRelation {
   constructor(
     public name: string,
     private _parent: DataColumn,
-    private _child: DataColumn,
-        /*private _operator?: Function*/) {
+    private _child: DataColumn) {
     if (_parent.table.dataSet !== _child.table.dataSet) {
       throw new TypeError("columns must be from the same DataSet")
     }

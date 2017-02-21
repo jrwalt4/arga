@@ -1,6 +1,6 @@
 // DataRow.js
 
-import { DataTable, RowChangeEvent } from './DataTable'
+import { DataTable } from './DataTable'
 import { DataRowCollection } from './DataRowCollection'
 import { DataRowState } from './DataRowState'
 import { DataRowVersion } from './DataRowVersion'
@@ -24,9 +24,8 @@ export class DataRow {
 	private _proposed: Object
 	private _detachedCache: Dict<any>
 
-	constructor(values?: Object, table?: DataTable) {
+	constructor(values?: Object) {
 		this._id = uniqueId();
-		this._table = table;
 
 		/**
 		 * _original is set to undefined, and
@@ -39,7 +38,16 @@ export class DataRow {
 		for (let key in values) {
 			this.set(key, values[key]);
 		}
+	}
 
+	get table(): DataTable {
+		return this._table;
+	}
+	set table(table: DataTable) {
+		if (table instanceof DataTable) {
+			this._table = table;
+		}
+		throw new TypeError("table is not a DataTable");
 	}
 
 	private _createOriginal(): {} {
@@ -373,34 +381,6 @@ export class DataRow {
 			this.endEdit();
 		}
 		delete this._current;
-	}
-
-	get table(): DataTable {
-		return this._table;
-	}
-	set table(table: DataTable) {
-		if (table instanceof DataTable) {
-			this._table = table;
-		}
-		throw new TypeError("table is not a DataTable");
-	}
-
-	private dispatchAdd() {
-
-	}
-
-	private dispatchChange<T>(key: string, newValue: T, oldValue?: T)
-	private dispatchChange<T>(column: DataColumn, newValue: T, oldValue?: T)
-	private dispatchChange<T>(keyOrColumn: string | DataColumn, newValue: T, oldValue?: T) {
-		this.table.emit({
-			row: this,
-			type: 'rowchanged',
-			column: keyOrColumn instanceof DataColumn ? keyOrColumn : this.table.columns.get(keyOrColumn)
-		})
-	}
-
-	private dispatchDelete() {
-
 	}
 
 	/**
