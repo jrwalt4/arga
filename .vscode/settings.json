@@ -10,5 +10,7 @@
     "typescript.format.enable": true,
     "editor.insertSpaces": true,
     "editor.tabSize": 2,
-    "vsicons.presets.angular": false
+    "editor.wordWrap": "off",
+    "editor.wordWrapColumn": 100,
+    "vsicons.presets.angular": true
   }
