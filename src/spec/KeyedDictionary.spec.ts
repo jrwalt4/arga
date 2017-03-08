@@ -2,58 +2,61 @@ import { KeyedDictionary } from '../core/Util'
 
 import * as _ from 'lodash'
 
-describe("arga.util.KeyedCollection", function () {
-  type Person = { name: { first?: string, last: string } };
+describe("KeyedCollection", () => {
+  let idDict = new KeyedDictionary<Person>('id');
+  let lastNameDict = new KeyedDictionary<Person>('name.last');
+  let firstNameDict = new KeyedDictionary<Person>('name.first');
+  let firstNameUniqs = _.uniqBy(people, 'first.name');
+  let firstNameDuplicates = _.difference(people, firstNameUniqs);
+  describe("add", () => {
 
-  // people with different first and last names required for tests
-  let people = [
-    {
-      name: {
-        first: "Reese",
-        last: "Walton"
-      },
-      id: '10'
-    },
-    {
-      name: {
-        first: "Beth",
-        last: "Jones"
-      },
-      id: '113'
-    },
-    {
-      name: {
-        first: "Ben",
-        last: "Williams"
-      },
-      id: '101'
-    }
-  ];
 
-  function testKeyPath(keyPath: string) {
-    let kc = new KeyedDictionary<Person>(keyPath);
-    describe("keyPath: " + keyPath, function () {
-      let i = 0;
+    it("should store objects with unique values at key path", () => {
       for (let person of people) {
-        it("should store objects", function () {
-          expect(kc.add(person)).toBeTruthy();
-          i++;
-        });
-        it("should track the number of values", function () {
-          expect(kc.size).toEqual(i);
-        });
-        it("should indicate that the value exists", function () {
-          expect(kc.has(_.get<string>(person, keyPath))).toBe(true);
-        });
-        it("should retrieve the same objects", function () {
-          expect(kc.get(_.get<string>(person, keyPath))).toBe(person);
-        });
-        it("should return false when adding same key", function () {
-          var sameKey = {};
-          _.set(sameKey, keyPath, _.get(person, keyPath));
-          expect(kc.add(sameKey as Person)).toBe(false);
-        })
+        expect(idDict.add(person)).toBeTruthy();
+        expect(lastNameDict.add(person)).toBeTruthy();
       }
+    });
+    it("should not store duplicate values", () => {
+      for (let person of firstNameUniqs) {
+        expect(firstNameDict.add(person)).toBeTruthy();
+      }
+      for (let person of firstNameDuplicates) {
+        expect(firstNameDict.add(person)).toBeFalsy();
+      }
+    })
+
+    describe("size", () => {
+      it("should track the number of values", function () {
+        let i = 0;
+        for (let person of people) {
+          firstNameDict.add(person);
+          idDict.add(person);
+          i++
+          expect(firstNameDict.size).toEqual(i)
+          expect(idDict.size).toEqual(i)
+        }
+        let j = 0;
+        for (let person of ) {
+
+        }
+      });
+    })
+
+
+    it("should indicate that the value exists", function () {
+      expect(kc.has(_.get<string>(person, keyPath))).toBe(true);
+    });
+    it("should retrieve the same objects", function () {
+      expect(kc.get(_.get<string>(person, keyPath))).toBe(person);
+    });
+    it("should return false when adding same key", function () {
+      var sameKey = {};
+      _.set(sameKey, keyPath, _.get(person, keyPath));
+      expect(kc.add(sameKey as Person)).toBe(false);
+    })
+
+    describe("forEach", () => {
       it("should iterate over all entries", function () {
         let i = 0;
         let callback = jasmine.createSpy(
@@ -66,18 +69,43 @@ describe("arga.util.KeyedCollection", function () {
         kc.forEach(callback)
         expect(callback).toHaveBeenCalledTimes(kc.size);
       })
-      for (let person of people) {
-        it("should return true when deleting by key", function () {
-          expect(kc.delete(_.get<string>(person, keyPath))).toBe(true)
-          i--;
-        })
-        it("should keep count after deleted items", function () {
-          expect(kc.size).toEqual(i);
-        })
-      }
-    });
+    })
+    for (let person of people) {
+      it("should return true when deleting by key", function () {
+        expect(kc.delete(_.get<string>(person, keyPath))).toBe(true)
+        i--;
+      })
+      it("should keep count after deleted items", function () {
+        expect(kc.size).toEqual(i);
+      })
+    }
+  })
+});
+
+type Person = { name: { first?: string, last: string }, id?: string };
+
+// people with different last names and at least
+// one repeat first name required for tests
+let people: Person[] = [
+  {
+    name: {
+      first: "Reese",
+      last: "Walton"
+    },
+    id: '10'
+  },
+  {
+    name: {
+      first: "Ben",
+      last: "Jones"
+    },
+    id: '113'
+  },
+  {
+    name: {
+      first: "Ben",
+      last: "Williams"
+    },
+    id: '101'
   }
-  testKeyPath('name.last');
-  testKeyPath('name.first');
-  testKeyPath('id');
-})
+];

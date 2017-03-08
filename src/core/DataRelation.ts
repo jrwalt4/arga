@@ -5,18 +5,23 @@ import { DataColumn } from './DataColumn'
 import { DataRow } from './DataRow'
 import { DataRelationCollection } from './DataRelationCollection'
 
+let rel_counter = 0;
+
 export class DataRelation {
 
+  public name:string
   private _dataSet: DataSet
+  private _parent: DataColumn
+  private _child: DataColumn
 
-  constructor(
-    public name: string,
-    private _parent: DataColumn,
-    private _child: DataColumn) {
-    if (_parent.table.dataSet !== _child.table.dataSet) {
+  constructor(childColumn: DataColumn, parentColumn: DataColumn, name?: string) {
+    if (parentColumn.table.dataSet !== childColumn.table.dataSet) {
       throw new TypeError("columns must be from the same DataSet")
     }
-    this._dataSet = _parent.table.dataSet;
+    this._dataSet = parentColumn.table.dataSet;
+    this._parent = parentColumn;
+    this._child = childColumn;
+    this.name = rel_counter++ && name || "DataRelation " + rel_counter;
   }
 
   get dataSet(): DataSet {

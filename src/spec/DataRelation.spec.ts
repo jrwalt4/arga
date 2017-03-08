@@ -8,49 +8,71 @@ import {
 describe("DataRelation", () => {
   let dt: DataTable,
     nameColumn: DataColumn,
-    parentColumn: DataColumn;
+    parentNameColumn: DataColumn,
+    relation:DataRelation;
 
   beforeEach(() => {
-    dt = new DataTable;
-    nameColumn = new DataColumn('name');
-    dt.columns.add(nameColumn);
-    parentColumn = new DataColumn('parent');
-    dt.columns.add(parentColumn);
+    dt = getTestData();
+    nameColumn = dt.columns.get('name');
+    parentNameColumn = dt.columns.get('parent');
+    relation = new DataRelation(parentNameColumn, nameColumn);
   })
 
-  describe("getParent", () => {
+  describe("getParentRow", () => {
+    it("should retrieve the parent row", () => {
+      let reese = dt.rows.get("Reese");
+      let matt = dt.rows.get("Matt");
+      let tom = dt.rows.get("Tom");
+      expect(reese.getParentRow(relation)).toBe(tom);
+      expect(matt.getParentRow(relation)).toBe(tom);
+    })
+  })
 
+  describe("getChildRows", ()=>{
+    it("should retrieve an array of child rows", ()=>{
+      let tom = dt.rows.get("Tom");
+      let reese = dt.rows.get("Reese");
+      let matt = dt.rows.get("Matt");
+      let children = tom.getChildRows(relation);
+      expect(children).toContain(reese);
+      expect(children).toContain(matt);
+    })
   })
 })
 interface Person {
-  name:string
-  parent?:string
-  age?:number
+  name: string
+  parent?: string
+  age?: number
 }
-function loadData(table:DataTable) {
-  let people:Person[] = [
+function getTestData(): DataTable {
+  let people: Person[] = [
     {
-      name:"Reese",
-      parent:"Tom",
-      age:28
+      name: "Reese",
+      parent: "Tom",
+      age: 28
     },
     {
-      name:"Matt",
-      parent:"Tom",
-      age:30
+      name: "Matt",
+      parent: "Tom",
+      age: 30
     },
     {
-      name:"Anna",
-      parent:"Drew",
-      age:28
+      name: "Anna",
+      parent: "Drew",
+      age: 28
     },
     {
-      name:"Tom",
-      age:60
+      name: "Tom",
+      age: 60
     }
   ];
+  let dt = new DataTable;
+  dt.columns.add(new DataColumn('name'));
+  dt.columns.add(new DataColumn('parent'));
+  dt.columns.add(new DataColumn('age'));
+  dt.primaryKey = [dt.columns.get('name')];
   for (let person of people) {
-    pending("add data to test with")
-    let dr = new DataRow();
+    dt.rows.add(new DataRow(person));
   }
+  return dt;
 }
