@@ -3,7 +3,7 @@
 import { IKeyedCollection } from './Util'
 import * as util from './Util'
 
-import { DataTable, RowChangeEvent } from './DataTable'
+import { DataTable } from './DataTable'
 import { DataRow } from './DataRow'
 import { DataRowState } from './DataRowState'
 import { DataColumn } from './DataColumn'

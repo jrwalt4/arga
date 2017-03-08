@@ -6,9 +6,9 @@ import { GenericDataColumn, DataColumn } from './DataColumn'
 import { DataColumnCollection } from './DataColumnCollection'
 import { DataRow } from './DataRow'
 import { DataRowCollection } from './DataRowCollection'
-import { ObservableEvent } from './Util'
+import { EventEmitter } from './Util'
 
-import { EventEmitter2 as EventEmitter } from 'EventEmitter2'
+//import { EventEmitter2 as EventEmitter } from 'EventEmitter2'
 
 let dt_counter = 0;
 
@@ -18,14 +18,8 @@ export class DataTable {
   private _rowCollection: DataRowCollection;
   private _columnCollection: DataColumnCollection;
   private _primaryKey: DataColumn[];
-  private _emitter: EventEmitter.emitter
 
-  public onPrimaryKeyChange = new ObservableEvent<{
-    newPrimaryKey: DataColumn[],
-    oldPrimaryKey: DataColumn[]
-  }>()
-
-  public onRowDeleted = new ObservableEvent<{
+  public onRowDeleted = new EventEmitter<{
     row:DataRow
   }>()
 
@@ -66,12 +60,7 @@ export class DataTable {
         // primary key hasn't changed, so skip
         return;
       }
-      let oldKeys = this._primaryKey;
       this._primaryKey = columns;
-      this.onPrimaryKeyChange.publish({
-        newPrimaryKey: columns,
-        oldPrimaryKey: oldKeys
-      });
     } else {
       throw new TypeError("primary key must be a DataColumn array")
     }
@@ -87,25 +76,6 @@ export class DataTable {
     return this.name;
   }
 
-  emit(event: RowChangeEvent)
-  emit(event: ColumnChangeEvent)
-  emit(event: RowChangeEvent | ColumnChangeEvent) {
-    let emitter = this._emitter || (this._emitter = new EventEmitter())
-    emitter.emit(event.type, event);
-  }
-
-  on(event: RowChangeEventType, listener: RowChangeListener)
-  on(event: ColumnChangeEventType, listener: ColumnChangeListener)
-  on(event: string, listener: (...values: any[]) => void) {
-    (this._emitter || (this._emitter = new EventEmitter())).on(event, listener);
-  }
-
-  off(event: RowChangeEventType, listener: RowChangeListener)
-  off(event: ColumnChangeEventType, listener: ColumnChangeListener)
-  off(event: string, listener: (...values: any[]) => void) {
-    (this._emitter || (this._emitter = new EventEmitter())).off(event, listener);
-  }
-
   /** 
    * @internal 
    */
@@ -116,24 +86,3 @@ export class DataTable {
     return false;
   }
 }
-
-export type RowChangeEventType = "rowadded" | "rowchanged" | "rowdeleted"
-
-export interface RowChangeEvent {
-  type: RowChangeEventType
-  row: DataRow
-  column?: DataColumn
-  oldValue?: any
-  newValue?: any
-}
-
-export type RowChangeListener = (event: RowChangeEvent) => void
-
-export type ColumnChangeEventType = "columnadded" | "columndeleted"
-
-export interface ColumnChangeEvent {
-  type: ColumnChangeEventType
-  column: DataColumn
-}
-
-export type ColumnChangeListener = (event: ColumnChangeEvent) => void

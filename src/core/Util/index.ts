@@ -9,7 +9,7 @@ export { EmptyObject } from './EmptyObject'
 
 export { Dictionary } from './Dictionary'
 
-export { ObservableEvent } from './ObservableEvent'
+export { EventEmitter } from './EventEmitter'
 
 export {
 	compareKeys, equalKeys, resolveKeyPath, resolveKeyPathArray, createValueWithKeyPath,

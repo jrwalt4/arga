@@ -1,6 +1,6 @@
 // DataColumn.ts
 
-import { ObservableEvent, equalKeys } from './Util'
+import { EventEmitter, equalKeys } from './Util'
 import { DataTable } from './DataTable'
 import { DataRow } from './DataRow'
 import { DataColumnCollection } from './DataColumnCollection'
@@ -8,13 +8,13 @@ import { DataColumnConstraint } from './DataColumnConstraint'
 import { DataType, GenericDataType } from './DataType'
 
 import * as _ from 'lodash'
-import { EventEmitter2 as EventEmitter } from 'EventEmitter2'
+//import { EventEmitter2 as EventEmitter } from 'EventEmitter2'
 
 export class GenericDataColumn<T> {
 
   private _table: DataTable
 
-  public onValueChanged = new ObservableEvent<{
+  public onValueChanged = new EventEmitter<{
     row: DataRow,
     column: GenericDataColumn<T>,
     newValue: T,

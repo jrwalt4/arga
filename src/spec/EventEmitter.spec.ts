@@ -1,4 +1,4 @@
-import { ObservableEvent as Observable } from '../core/Util'
+import { EventEmitter as Emitter } from '../core/Util'
 
 type ChangeEventArgs<T> = {
   type: "added" | "changed" | "deleted",
@@ -7,9 +7,9 @@ type ChangeEventArgs<T> = {
 };
 
 describe("ObservableEvent", () => {
-  let onChange:Observable<ChangeEventArgs<string>>
+  let onChange:Emitter<ChangeEventArgs<string>>
   beforeEach(()=>{
-    onChange = new Observable<ChangeEventArgs<string>>();
+    onChange = new Emitter<ChangeEventArgs<string>>();
   })
   describe("subscribe", () => {
     it("should register a listener", () => {

@@ -1,4 +1,4 @@
-export class ObservableEvent<TEventArgs> {
+export class EventEmitter<TEventArgs> {
   private _listeners: Array<(eventArgs: TEventArgs) => void>
   subscribe(listener: (eventArgs: TEventArgs) => void): () => void {
     if (typeof listener === "function") {
