@@ -12,5 +12,5 @@
     "editor.tabSize": 2,
     "editor.wordWrap": "off",
     "editor.wordWrapColumn": 100,
-    "vsicons.presets.angular": true
+    "vsicons.presets.angular": false
   }
