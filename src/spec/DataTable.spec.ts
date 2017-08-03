@@ -1,6 +1,6 @@
 import { DataTable, DataSet } from '../arga'
 
-var data = require('../../spec/data/test-data');
+import data from './data/test-data';
 
 describe("DataTable", function () {
 

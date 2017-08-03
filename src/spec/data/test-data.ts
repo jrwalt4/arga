@@ -1,4 +1,4 @@
-{
+export default {
     "people": [
         {
             "id": "person1",

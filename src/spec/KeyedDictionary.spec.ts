@@ -63,7 +63,8 @@ describe("KeyedCollection", () => {
       }
     })
   })
-
+});
+/*
   it("should indicate that the value exists", function () {
     expect(kc.has(_.get<string>(person, keyPath))).toBe(true);
   });
@@ -101,7 +102,7 @@ describe("KeyedCollection", () => {
   }
 })
 });
-
+*/
 type Person = { name: { first?: string, last: string }, id?: string };
 
 // people with different last names and at least

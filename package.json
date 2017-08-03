@@ -7,14 +7,11 @@
     "type": "git",
     "url": "https://www.github.com/jrwalt4/arga.git"
   },
-  "bin": {
-    "jasmine-node": "./node_modules/jasmine-node"
-  },
   "directories": {
     "lib": "src"
   },
   "scripts": {
-    "test": "jasmine"
+    "test": "ts-node ./scripts/test.js"
   },
   "keywords": [
     "dataset",
@@ -27,18 +24,17 @@
   "author": "jrwalt4",
   "license": "MIT",
   "dependencies": {
-    "collections": "latest",
+    "@types/node": "^8.0.19",
+    "collections": "2.x",
     "dict": "^1.4.0",
     "eventemitter2": "latest",
     "lodash": "^4.17.2"
   },
   "devDependencies": {
-    "browserify": "latest",
+    "@types/jasmine": "latest",
+    "@types/lodash": "latest",
     "jasmine": "latest",
-    "jasmine-node": "latest",
-    "minifyify": "latest",
-    "tsify": "latest",
-    "typescript": "latest",
-    "uglify": "latest"
+    "ts-node": "latest",
+    "typescript": "latest"
   }
 }

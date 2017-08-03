@@ -17,4 +17,5 @@ export { DataColumnCollection } from './core/DataColumnCollection'
 
 export { DataRelation } from './core/DataRelation'
 
-export import util = require('./core/Util');
+import * as coreUtil from './core/Util'
+export const util = coreUtil;

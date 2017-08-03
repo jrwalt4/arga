@@ -8,8 +8,8 @@ import { DataRow } from './DataRow'
 import { DataRowState } from './DataRowState'
 import { DataColumn } from './DataColumn'
 
-import FastSet = require('collections/fast-set')
-import FastMap = require('collections/fast-map')
+import * as FastSet from 'collections/fast-set'
+import * as FastMap from 'collections/fast-map'
 
 export class DataRowCollection implements IKeyedCollection<any, DataRow> {
 
