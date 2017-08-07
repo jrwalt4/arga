@@ -1,7 +1,7 @@
 // util/Functions.ts
 
 // used for type information only
-import DataRow = require('../DataRow')
+import {DataRow} from '../DataRow'
 
 export let compareKeys: (a, b) => number;
 if (typeof indexedDB !== "undefined") {

@@ -3,8 +3,7 @@ import { IKeyedCollection } from './IKeyedCollection'
 import {Dictionary as Dict} from './Dictionary'
 
 //import Dict = require('dict')
-import * as _ from 'lodash'
-let {get: _get, property:_property} = _;
+import {get as _get, property as _property} from 'lodash'
 
 export class KeyedDictionary<TValue> implements IKeyedCollection<string, TValue> {
 

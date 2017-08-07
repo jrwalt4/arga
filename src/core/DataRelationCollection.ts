@@ -4,7 +4,7 @@ import {DataSet} from './DataSet'
 import {DataTable} from './DataTable'
 import {DataRelation} from './DataRelation'
 import {KeyedDictionary} from './Util'
-import FastSet = require('collections/fast-set');
+import * as FastSet from'collections/fast-set'
 
 export class DataRelationCollection extends KeyedDictionary<DataRelation> {
     private _dataSet:DataSet

@@ -33,7 +33,12 @@
   "devDependencies": {
     "@types/jasmine": "latest",
     "@types/lodash": "latest",
+    "@types/rollup": "^0.41.1",
     "jasmine": "latest",
+    "rollup": "^0.45.2",
+    "rollup-plugin-commonjs": "^8.1.0",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-typescript2": "^0.5.0",
     "ts-node": "latest",
     "typescript": "latest"
   }

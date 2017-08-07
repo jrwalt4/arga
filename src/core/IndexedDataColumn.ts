@@ -3,7 +3,7 @@
 import { GenericDataColumn } from './DataColumn'
 import { DataRow } from './DataRow'
 
-import FastMap = require('collections/fast-map')
+import * as FastMap from 'collections/fast-map'
 
 export class GenericIndexedDataColumn<T> extends GenericDataColumn<T> {
     // will only store unique values. must find a replacement
