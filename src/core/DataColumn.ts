@@ -10,13 +10,13 @@ import { DataType, GenericDataType } from './DataType'
 import * as _ from 'lodash'
 //import { EventEmitter2 as EventEmitter } from 'EventEmitter2'
 
-export class GenericDataColumn<T> {
+export class DataColumn<T = {}> {
 
   private _table: DataTable
 
   public onValueChanged = new EventEmitter<{
     row: DataRow,
-    column: GenericDataColumn<T>,
+    column: DataColumn<T>,
     newValue: T,
     oldValue: T
   }>();
@@ -109,6 +109,3 @@ export class GenericDataColumn<T> {
     return `DataColumn(keyPath:"${this.keyPath}")`;
   }
 }
-
-export let DataColumn = GenericDataColumn
-export type DataColumn = GenericDataColumn<any>

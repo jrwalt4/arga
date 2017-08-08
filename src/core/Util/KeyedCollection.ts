@@ -58,6 +58,6 @@ export class KeyedCollection<TKey extends string | number, TValue> implements IK
 	}
 
 	forEach(callback: (value: TValue, key: TKey, collection: this) => void, thisArg?: any) {
-		_.forOwn(this._store, <_.ObjectIterator<TValue, void>>callback, thisArg);
+		_.forOwn(this._store, <_.ObjectIterator<TValue, void>>callback.bind(thisArg));
 	}
 }

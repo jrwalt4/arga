@@ -2,7 +2,7 @@
 
 import { DataSet } from './DataSet'
 import { DataTableCollection } from './DataTableCollection'
-import { GenericDataColumn, DataColumn } from './DataColumn'
+import { DataColumn } from './DataColumn'
 import { DataColumnCollection } from './DataColumnCollection'
 import { DataRow } from './DataRow'
 import { DataRowCollection } from './DataRowCollection'

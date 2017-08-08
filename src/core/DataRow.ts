@@ -4,7 +4,7 @@ import { DataTable } from './DataTable'
 import { DataRowCollection } from './DataRowCollection'
 import { DataRowState } from './DataRowState'
 import { DataRowVersion } from './DataRowVersion'
-import { DataColumn, GenericDataColumn } from './DataColumn'
+import { DataColumn } from './DataColumn'
 import { DataRelation } from './DataRelation'
 import {
 	Dictionary as Dict, EmptyObject, deepCopy, compareKeys,
@@ -133,7 +133,7 @@ export class DataRow {
 		}
 	}
 
-	get<T>(column: GenericDataColumn<T>, version?: DataRowVersion): T
+	get<T>(column: DataColumn<T>, version?: DataRowVersion): T
 	get<T>(columns: DataColumn[], version?: DataRowVersion): T
 	get<T>(columnName: string, version?: DataRowVersion): T
 	get<T>(columnOrName: any, version?: DataRowVersion): any {
@@ -143,7 +143,7 @@ export class DataRow {
 		if (Array.isArray(columnOrName)) {
 			return (<DataColumn[]>columnOrName).map(column => this.get(column))
 		}
-		return this._getItemWithColumn<T>(<DataColumn>columnOrName, version);
+		return this._getItemWithColumn<T>(<DataColumn<T>>columnOrName, version);
 	}
 
 	private _getItemWithKey(key: string, version?: DataRowVersion): any {
@@ -156,7 +156,7 @@ export class DataRow {
 		}
 	}
 
-	private _getItemWithColumn<T>(column: GenericDataColumn<T>, version?: DataRowVersion): T {
+	private _getItemWithColumn<T>(column: DataColumn<T>, version?: DataRowVersion): T {
 		var data = this._getVersion(version);
 		if (data != null) {
 			return column.getValue(data, this);
@@ -221,7 +221,7 @@ export class DataRow {
 	 * @todo
 	 */
 	private _setItemWithColumn<T>(
-		column: GenericDataColumn<T>,
+		column: DataColumn<T>,
 		value: T
 	): boolean {
 		let store = this.isEditing() ?
@@ -420,5 +420,5 @@ export class DataRow {
 
 
 function isDataColumn(dc: any): dc is DataColumn {
-	return dc instanceof GenericDataColumn;
+	return dc instanceof DataColumn;
 }

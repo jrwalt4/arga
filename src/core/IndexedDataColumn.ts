@@ -1,11 +1,11 @@
 // IndexedDataColumn.ts
 
-import { GenericDataColumn } from './DataColumn'
+import { DataColumn } from './DataColumn'
 import { DataRow } from './DataRow'
 
 import * as FastMap from 'collections/fast-map'
 
-export class GenericIndexedDataColumn<T> extends GenericDataColumn<T> {
+export class IndexedDataColumn<T> extends DataColumn<T> {
     // will only store unique values. must find a replacement
     // or make a switch based on constraints (UniqueConstraint)
     private _index = new FastMap<T, string>();
@@ -37,6 +37,3 @@ export class GenericIndexedDataColumn<T> extends GenericDataColumn<T> {
         return false;
     }
 }
-
-export let IndexedDataColumn = GenericIndexedDataColumn;
-export interface IndexedDataColumn extends GenericIndexedDataColumn<any> { }
