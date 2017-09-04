@@ -1,4 +1,4 @@
-import { Dictionary } from '../core/Util'
+import { Dictionary } from './Dictionary'
 /* 
  * Stolen from https://github.com/domenic/dict
  */

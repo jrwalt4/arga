@@ -1,15 +1,13 @@
-import {
-  DataTable,
-  DataColumn,
-  DataRelation,
-  DataRow
-} from '../arga'
+import { DataRelation } from './DataRelation'
+import { DataTable } from './DataTable'
+import { DataRow } from './DataRow';
+import { DataColumn } from './DataColumn';
 
 describe("DataRelation", () => {
   let dt: DataTable,
     nameColumn: DataColumn,
     parentNameColumn: DataColumn,
-    relation:DataRelation;
+    relation: DataRelation;
 
   beforeEach(() => {
     dt = getTestData();
@@ -28,8 +26,8 @@ describe("DataRelation", () => {
     })
   })
 
-  describe("getChildRows", ()=>{
-    it("should retrieve an array of child rows", ()=>{
+  describe("getChildRows", () => {
+    it("should retrieve an array of child rows", () => {
       let tom = dt.rows.get("Tom");
       let reese = dt.rows.get("Reese");
       let matt = dt.rows.get("Matt");

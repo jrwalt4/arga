@@ -1,6 +1,6 @@
-import {
-  DataRow, DataRowState, DataRowVersion, DataTable, DataColumn
-} from '../arga'
+import { DataRow } from './DataRow'
+import { DataTable } from './DataTable'
+import { DataRowState } from './DataRowState'
 
 describe("DataRow", function () {
   describe("constructor", function () {

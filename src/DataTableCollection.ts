@@ -1,6 +1,6 @@
 // DataTableCollection.ts
 
-import {KeyedDictionary} from './Util'
+import {KeyedDictionary} from './util'
 import {DataTable} from './DataTable'
 import {DataSet} from './DataSet'
 

@@ -1,4 +1,4 @@
-import * as util from '../core/Util'
+import * as util from './Functions'
 
 describe("Util", function () {
     //pending("Util is in flux")

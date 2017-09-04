@@ -1,4 +1,4 @@
-import { DataSet, DataTable, DataRelation, DataTableCollection } from '../arga'
+import { DataSet } from './DataSet'
 
 describe("DataSet", function () {
 

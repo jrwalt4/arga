@@ -1,6 +1,6 @@
 // DataColumn.ts
 
-import { EventEmitter, equalKeys } from './Util'
+import { EventEmitter, equalKeys } from './util'
 import { DataTable } from './DataTable'
 import { DataRow } from './DataRow'
 import { DataColumnCollection } from './DataColumnCollection'

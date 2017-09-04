@@ -1,4 +1,4 @@
-import { KeyedDictionary } from '../core/Util'
+import { KeyedDictionary } from './KeyedDictionary'
 
 import * as _ from 'lodash'
 

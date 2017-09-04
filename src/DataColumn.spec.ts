@@ -1,4 +1,6 @@
-import { DataTable, DataColumn, DataRow } from '../arga'
+import { DataColumn } from './DataColumn'
+import { DataTable } from './DataTable'
+import { DataRow } from './DataRow'
 
 export function testColumn(ColumnCtor: typeof DataColumn) {
     describe(ColumnCtor.name, function () {

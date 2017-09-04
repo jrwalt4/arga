@@ -1,6 +1,7 @@
-import {
-  DataRowCollection, DataRow, DataTable, DataColumn
-} from '../arga'
+import { DataRowCollection } from './DataRowCollection'
+import { DataRow } from './DataRow'
+import { DataTable } from './DataTable'
+import { DataColumn } from './DataColumn'
 
 describe("DataRowCollection", function () {
   describe("constructor", function () {
@@ -36,7 +37,7 @@ describe("DataRowCollection", function () {
       expect(dt.rows.get(["Reese"])).toBe(dr);
     })
   })
-  describe("delete", function(){
+  describe("delete", function () {
 
   })
 })

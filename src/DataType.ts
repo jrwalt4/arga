@@ -1,6 +1,6 @@
 // DataType.ts
 
-import { deserializeString } from './Util'
+import { deserializeString } from './util'
 
 export type DataTypeConstructorOptions = {
     serialize: (value: any) => string

@@ -6,7 +6,7 @@ import { DataColumn } from './DataColumn'
 import { DataColumnCollection } from './DataColumnCollection'
 import { DataRow } from './DataRow'
 import { DataRowCollection } from './DataRowCollection'
-import { EventEmitter } from './Util'
+import { EventEmitter } from './util'
 
 //import { EventEmitter2 as EventEmitter } from 'EventEmitter2'
 

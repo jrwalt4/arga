@@ -1,6 +1,6 @@
-import { DataTable, DataSet } from '../arga'
+import { DataTable } from './DataTable'
 
-import data from './data/test-data';
+import data from './test-data';
 
 describe("DataTable", function () {
 

@@ -1,7 +1,6 @@
 // DataRowCollection.ts
 
-import { IKeyedCollection } from './Util'
-import * as util from './Util'
+import * as util from './util'
 
 import { DataTable } from './DataTable'
 import { DataRow } from './DataRow'
@@ -11,7 +10,7 @@ import { DataColumn } from './DataColumn'
 import * as FastSet from 'collections/fast-set'
 import * as FastMap from 'collections/fast-map'
 
-export class DataRowCollection implements IKeyedCollection<any, DataRow> {
+export class DataRowCollection implements util.IKeyedCollection<any, DataRow> {
 
   private _store: FastSet<DataRow> = new FastSet<DataRow>(
     [],

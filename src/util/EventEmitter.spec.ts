@@ -1,4 +1,4 @@
-import { EventEmitter as Emitter } from '../core/Util'
+import { EventEmitter as Emitter } from './EventEmitter'
 
 type ChangeEventArgs<T> = {
   type: "added" | "changed" | "deleted",

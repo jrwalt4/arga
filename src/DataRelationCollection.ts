@@ -3,7 +3,7 @@
 import {DataSet} from './DataSet'
 import {DataTable} from './DataTable'
 import {DataRelation} from './DataRelation'
-import {KeyedDictionary} from './Util'
+import {KeyedDictionary} from './util'
 import * as FastSet from'collections/fast-set'
 
 export class DataRelationCollection extends KeyedDictionary<DataRelation> {

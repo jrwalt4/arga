@@ -9,7 +9,7 @@ import { DataRelation } from './DataRelation'
 import {
 	Dictionary as Dict, EmptyObject, deepCopy, compareKeys,
 	equalKeys, getValueAtKeyPath, setValueAtKeyPath
-} from './Util'
+} from './util'
 
 import { uniqueId } from 'lodash'
 

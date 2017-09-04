@@ -11,7 +11,7 @@
     "lib": "src"
   },
   "scripts": {
-    "test": "ts-node ./scripts/test.js",
+    "test": "ts-node ./node_modules/jasmine/bin/jasmine.js --config=./scripts/jasmine.json",
     "rollup": "node ./scripts/rollup.js"
   },
   "keywords": [
